@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
+	"unicode/utf8"
 )
 
 func ex02() {
@@ -65,7 +67,64 @@ func ex06() {
 	fmt.Println("Number of items", len(Args))
 }
 
+func s01() {
+	// Both are string type
+	// string literal => single line interpreted
+	// raw string literal => multi line not interpreted
+
+	var s string
+	s = "How are you ?"
+	s = `How are you?`
+
+	s = "<html>\n\t<body>\"Hello\"</body>\n</html>"
+	s = `
+<html>
+	<body>"Hello"</body>
+</html>`
+	fmt.Println(s)
+	fmt.Println("c:\\my\\dir\\file")
+	fmt.Println(`c:\my\dir\file`)
+}
+
+func s02() {
+	name := "ㄱㄴㄷ"
+	fmt.Println(utf8.RuneCountInString(name))
+	arr := []rune(name)
+	fmt.Println(len(arr))
+}
+
+func s03() {
+	msg := os.Args[1]
+	s := strings.ToUpper(msg) + strings.Repeat("!", len(msg))
+	fmt.Println(s)
+}
+
+func iota01() {
+	// iota is a built on constant generate which generates ever increasing number
+	// Expressions with iota, So the other constants will repeat the expressions
+	const (
+		monday = iota + 1
+		tuesday
+		wednesday
+		thursday
+		friday
+		saturday
+		sunday
+	)
+
+	fmt.Println(monday, tuesday, wednesday, thursday, friday, saturday, sunday)
+}
+
+func blankIdentifier02() {
+	// which formula do i need to inialize constants with correct timezone value ?
+	const (
+		EST = -(5 + iota)
+		_
+		MST
+		PST
+	)
+}
+
 func main() {
-	a, b := 10, 5.5
-	fmt.Println(float64(a) + b)
+	iota01()
 }
