@@ -114,3 +114,34 @@ func s08() {
 	utf8.RuneCountInString(name)
 	fmt.Println(len(strings.TrimRight(name, " ")))
 }
+
+func p01() {
+	fmt.Println("I'm 30 years old.")
+
+	a := "Guiwoo"
+	b := "Park"
+	fmt.Printf("My name is %s and my lastname is %s\n", a, b)
+
+	// UNCOMMENT THE FOLLOWING CODE
+	// AND DO NOT CHANGE IT AFTERWARDS
+	tf := false
+
+	// TYPE YOUR CODE HERE
+	fmt.Printf("These are %t claims\n", tf)
+
+	tmepf := 7.2
+	fmt.Printf("Temperature is %.1f cellcius degree", tmepf)
+
+	fmt.Printf("\"Hello World\"")
+
+	c := 3
+	fmt.Printf("Type of %d is %[1]T", c)
+
+	d := 3.14
+	fmt.Printf("Type of %.2f is %[1]T\n", d)
+
+	e := "Hello"
+	fmt.Printf("Type of %s is %[1]T\n", e)
+
+	fmt.Printf("Type of %t is %[1]T\n", true)
+}

@@ -116,7 +116,7 @@ func iota01() {
 }
 
 func blankIdentifier02() {
-	// which formula do i need to inialize constants with correct timezone value ?
+	// which formula do i need to initialize constants with correct timezone value ?
 	const (
 		EST = -(5 + iota)
 		_
@@ -125,6 +125,62 @@ func blankIdentifier02() {
 	)
 }
 
+func print01() {
+	// formatting text verb ~~ what and how
+	// \n escape sequence print a newline
+	// fmt.Printf("%q\n",brand)
+
+	var (
+		ops  int = 2000
+		ok   int = 1000
+		fail int = 1000
+	)
+
+	fmt.Println("total :", ops, "success:", ok, "/", fail)
+	fmt.Printf("totoal : %d, success: %d , fail : %d\n", ops, ok, fail)
+
+	// "Escape Sequences"
+	fmt.Println("hi \nhi")
+	// \n Special escape sequences go interpreter make a new line
+	// \\ when you wanna just print back slash
+
+	//fmt.Printf() types of values !
+	// %T => print type
+	var (
+		planet   = "venus"
+		distance = 261
+		orbital  = 224.701
+		hasLife  = false
+	)
+	// Type safe way
+	fmt.Printf("%s\n", planet)
+	fmt.Printf("%d\n", distance)
+	fmt.Printf("%.3f\n", orbital)
+	fmt.Printf("%t\n", hasLife)
+
+	// Argument Indexing
+	fmt.Printf("%v is %v away . Think! %[2]v\n", planet, distance)
+}
+
+func if01() {
+
+}
+
 func main() {
-	iota01()
+	username := "park"
+	password := "123"
+
+	args := os.Args[1:]
+	if len(args) < 2 {
+		fmt.Println("Usage [username] [password]")
+		return
+	}
+
+	if args[0] != username {
+		fmt.Println("Access denied for", args[0])
+	} else if args[1] != password {
+		fmt.Println("Invalid password for", args[0])
+	} else {
+		fmt.Println("Access granted to \"" + args[0] + "\".")
+	}
 }
