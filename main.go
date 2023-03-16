@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 )
@@ -162,25 +163,46 @@ func print01() {
 	fmt.Printf("%v is %v away . Think! %[2]v\n", planet, distance)
 }
 
-func if01() {
+func whatIsNil() {
+	// nil value means that the value is non
+	// javascript null, Python none java null
+
+	// nil zero value for pointer based types
+	// pointers slices maps interfaces channels
+
+	// Err Handling "There is no error"
+	// error value
+	//s := strconv.Itoa(42)
+	s := "4o2"
+	if a, err := strconv.Atoi(s); err != nil {
+		panic(err)
+	} else {
+		fmt.Println(a)
+	}
+}
+
+func shortIf() {
+	if _, err := strconv.Atoi("42"); err != nil {
+		panic(err)
+	}
+	// scopes
+
+	var (
+		n   int
+		err error
+	)
+
+	if a := os.Args; len(a) != 2 {
+		panic("Give me a number")
+	} else if n, err = strconv.Atoi(a[1]); err != nil {
+		panic("Can not convert mother ")
+	} else {
+		fmt.Println(n)
+	}
+	fmt.Println(n)
 
 }
 
 func main() {
-	username := "park"
-	password := "123"
 
-	args := os.Args[1:]
-	if len(args) < 2 {
-		fmt.Println("Usage [username] [password]")
-		return
-	}
-
-	if args[0] != username {
-		fmt.Println("Access denied for", args[0])
-	} else if args[1] != password {
-		fmt.Println("Invalid password for", args[0])
-	} else {
-		fmt.Println("Access granted to \"" + args[0] + "\".")
-	}
 }
