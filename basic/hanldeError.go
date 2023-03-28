@@ -1,4 +1,4 @@
-package basic
+package main
 
 import (
 	"errors"
@@ -199,7 +199,7 @@ func errEx06() {
 		return
 	}
 
-	if n, err = strconv.Atoi(a); err != nil {
+	if n, err = strconv.Atoi(a[1]); err != nil {
 		fmt.Println("Give me a number ")
 	} else if n <= 0 {
 		fmt.Println("Pleas give me a number")

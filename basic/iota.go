@@ -1,4 +1,4 @@
-package basic
+package main
 
 import "fmt"
 
@@ -75,10 +75,11 @@ func iotaEx03() {
 	// NOTE : You should remove all the initializers below
 	//        first. Then use iota to fix it.
 	const (
-		Spring = (iota+1)*3
+		Spring = (iota + 1) * 3
 		Summer
 		Fall
 		Winter
 	)
 
 	fmt.Println(Winter, Spring, Summer, Fall)
+}
