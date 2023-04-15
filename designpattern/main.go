@@ -1,4 +1,6 @@
-package designpattern
+package main
+
+import "designpattern/bridge"
 
 /**
 Complicated object ts aren't designed from scratch
@@ -11,3 +13,7 @@ We make the cloning convenient via a Factory
 */
 
 // Deep copyting
+
+func main() {
+	bridge.Start()
+}
