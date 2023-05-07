@@ -1,7 +1,5 @@
 package main
 
-import "designpattern/bridge"
-
 /**
 Complicated object ts aren't designed from scratch
 - They reiterate exisitng desings
@@ -14,6 +12,18 @@ We make the cloning convenient via a Factory
 
 // Deep copyting
 
+func twoSum(nums []int, target int) []int {
+	m := make(map[int]int)
+	for i, v := range nums {
+		if j, ok := m[target-v]; ok {
+			return []int{j, i}
+		} else {
+			m[v] = i
+		}
+	}
+	return nil
+}
+
 func main() {
-	bridge.Start()
+
 }
