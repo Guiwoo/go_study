@@ -1,5 +1,7 @@
 package main
 
+import "designpattern/prototype"
+
 /**
 Complicated object ts aren't designed from scratch
 - They reiterate exisitng desings
@@ -25,5 +27,5 @@ func twoSum(nums []int, target int) []int {
 }
 
 func main() {
-
+	prototype.Run()
 }

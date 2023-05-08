@@ -106,3 +106,46 @@ func newMainOfficeEmployee(name, city string) *employee {
 func newAuxOfficeEmployee(name, city string) *employee {
 	return newEmployee(&auxOffice, name, city)
 }
+
+type Keyboard struct {
+	Layout string
+	Switch []string
+	KeyCap string
+}
+
+func (k *Keyboard) Clone() Cloneable {
+	cloneSlice := make([]string, len(k.Switch))
+	copy(cloneSlice, k.Switch)
+	return &Keyboard{
+		Layout: k.Layout,
+		Switch: cloneSlice,
+		KeyCap: k.KeyCap,
+	}
+
+}
+
+type Cloneable interface {
+	Clone() Cloneable
+}
+
+func deepCopyProblem(k *Keyboard) *Keyboard {
+
+	var leopold *Keyboard
+
+	buf := bytes.Buffer{}
+	encoder := gob.NewEncoder(&buf)
+	_ = encoder.Encode(k)
+
+	decoder := gob.NewDecoder(&buf)
+	_ = decoder.Decode(&leopold)
+
+	return leopold
+}
+
+func Run() {
+	sixty := &Keyboard{"60%", []string{"Cherry MX Blue", "Cherry MX Brown", "Cherry MX Red"}, "DSA"}
+
+	keyboardClone := sixty.Clone()
+
+	fmt.Println(keyboardClone)
+}

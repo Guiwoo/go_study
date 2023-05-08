@@ -105,3 +105,42 @@ func Start2() {
 	Connect(layer2, neuron1)
 	Connect(layer1, layer2)
 }
+
+type Component interface {
+	Print() string
+	Add(Component)
+}
+type Employee struct {
+	Name, Position string
+	Sub            []Component
+}
+
+func (e *Employee) Print() string {
+	return fmt.Sprintf("Name: %s, Position: %s", e.Name, e.Position)
+}
+func (e *Employee) Add(c Component) {
+	e.Sub = append(e.Sub, c)
+}
+
+type Department struct {
+	Name       string
+	Components []Component
+}
+
+func (d *Department) Print() string {
+	return fmt.Sprintf("Department: %s", d.Name)
+}
+func (d *Department) Add(c Component) {
+	d.Components = append(d.Components, c)
+}
+
+type SongComponent interface {
+}
+
+type Song struct {
+	Name, Singer string
+}
+type PlayList struct {
+	Name       string
+	Components []SongComponent
+}
