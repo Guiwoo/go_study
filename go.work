@@ -5,4 +5,5 @@ use (
 	./advance
 	./designpattern
 	./section2
+	./tdd
 )
