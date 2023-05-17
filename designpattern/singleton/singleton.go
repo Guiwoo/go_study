@@ -107,5 +107,5 @@ func Start2() {
 func Start() {
 	db := GetSingletonDatabase()
 	pop := db.GetPopulation("Seoul")
-	fmt.Println("POpulation of seoul is ", pop)
+	fmt.Println("Population of seoul is ", pop)
 }

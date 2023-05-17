@@ -57,3 +57,54 @@ func getNextDir(dir []int) (ans []int) {
 	}
 	return ans
 }
+
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func swapPairs(head *ListNode) *ListNode {
+	helper(head, true)
+	return head
+}
+
+func helper(head *ListNode, isEven bool) {
+	if head == nil {
+		return
+	}
+
+	if head.Next != nil && isEven {
+		nxt := head
+		tmp := head.Next
+		nxt.Next = head.Next.Next
+		tmp.Next = nxt
+
+		head = tmp
+	}
+
+	helper(head.Next, !isEven)
+	return
+}
+
+func pairSum(head *ListNode) int {
+	list := make([]int, 0)
+
+	return getPare(helper2(head, list))
+}
+
+func helper2(head *ListNode, list []int) []int {
+	if head == nil {
+		return list
+	}
+	return helper2(head.Next, append(list, head.Val))
+}
+
+func getPare(list []int) int {
+	max := 0
+	for i := 0; i < len(list)/2; i++ {
+		if max < (list[i] + list[len(list)-i-1]) {
+			max = list[i] + list[len(list)-i-1]
+		}
+	}
+	return max
+}

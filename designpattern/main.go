@@ -1,6 +1,8 @@
 package main
 
-import "designpattern/prototype"
+import (
+	"designpattern/proxy"
+)
 
 /**
 Complicated object ts aren't designed from scratch
@@ -27,5 +29,5 @@ func twoSum(nums []int, target int) []int {
 }
 
 func main() {
-	prototype.Run()
+	proxy.Start()
 }
