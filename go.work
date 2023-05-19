@@ -6,4 +6,6 @@ use (
 	./designpattern
 	./section2
 	./leetcode
+	./boj
+
 )
