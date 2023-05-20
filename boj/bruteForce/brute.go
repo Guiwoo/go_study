@@ -1,4 +1,4 @@
-package main
+package bruteForce
 
 import (
 	"bufio"
@@ -9,7 +9,47 @@ import (
 	"strings"
 )
 
-func main() {
+func p_01() {
+	reader := bufio.NewReader(os.Stdin)
+	writer := bufio.NewWriter(os.Stdout)
+
+	defer writer.Flush()
+
+	list := make([]int, 9)
+
+	var (
+		total, a, b int
+	)
+
+	for i := range list {
+		fmt.Fscanln(reader, &list[i])
+		total += list[i]
+	}
+
+exit:
+	for i := 0; i < len(list); i++ {
+		for j := i + 1; j < len(list); j++ {
+			if total-list[i]-list[j] == 100 {
+				a = list[i]
+				b = list[j]
+				break exit
+			}
+		}
+	}
+
+	sort.Ints(list)
+
+	for _, v := range list {
+		if v == a || v == b {
+			continue
+		}
+		fmt.Fprintln(writer, v)
+	}
+
+	return
+}
+
+func p_02() {
 	reader := bufio.NewReader(os.Stdin)
 	writer := bufio.NewWriter(os.Stdout)
 	defer writer.Flush()
