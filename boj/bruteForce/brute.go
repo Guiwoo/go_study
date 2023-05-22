@@ -94,3 +94,51 @@ func generateCombinations(arr []int, length int, current []int, writer *bufio.Wr
 		generateCombinations(arr[i+1:], length, append(current, val), writer)
 	}
 }
+
+var arr []int
+var (
+	answer, target int
+)
+
+func p_03() {
+	sc := bufio.NewScanner(os.Stdin)
+
+	rs := toArr(sc)
+	for i := range rs {
+		x, _ := strconv.Atoi(rs[i])
+		if i == 0 {
+			arr = make([]int, x)
+		} else {
+			target = x
+		}
+	}
+
+	rs = toArr(sc)
+	for i := range rs {
+		x, _ := strconv.Atoi(rs[i])
+		arr[i] = x
+	}
+	subArray(0, 0)
+	if target == 0 {
+		answer--
+	}
+	fmt.Println(answer)
+}
+
+func subArray(idx, sum int) {
+	if idx == len(arr) {
+		if sum == target {
+			answer++
+		}
+		return
+	}
+	subArray(idx+1, sum+arr[idx])
+	subArray(idx+1, sum)
+}
+
+func toArr(sc *bufio.Scanner) []string {
+	sc.Scan()
+	input := sc.Text()
+	rs := strings.Split(input, " ")
+	return rs
+}
