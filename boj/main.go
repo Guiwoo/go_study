@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -11,47 +12,51 @@ import (
 func main() {
 	sc := bufio.NewScanner(os.Stdin)
 
-	params := toArr(sc)
-	arrLen, _ := strconv.Atoi(params[0])
-	target, _ := strconv.Atoi(params[1])
+	sc.Scan()
+	input := sc.Text()
+	a, _ := strconv.Atoi(input)
 
-	arr := make([]int, arrLen)
-	nums := toArr(sc)
-	for i, numStr := range nums {
-		arr[i], _ = strconv.Atoi(numStr)
+	list := make([]int, a)
+
+	sc.Scan()
+	input = sc.Text()
+	in := strings.Split(input, " ")
+
+	for i := range in {
+		list[i], _ = strconv.Atoi(in[i])
 	}
 
-	answer := subArray(arr, target)
-	if target == 0 {
-		answer--
-	}
-	fmt.Println(answer)
+	max := dfs(list)
+	fmt.Println(max)
 }
 
-func subArray(arr []int, target int) int {
+func dfs(nums []int) int {
 	answer := 0
-	n := len(arr)
-
-	// 비트 마스크를 0부터 (2^n - 1)까지 순회합니다.
-	for i := 0; i < (1 << n); i++ {
-		sum := 0
-		// 비트 마스크의 각 비트를 확인하여 포함된 원소의 합을 계산합니다.
-		for j := 0; j < n; j++ {
-			if (i & (1 << j)) > 0 {
-				sum += arr[j]
-			}
-		}
-		if sum == target {
-			answer++
-		}
-	}
-
+	out := make([]int, len(nums))
+	bitmask(nums, out, 0, 0, &answer)
 	return answer
 }
 
-func toArr(sc *bufio.Scanner) []string {
-	sc.Scan()
-	input := sc.Text()
-	rs := strings.Split(input, " ")
-	return rs
+func bitmask(num, out []int, flag, depth int, answer *int) {
+	if depth == len(num) {
+		x := getResult(out)
+		if x > *answer {
+			*answer = x
+		}
+		return
+	}
+	for i := 0; i < len(num); i++ {
+		if flag&(1<<i) == 0 {
+			out[depth] = num[i]
+			bitmask(num, out, flag|(1<<i), depth+1, answer)
+		}
+	}
+}
+
+func getResult(num []int) int {
+	sum := 0
+	for i := 0; i < len(num)-1; i++ {
+		sum += int(math.Abs(float64(num[i] - num[i+1])))
+	}
+	return sum
 }
