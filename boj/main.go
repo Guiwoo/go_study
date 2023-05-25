@@ -13,21 +13,19 @@ func main() {
 	sc := bufio.NewScanner(os.Stdin)
 
 	sc.Scan()
-	input := sc.Text()
-	a, _ := strconv.Atoi(input)
 
-	list := make([]int, a)
+	a := sc.Text()
+	input, _ := strconv.Atoi(a)
+
+	arr := make([]int, input)
 
 	sc.Scan()
-	input = sc.Text()
-	in := strings.Split(input, " ")
-
-	for i := range in {
-		list[i], _ = strconv.Atoi(in[i])
+	b := strings.Split(sc.Text(), " ")
+	for i := range b {
+		arr[i], _ = strconv.Atoi(b[i])
 	}
 
-	max := dfs(list)
-	fmt.Println(max)
+	fmt.Println(dfs(arr))
 }
 
 func dfs(nums []int) int {
