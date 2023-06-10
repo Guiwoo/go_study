@@ -310,5 +310,5 @@ func startNetworkDaemon() *sync.WaitGroup {
 }
 
 func main() {
-	cond2()
+
 }
