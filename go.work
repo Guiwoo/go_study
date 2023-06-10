@@ -7,5 +7,7 @@ use (
 	./section2
 	./leetcode
 	./boj
-
+	./nats
+	./concurrency
+	./socket
 )
