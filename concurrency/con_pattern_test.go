@@ -120,23 +120,32 @@ func Test_Pattern_05(t *testing.T) {
 }
 
 func Test_Pattern_06(t *testing.T) {
-	newRandStream := func() <-chan int {
+	newRandStream := func(done <-chan interface{}) <-chan int {
 		randStream := make(chan int)
 		go func() {
 			defer fmt.Println("newRandStream closure exited.")
 			defer close(randStream)
 			for {
-				randStream <- rand.Int()
+				select {
+				case randStream <- rand.Int():
+				case <-done:
+					return
+				}
 			}
 		}()
 		return randStream
 	}
 
-	randStream := newRandStream()
+	done := make(chan interface{})
+
+	randStream := newRandStream(done)
 	fmt.Println("3 random ints :")
 	for i := 0; i <= 3; i++ {
 		fmt.Printf("%d : %d\n", i, <-randStream)
 	}
+	close(done)
+
+	time.Sleep(1 * time.Second)
 }
 
 func Test_Pattern_07(t *testing.T) {
@@ -251,18 +260,19 @@ func Test_Pattern_09(t *testing.T) {
 
 	done := make(chan interface{})
 	defer close(done)
-	/*
-		urls := []string{"https://www.google.com", "https://www.naver.com", "http://localhost:8080"}
-		for result := range checkStatus(done, urls...) {
-			if result.Error != nil {
-				fmt.Printf("Error : %v\n", result.Error)
-				continue
-			}
-			fmt.Printf("Response : %v\n", result.Response.Status)
-		}
-	*/
 
-	urls := []string{"https://www.google.com", "https://www.naver.com", "http://localhost:8080", "a", "b", "c", "d", "e", "f", "g"}
+	urls := []string{"https://www.google.com", "https://www.naver.com", "http://localhost:8080"}
+	for result := range checkStatus(done, urls...) {
+		if result.Error != nil {
+			fmt.Printf("Error : %v\n", result.Error)
+			continue
+		}
+		fmt.Printf("Response : %v\n", result.Response.Status)
+	}
+
+	fmt.Println()
+
+	urls = []string{"https://www.google.com", "https://www.naver.com", "http://localhost:8080", "a", "b", "c", "d", "e", "f", "g"}
 	errCount := 0
 	for result := range checkStatus(done, urls...) {
 		if result.Error != nil {
@@ -280,5 +290,235 @@ func Test_Pattern_09(t *testing.T) {
 }
 
 func Test_Pattern_10(t *testing.T) {
+	//Reader 파이프
+	reader := func(done <-chan interface{}, values ...interface{}) <-chan interface{} {
+		valueStream := make(chan interface{})
+		go func() {
+			defer close(valueStream)
+			for {
+				for _, v := range values {
+					select {
+					case <-done:
+						return
+					case valueStream <- v:
+					}
+				}
+			}
+		}()
+		return valueStream
+	}
 
+	take := func(done <-chan interface{}, valueStream <-chan interface{}, num int) <-chan interface{} {
+		takeStream := make(chan interface{})
+		go func() {
+			defer close(takeStream)
+			for i := 0; i < num; i++ {
+				select {
+				case <-done:
+					return
+				case takeStream <- <-valueStream:
+				}
+			}
+		}()
+		return takeStream
+	}
+
+	done := make(chan interface{})
+	defer close(done)
+
+	for num := range take(done, reader(done, 1), 10) {
+		fmt.Printf("%v ", num)
+	}
+}
+
+func Test_Pattern_11(t *testing.T) {
+	repeatFn := func(done <-chan interface{}, fn func() interface{}) <-chan interface{} {
+		valueStream := make(chan interface{})
+		go func() {
+			defer close(valueStream)
+			for {
+				select {
+				case <-done:
+					return
+				case valueStream <- fn():
+				}
+			}
+		}()
+		return valueStream
+	}
+
+	take := func(done <-chan interface{}, valueStream <-chan interface{}, repeat int) <-chan interface{} {
+		takeStream := make(chan interface{})
+		go func() {
+			defer close(takeStream)
+			for i := 0; i < repeat; i++ {
+				select {
+				case <-done:
+					return
+				case takeStream <- <-valueStream:
+				}
+			}
+		}()
+		return takeStream
+	}
+
+	done := make(chan interface{})
+	defer close(done)
+
+	rr := func() interface{} { return rand.Int() }
+
+	for v := range take(done, repeatFn(done, rr), 10) {
+		fmt.Println(v)
+	}
+}
+
+func Test_Pattern_12(t *testing.T) {
+	toString := func(done <-chan interface{}, valueStream <-chan interface{}) <-chan string {
+		stringStream := make(chan string)
+		go func() {
+			defer close(stringStream)
+			for v := range valueStream {
+				select {
+				case <-done:
+					return
+				case stringStream <- v.(string):
+				}
+			}
+		}()
+		return stringStream
+	}
+
+	repeat := func(done <-chan interface{}, values ...interface{}) <-chan interface{} {
+		valueStream := make(chan interface{})
+		go func() {
+			defer close(valueStream)
+			for {
+				for _, v := range values {
+					select {
+					case <-done:
+						return
+					case valueStream <- v:
+					}
+				}
+			}
+		}()
+		return valueStream
+	}
+
+	take := func(done <-chan interface{}, valueStream <-chan interface{}, num int) <-chan interface{} {
+		takeStream := make(chan interface{})
+		go func() {
+			defer close(takeStream)
+			for i := 0; i < num; i++ {
+				select {
+				case <-done:
+					return
+				case takeStream <- <-valueStream:
+				}
+			}
+		}()
+		return takeStream
+	}
+
+	done := make(chan interface{})
+	defer close(done)
+
+	var message string
+	for v := range toString(done, take(done, repeat(done, "I", "am."), 5)) {
+		message += v
+	}
+	fmt.Printf("message : %s...", message)
+}
+
+func Benchmark_Pattern_01(b *testing.B) {
+	toString := func(done <-chan interface{}, valueStream <-chan interface{}) <-chan string {
+		stringStream := make(chan string)
+		go func() {
+			defer close(stringStream)
+			for v := range valueStream {
+				select {
+				case <-done:
+					return
+				case stringStream <- v.(string):
+				}
+			}
+		}()
+		return stringStream
+	}
+
+	repeat := func(done <-chan interface{}, values ...interface{}) <-chan interface{} {
+		valueStream := make(chan interface{})
+		go func() {
+			defer close(valueStream)
+			for {
+				for _, v := range values {
+					select {
+					case <-done:
+						return
+					case valueStream <- v:
+					}
+				}
+			}
+		}()
+		return valueStream
+	}
+
+	take := func(done <-chan interface{}, valueStream <-chan interface{}, num int) <-chan interface{} {
+		takeStream := make(chan interface{})
+		go func() {
+			defer close(takeStream)
+			for i := 0; i < num; i++ {
+				select {
+				case <-done:
+					return
+				case takeStream <- <-valueStream:
+				}
+			}
+		}()
+		return takeStream
+	}
+
+	done := make(chan interface{})
+	defer close(done)
+	for range toString(done, take(done, repeat(done, "I", "am."), b.N)) {
+	}
+}
+
+func Benchmark_Pattern_02(b *testing.B) {
+	repeat := func(done <-chan interface{}, values ...interface{}) <-chan interface{} {
+		valueStream := make(chan interface{})
+		go func() {
+			defer close(valueStream)
+			for {
+				for _, v := range values {
+					select {
+					case <-done:
+						return
+					case valueStream <- v:
+					}
+				}
+			}
+		}()
+		return valueStream
+	}
+
+	take := func(done <-chan interface{}, valueStream <-chan interface{}, num int) <-chan interface{} {
+		takeStream := make(chan interface{})
+		go func() {
+			defer close(takeStream)
+			for i := 0; i < num; i++ {
+				select {
+				case <-done:
+					return
+				case takeStream <- <-valueStream:
+				}
+			}
+		}()
+		return takeStream
+	}
+
+	done := make(chan interface{})
+	defer close(done)
+	for range take(done, repeat(done, "I", "am."), b.N) {
+	}
 }
