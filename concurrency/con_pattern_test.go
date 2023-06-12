@@ -480,7 +480,7 @@ func Benchmark_Pattern_01(b *testing.B) {
 
 	done := make(chan interface{})
 	defer close(done)
-	for range toString(done, take(done, repeat(done, "I", "am."), b.N)) {
+	for range toString(done, take(done, repeat(done, "I", "am."), 1000000)) {
 	}
 }
 
@@ -519,6 +519,6 @@ func Benchmark_Pattern_02(b *testing.B) {
 
 	done := make(chan interface{})
 	defer close(done)
-	for range take(done, repeat(done, "I", "am."), b.N) {
+	for range take(done, repeat(done, "I", "am."), 1000000) {
 	}
 }

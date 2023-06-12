@@ -126,7 +126,8 @@ func (c *Cal) generate(ints ...int) *Cal {
 		}
 		c.ch = cc
 	}()
-	return &Cal{done: c.done, ch: cc}
+	c.ch = cc
+	return c
 }
 
 func (c *Cal) multiply(multiplier int) *Cal {
@@ -142,7 +143,8 @@ func (c *Cal) multiply(multiplier int) *Cal {
 		}
 		c.ch = cc
 	}()
-	return &Cal{done: c.done, ch: cc}
+	c.ch = cc
+	return c
 }
 
 func (c *Cal) adder(adder int) *Cal {
@@ -158,7 +160,8 @@ func (c *Cal) adder(adder int) *Cal {
 		}
 		c.ch = cc
 	}()
-	return &Cal{done: c.done, ch: cc}
+	c.ch = cc
+	return c
 }
 
 func Test_pipe_line_test(t *testing.T) {
