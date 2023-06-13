@@ -60,7 +60,7 @@ type BankAccountCommand struct {
 }
 
 func (b *BankAccountCommand) Succeeded() bool {
-
+	return true
 }
 
 func (b *BankAccountCommand) SetSucceeded(value bool) {
