@@ -1,7 +1,7 @@
 package main
 
 import (
-	"designpattern/iterator"
+	"designpattern/mediator"
 )
 
 /**
@@ -29,5 +29,5 @@ func twoSum(nums []int, target int) []int {
 }
 
 func main() {
-	iterator.Start()
+	mediator.Start()
 }
