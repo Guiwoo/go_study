@@ -347,14 +347,14 @@ func Test_fan_04(t *testing.T) {
 			defer close(out1)
 
 			for val := range orDone(done, in) {
-				var out11, out22 = out1, out2
+				var out1, out2 = out1, out2
 				for i := 0; i < 2; i++ {
 					select {
 					case <-done:
-					case out11 <- val:
-						out11 = nil
-					case out22 <- val:
-						out22 = nil
+					case out1 <- val:
+						out1 = nil
+					case out2 <- val:
+						out2 = nil
 					}
 				}
 			}
@@ -436,5 +436,164 @@ func Test_fan_05(t *testing.T) {
 
 	for v := range bridge(nil, genVals()) {
 		fmt.Printf("%v ", v)
+	}
+}
+
+func Test_CPU_CHECK(t *testing.T) {
+	fmt.Println(runtime.NumCPU())
+}
+
+func Test_OR_Done(t *testing.T) {
+	repeat := func(done <-chan interface{}, values ...interface{}) <-chan interface{} {
+		valueStream := make(chan interface{})
+		go func() {
+			defer fmt.Println("repeat closed ", values)
+			for {
+				for _, v := range values {
+					select {
+					case <-done:
+						return
+					case valueStream <- v:
+					}
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}()
+		return valueStream
+	}
+	orDone := func(done, value <-chan interface{}) <-chan interface{} {
+		valueStream := make(chan interface{})
+		go func() {
+			defer close(valueStream)
+			defer fmt.Println("Close value stream")
+			for {
+				select {
+				case <-done:
+					fmt.Println("Close done in first select")
+					return
+				case v, ok := <-value:
+					if ok == false {
+						fmt.Println("Closed value channel")
+						return
+					}
+					select {
+					case valueStream <- v:
+						fmt.Println("Value sent")
+					case <-done:
+						fmt.Println("Close done in second select")
+					}
+				}
+			}
+		}()
+		return valueStream
+	}
+
+	dons := make([]chan interface{}, runtime.NumCPU())
+
+	for i := 0; i < runtime.NumCPU(); i++ {
+		dons[i] = make(chan interface{})
+	}
+
+	time.AfterFunc(1*time.Second, func() {
+		close(dons[2])
+	})
+	time.AfterFunc(5*time.Second, func() {
+		for i := 0; i < runtime.NumCPU(); i++ {
+			if i == 2 {
+				continue
+			}
+			close(dons[i])
+		}
+		defer fmt.Println("all dons closed")
+	})
+
+	fanin := func(done <-chan interface{}, chans ...<-chan interface{}) <-chan interface{} {
+		var wg sync.WaitGroup
+		valueStream := make(chan interface{})
+
+		output := func(c <-chan interface{}) {
+			defer wg.Done()
+			for v := range c {
+				select {
+				case <-done:
+					return
+				case valueStream <- v:
+				}
+			}
+		}
+
+		wg.Add(len(chans))
+		for _, c := range chans {
+			go output(c)
+		}
+
+		go func() {
+			wg.Wait()
+			close(valueStream)
+		}()
+
+		return valueStream
+	}
+
+	things := make([]<-chan interface{}, len(dons))
+	for i := 0; i < len(dons); i++ {
+		var or int
+		if i == 0 {
+			or = 0
+		} else {
+			or = i - 1
+		}
+		things[i] = orDone(dons[or], repeat(dons[i], i))
+	}
+
+	donedone := make(chan interface{})
+	defer close(donedone)
+	for v := range fanin(donedone, things...) {
+		fmt.Println(v)
+	}
+
+	fmt.Println("all done")
+}
+
+func Test_case_done_why_need_it_fuck(t *testing.T) {
+	tt := func() <-chan interface{} {
+		val := make(chan interface{})
+		time.AfterFunc(10*time.Second, func() {
+			close(val)
+		})
+		go func() {
+			defer close(val)
+			for {
+				val <- "sibal"
+				time.Sleep(1 * time.Second)
+			}
+		}()
+		return val
+	}
+
+	mid := func(done, c <-chan interface{}) <-chan interface{} {
+		val := make(chan interface{})
+		go func() {
+			defer close(val)
+			for {
+				select {
+				case val <- c:
+					fmt.Println("값 전달")
+				case <-done:
+					fmt.Println("5초 기다려야해서 다른거 프린트")
+				}
+			}
+		}()
+		return val
+	}
+
+	done := make(chan interface{})
+	var i int
+	for a := range mid(done, tt()) {
+		i++
+		if i == 5 {
+			break
+		}
+		fmt.Println(a)
 	}
 }

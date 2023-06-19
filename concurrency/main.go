@@ -6,6 +6,7 @@ import (
 	"math"
 	"net"
 	"os"
+	"runtime"
 	"sync"
 	"text/tabwriter"
 	"time"
@@ -310,30 +311,118 @@ func startNetworkDaemon() *sync.WaitGroup {
 }
 
 func main() {
-	dowork := func(done <-chan bool, strings <-chan string) <-chan interface{} {
-		terminated := make(chan interface{})
+	repeat := func(done <-chan interface{}, values ...interface{}) <-chan interface{} {
+		valueStream := make(chan interface{})
 		go func() {
-			defer fmt.Println("dowork exited")
-			defer close(terminated)
+			defer fmt.Println("repeat closed ", values)
+			for {
+				for _, v := range values {
+					select {
+					case <-done:
+						return
+					case valueStream <- v:
+					}
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}()
+		return valueStream
+	}
+	orDone := func(done, value <-chan interface{}) <-chan interface{} {
+		valueStream := make(chan interface{})
+		go func() {
+			defer close(valueStream)
+			defer fmt.Println("Close value stream")
 			for {
 				select {
-				case s := <-strings:
-					fmt.Printf("Received : %s\n", s)
 				case <-done:
+					fmt.Println("Close done in first select")
 					return
+				case v, ok := <-value:
+					if ok == false {
+						fmt.Println("Closed value channel")
+						return
+					}
+					select {
+					case valueStream <- v:
+						fmt.Println("Value sent")
+					case <-done:
+						fmt.Println("Close done in second select")
+					}
 				}
 			}
 		}()
-		return terminated
+		return valueStream
 	}
 
-	done := make(chan bool)
-	terminated := dowork(done, nil)
-	go func() {
-		time.Sleep(1 * time.Second)
-		fmt.Println("Canceling dowork goroutine...")
-		close(done)
-	}()
-	<-terminated
-	fmt.Println("Done.")
+	dons := make([]chan interface{}, runtime.NumCPU())
+
+	for i := 0; i < runtime.NumCPU(); i++ {
+		dons[i] = make(chan interface{})
+	}
+
+	time.AfterFunc(2*time.Second, func() {
+		close(dons[2])
+	})
+	time.AfterFunc(5*time.Second, func() {
+		for i := 0; i < runtime.NumCPU(); i++ {
+			if i == 2 {
+				continue
+			}
+			close(dons[i])
+		}
+		defer fmt.Println("all dons closed")
+	})
+
+	fanin := func(done <-chan interface{}, chans ...<-chan interface{}) <-chan interface{} {
+		var wg sync.WaitGroup
+		valueStream := make(chan interface{})
+
+		output := func(c <-chan interface{}) {
+			defer wg.Done()
+			for v := range c {
+				select {
+				case <-done:
+					return
+				case valueStream <- v:
+				}
+			}
+		}
+
+		wg.Add(len(chans))
+		for _, c := range chans {
+			go output(c)
+		}
+
+		go func() {
+			wg.Wait()
+			close(valueStream)
+		}()
+
+		return valueStream
+	}
+
+	strat := time.Now()
+
+	things := make([]<-chan interface{}, len(dons))
+	for i := 0; i < len(dons); i++ {
+		var or int
+		if i == 0 {
+			or = 0
+		} else {
+			or = i - 1
+		}
+		things[i] = orDone(dons[or], repeat(dons[0], i))
+	}
+
+	donedone := make(chan interface{})
+	defer close(donedone)
+	for v := range fanin(donedone, things...) {
+		if (time.Since(strat) > 3*time.Second) {
+			break
+		}
+		fmt.Println(v)
+	}
+
+	fmt.Println("all done", time.Since(strat))
 }
