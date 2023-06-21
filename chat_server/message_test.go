@@ -58,3 +58,32 @@ func Test_Thing(t *testing.T) {
 		fmt.Println()
 	}
 }
+
+func Test_slicing(t *testing.T) {
+	idx := 11
+	s := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	a := s[:idx]
+	s = append(a, s[idx+1:]...)
+
+	fmt.Println(s)
+}
+
+func slicer[T any](arr []T, target int) []T {
+	var answer []T
+	switch {
+	case target < 0:
+	case target == len(arr):
+		answer = arr[:target]
+	default:
+		answer = arr[:target]
+		answer = append(answer, arr[target+1:]...)
+	}
+	return answer
+}
+
+func Test_Thing2(t *testing.T) {
+	arr := []int{0, 1, 2, 3, 4, 5, 6}
+	arr = slicer(arr, 4)
+	fmt.Println(arr)
+}

@@ -39,7 +39,7 @@ func (m *MessageLink) Add(link *MessageLink) {
 func (m *MessageLink) GenerateHistory() string {
 	sb := strings.Builder{}
 	for m.next != nil {
-		sb.WriteString(m.next.msg.GenerateMessage())
+		sb.WriteString(m.next.msg.GenerateMessage() + "\n")
 		m = m.next
 	}
 	return sb.String() + "✅"

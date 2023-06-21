@@ -1,12 +1,16 @@
 package main
 
-import "log"
+import (
+	"log"
+	"sync"
+)
 
 type Room struct {
 	users  []*User
 	link   *MessageLink
 	number string
 	signal chan *RoomSignal
+	mu     sync.Mutex
 }
 
 type Signal int
@@ -53,6 +57,8 @@ func (r *Room) Run() {
 
 func (r *Room) sendMessage(msg *Message) {
 	go func() {
+		r.mu.Lock()
+		defer r.mu.Unlock()
 		for _, v := range r.users {
 			if err := v.ws.conn.WriteJSON(msg.GenerateMessage()); err != nil {
 				log.Println(err)
@@ -64,5 +70,5 @@ func (r *Room) sendMessage(msg *Message) {
 
 func NewRoom(num string) *Room {
 	c := make(chan *RoomSignal, 1000)
-	return &Room{number: num, signal: c, link: NewMessageLink()}
+	return &Room{number: num, signal: c, link: NewMessageLink(), mu: sync.Mutex{}}
 }

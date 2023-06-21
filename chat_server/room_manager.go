@@ -35,10 +35,31 @@ func (rm *RoomManager) SendEnterSignal(room *Room, userId string) {
 
 func (rm *RoomManager) SendExitSignal(w *WebSocket, param string, name string) {
 	go func() {
-		defer w.conn.Close()
+		defer func() {
+			w.conn.Close()
+		}()
 		msg := NewMessage(param, name, "님이 퇴장하셨습니다.")
 		if value, ok := rm.Rooms.Load(param); ok {
 			v := value.(*Room)
+
+			v.mu.Lock()
+			defer v.mu.Unlock()
+
+			idx := -1
+			for i, user := range v.users {
+				if user.userId == name {
+					idx = i
+					break
+				}
+			}
+
+			if idx == len(v.users) {
+				v.users = v.users[:idx]
+			} else if idx != -1 {
+				tmp := v.users[:idx]
+				v.users = append(tmp, v.users[idx+1:]...)
+			}
+
 			v.signal <- NewRoomSignal(msg, EXIT)
 		}
 	}()
