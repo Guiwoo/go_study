@@ -1,6 +1,6 @@
 package main
 
-import "designpattern/state"
+import "designpattern/strategy"
 
 /**
 Complicated object ts aren't designed from scratch
@@ -27,5 +27,5 @@ func twoSum(nums []int, target int) []int {
 }
 
 func main() {
-	state.Start()
+	strategy.Start()
 }
