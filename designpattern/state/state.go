@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 /**
@@ -171,7 +172,7 @@ var rules = map[State2][]TriggerResult{
 	},
 }
 
-func Start() {
+func Ex02() {
 	state, exitState := OffHook, OnHook
 
 	for ok := true; ok; ok = state != exitState {
@@ -192,3 +193,50 @@ func Start() {
 
 	fmt.Println("We are done using the phone")
 }
+
+type State3 int
+
+const (
+	Locked State3 = iota
+	Failed
+	Unlocked
+)
+
+func Start() {
+	code := "1234"
+	state := Locked
+	entry := strings.Builder{}
+
+	for {
+		switch state {
+		case Locked:
+			r, _, _ := bufio.NewReader(os.Stdin).ReadRune()
+			entry.WriteRune(r)
+
+			if entry.String() == code {
+				state = Unlocked
+				break
+			}
+
+			if strings.Index(code, entry.String()) != 0 {
+				state = Failed
+			}
+		case Failed:
+			fmt.Println("FAILED")
+			entry.Reset()
+			state = Locked
+		case Unlocked:
+			fmt.Println("UNLOCKED")
+			return
+		}
+	}
+}
+
+/**
+Given sufficient complexity, it pays to formally define possible states and events/triggers
+Can define
+	- State entry/exit behaviors
+	- Action when a particular event causes a transition
+	- Guard conditions enabling/disabling a transition
+	- Default action when no transitions are found for an event
+*/
