@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -12,7 +13,9 @@ import (
 )
 
 type WebSocket struct {
-	conn *websocket.Conn
+	conn    *websocket.Conn
+	isClose bool
+	rw      sync.RWMutex
 }
 
 func (w *WebSocket) setReadTimeout() error {
@@ -47,26 +50,30 @@ func newWebSocket(e echo.Context) (*WebSocket, error) {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				return nil
 			} else {
+				w.rw.RLock()
+				defer w.rw.RUnlock()
+				w.isClose = true
 				w.conn.Close()
 			}
 			return nil
 		}
 		return nil
 	})
+	p := e.Param("id")
 	rm := GetRoomManager()
-	user := NewUser(name, w)
-	rm.EnterRoom(e.Param("id"), user)
+	user := NewUser(name, p, w)
+	rm.EnterRoom(user)
 
 	w.conn.SetCloseHandler(func(code int, text string) error {
-		rm.SendExitSignal(w, e.Param("id"), name)
+		fmt.Println(e.Param("id"), name)
+		rm.SendExitSignal(user)
 		return nil
 	})
+
 	return w, nil
 }
 
-func (w *WebSocket) writer() {
-
-}
+func (w *WebSocket) writer() {}
 
 func (w *WebSocket) repeat(done chan interface{}) <-chan *Message {
 	valueStream := make(chan *Message)
@@ -78,9 +85,18 @@ func (w *WebSocket) repeat(done chan interface{}) <-chan *Message {
 				return
 			default:
 				var msg Message
+				if w.isClose {
+					fmt.Println("socket is closed")
+					return
+				}
 				if err := w.conn.ReadJSON(&msg); err != nil {
-					log.Errorf("error is : ", err)
 					if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+						return
+					}
+					if websocket.IsCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+						return
+					}
+					if _, ok := err.(*json.SyntaxError); !ok {
 						return
 					}
 					continue

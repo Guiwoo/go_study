@@ -16,12 +16,13 @@ type RoomManager struct {
 	broadcaster chan BroadCaster
 }
 
-func (rm *RoomManager) EnterRoom(roomNumber string, user *User) {
-	v, ok := rm.Rooms.LoadOrStore(roomNumber, NewRoom(roomNumber))
+func (rm *RoomManager) EnterRoom(user *User) {
+	v, ok := rm.Rooms.LoadOrStore(user.roomNum, NewRoom(user.roomNum))
 	if !ok {
 		go v.(*Room).Run()
 	}
 	room := v.(*Room)
+	fmt.Println("Enter someone", user)
 	room.users = append(room.users, user)
 	rm.SendEnterSignal(room, user.userId)
 }
@@ -33,13 +34,19 @@ func (rm *RoomManager) SendEnterSignal(room *Room, userId string) {
 	}()
 }
 
-func (rm *RoomManager) SendExitSignal(w *WebSocket, param string, name string) {
+func (rm *RoomManager) SendExitSignal(exit *User) {
 	go func() {
 		defer func() {
-			w.conn.Close()
+			exit.ws.rw.RLock()
+			err := exit.ws.conn.Close()
+			if err != nil {
+				fmt.Printf("error occur on send exit signal on socket close signal : %v\n", err)
+			}
+			exit.ws.isClose = true
+			exit.ws.rw.RUnlock()
 		}()
-		msg := NewMessage(param, name, "님이 퇴장하셨습니다.")
-		if value, ok := rm.Rooms.Load(param); ok {
+		msg := NewMessage(exit.roomNum, exit.userId, "님이 퇴장하셨습니다.")
+		if value, ok := rm.Rooms.Load(exit.roomNum); ok {
 			v := value.(*Room)
 
 			v.mu.Lock()
@@ -47,7 +54,7 @@ func (rm *RoomManager) SendExitSignal(w *WebSocket, param string, name string) {
 
 			idx := -1
 			for i, user := range v.users {
-				if user.userId == name {
+				if user.userId == exit.userId {
 					idx = i
 					break
 				}
@@ -59,7 +66,7 @@ func (rm *RoomManager) SendExitSignal(w *WebSocket, param string, name string) {
 				tmp := v.users[:idx]
 				v.users = append(tmp, v.users[idx+1:]...)
 			}
-
+			fmt.Println("current user list : ", v.users, v.number)
 			v.signal <- NewRoomSignal(msg, EXIT)
 		}
 	}()

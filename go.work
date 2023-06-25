@@ -13,4 +13,5 @@ use (
 	./web_pratice
 	./chat_server
 	./chat_server_gorilla
+	./oauth
 )

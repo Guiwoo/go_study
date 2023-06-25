@@ -1,10 +1,14 @@
 package main
 
+import "fmt"
+
 type User struct {
-	userId string
-	ws     *WebSocket
+	userId  string
+	roomNum string
+	ws      *WebSocket
 }
 
-func NewUser(userId string, ws *WebSocket) *User {
-	return &User{userId, ws}
+func NewUser(userId, roomNum string, ws *WebSocket) *User {
+	fmt.Println("Socket is created", ws)
+	return &User{userId, roomNum, ws}
 }
