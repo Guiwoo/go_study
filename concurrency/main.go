@@ -1,12 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"math"
 	"net"
 	"os"
-	"runtime"
 	"sync"
 	"text/tabwriter"
 	"time"
@@ -311,118 +311,80 @@ func startNetworkDaemon() *sync.WaitGroup {
 }
 
 func main() {
-	repeat := func(done <-chan interface{}, values ...interface{}) <-chan interface{} {
-		valueStream := make(chan interface{})
-		go func() {
-			defer fmt.Println("repeat closed ", values)
-			for {
-				for _, v := range values {
-					select {
-					case <-done:
-						return
-					case valueStream <- v:
-					}
-				}
-				time.Sleep(1 * time.Second)
-			}
-		}()
-		return valueStream
-	}
-	orDone := func(done, value <-chan interface{}) <-chan interface{} {
-		valueStream := make(chan interface{})
-		go func() {
-			defer close(valueStream)
-			defer fmt.Println("Close value stream")
-			for {
-				select {
-				case <-done:
-					fmt.Println("Close done in first select")
-					return
-				case v, ok := <-value:
-					if ok == false {
-						fmt.Println("Closed value channel")
-						return
-					}
-					select {
-					case valueStream <- v:
-						fmt.Println("Value sent")
-					case <-done:
-						fmt.Println("Close done in second select")
-					}
-				}
-			}
-		}()
-		return valueStream
-	}
+	var wg sync.WaitGroup
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	wg.Add(2)
 
-	dons := make([]chan interface{}, runtime.NumCPU())
-
-	for i := 0; i < runtime.NumCPU(); i++ {
-		dons[i] = make(chan interface{})
-	}
-
-	time.AfterFunc(2*time.Second, func() {
-		close(dons[2])
-	})
-	time.AfterFunc(5*time.Second, func() {
-		for i := 0; i < runtime.NumCPU(); i++ {
-			if i == 2 {
-				continue
-			}
-			close(dons[i])
-		}
-		defer fmt.Println("all dons closed")
-	})
-
-	fanin := func(done <-chan interface{}, chans ...<-chan interface{}) <-chan interface{} {
-		var wg sync.WaitGroup
-		valueStream := make(chan interface{})
-
-		output := func(c <-chan interface{}) {
-			defer wg.Done()
-			for v := range c {
-				select {
-				case <-done:
-					return
-				case valueStream <- v:
-				}
+	locale := func(ctx context.Context) (string, error) {
+		if deadline, ok := ctx.Deadline(); ok {
+			if deadline.Sub(time.Now().Add(1*time.Minute)) <= 0 {
+				return "", fmt.Errorf("unsupported locale")
 			}
 		}
-
-		wg.Add(len(chans))
-		for _, c := range chans {
-			go output(c)
+		select {
+		case <-ctx.Done():
+			return "", ctx.Err()
+		case <-time.After(3 * time.Second):
+			return "EN/US", nil
 		}
-
-		go func() {
-			wg.Wait()
-			close(valueStream)
-		}()
-
-		return valueStream
 	}
 
-	strat := time.Now()
+	genGreeting := func(ctx context.Context) (string, error) {
+		ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+		defer cancel()
+		defer wg.Done()
 
-	things := make([]<-chan interface{}, len(dons))
-	for i := 0; i < len(dons); i++ {
-		var or int
-		if i == 0 {
-			or = 0
-		} else {
-			or = i - 1
+		switch loc, err := locale(ctx); {
+		case err != nil:
+			return "", err
+		case loc == "EN/US":
+			return "hello", nil
 		}
-		things[i] = orDone(dons[or], repeat(dons[0], i))
+		return "", fmt.Errorf("unsupported")
 	}
 
-	donedone := make(chan interface{})
-	defer close(donedone)
-	for v := range fanin(donedone, things...) {
-		if (time.Since(strat) > 3*time.Second) {
-			break
+	genFarewell := func(ctx context.Context) (string, error) {
+		switch loc, err := locale(ctx); {
+		case err != nil:
+			return "", err
+		case loc == "EN/US":
+			return "Good bye", nil
 		}
-		fmt.Println(v)
+		return "", fmt.Errorf("unsupported")
 	}
 
-	fmt.Println("all done", time.Since(strat))
+	printGreeting := func(ctx context.Context) error {
+		greeting, err := genGreeting(ctx)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%s world!\n", greeting)
+		return nil
+	}
+	printFarewell := func(ctx context.Context) error {
+		defer wg.Done()
+		farewell, err := genFarewell(ctx)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%s world \n", farewell)
+		return nil
+	}
+
+	go func() {
+		if err := printGreeting(ctx); err != nil {
+			fmt.Printf("Erorr ouccr on print Greeting : %s\n", err)
+			cancel()
+		}
+	}()
+
+	go func() {
+		if err := printFarewell(ctx); err != nil {
+			fmt.Printf("Error occur on print Farewell : %s\n", err)
+		}
+	}()
+
+	wg.Wait()
+	fmt.Println("All go routines done")
 }

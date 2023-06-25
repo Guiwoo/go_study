@@ -94,7 +94,13 @@ func take(done, val <-chan interface{}, rp int) <-chan interface{} {
 			select {
 			case <-done:
 				return
-			case valueStream <- val:
+			case v := <-val:
+				switch t := v.(type) {
+				case byte:
+					valueStream <- t
+				default:
+					fmt.Println("something wrong")
+				}
 			}
 		}
 	}()
@@ -115,7 +121,7 @@ func performWrite(b *testing.B, writer io.Writer) {
 	b.ResetTimer()
 
 	for bt := range take(done, repeat(done, byte(0)), b.N) {
-		fmt.Println(bt)
+		writer.Write([]byte{bt.(byte)})
 	}
 
 }
@@ -127,4 +133,3 @@ func Benchmark_Queue_02_01(b *testing.B) {
 	buf := bufio.NewWriter(tmpFileOrFatal())
 	performWrite(b, bufio.NewWriter(buf))
 }
-

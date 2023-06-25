@@ -106,31 +106,12 @@ func Test02(t *testing.T) {
 		return "", fmt.Errorf("unsupported")
 	}
 
-	genFarewell := func(ctx context.Context) (string, error) {
-		switch loc, err := locale(ctx); {
-		case err != nil:
-			return "", err
-		case loc == "EN/US":
-			return "bye bye", nil
-		}
-		return "", fmt.Errorf("unsupported")
-	}
-
 	printGreeting := func(ctx context.Context) error {
 		greeting, err := genGreeting(ctx)
 		if err != nil {
 			return err
 		}
 		fmt.Printf("%s world\n", greeting)
-		return nil
-	}
-
-	printFarewell := func(ctx context.Context) error {
-		farewell, err := genFarewell(ctx)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("%s world\n", farewell)
 		return nil
 	}
 
@@ -145,7 +126,7 @@ func Test02(t *testing.T) {
 
 	go func() {
 		defer wg.Done()
-		if err := printFarewell(ctx); err != nil {
+		if err := printGreeting(ctx); err != nil {
 			fmt.Printf("Can not printing farewell : %s", err)
 			cancel()
 		}
@@ -160,19 +141,122 @@ func Test03(t *testing.T) {
 	defer cancel()
 	wg.Add(2)
 
+	locale := func(ctx context.Context) (string, error) {
+		if deadline, ok := ctx.Deadline(); ok {
+			if deadline.Sub(time.Now().Add(1*time.Minute)) <= 0 {
+				return "", fmt.Errorf("unsupported locale")
+			}
+		}
+		select {
+		case <-ctx.Done():
+			return "", ctx.Err()
+		case <-time.After(1 * time.Minute):
+			return "EN/US", nil
+		}
+	}
+
+	genGreeting := func(ctx context.Context) (string, error) {
+		ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+		defer cancel()
+		defer wg.Done()
+		switch loc, err := locale(ctx); {
+		case err != nil:
+			return "", err
+		case loc == "EN/US":
+			return "hello", nil
+		}
+		return "", fmt.Errorf("unsupported")
+	}
+
+	printGreeting := func(ctx context.Context) error {
+		greeting, err := genGreeting(ctx)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%s world!\n", greeting)
+		return nil
+	}
+	printFarewell := func(ctx context.Context) error {
+		defer wg.Done()
+		farewell, err := genGreeting(ctx)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%s world \n", farewell)
+		return nil
+	}
+
 	go func() {
-		if err := printGreeting(); err != nil {
+		if err := printGreeting(ctx); err != nil {
 			fmt.Printf("Erorr ouccr on print Greeting : %s", err)
 			cancel()
 		}
 	}()
 
 	go func() {
-		if err := printFarewell(); err != nil {
+		if err := printFarewell(ctx); err != nil {
 			fmt.Printf("Error occur on print Farewell : %s", err)
 		}
 	}()
 
 	wg.Wait()
 	fmt.Println("All go routines done")
+}
+
+func Test04(t *testing.T) {
+	var id, token string
+
+	HandleResponse := func(ctx context.Context) {
+		id = ctx.Value("userId").(string)
+		token = ctx.Value("token").(string)
+		fmt.Printf("handling response for %v %v", ctx.Value("userId"), ctx.Value("token"))
+	}
+
+	processRequest := func(id, token string) {
+		ctx := context.WithValue(context.Background(), "userId", id)
+		ctx = context.WithValue(ctx, "token", token)
+		HandleResponse(ctx)
+	}
+
+	processRequest("guiwoo", "abc123")
+
+	if id != "guiwoo" || token != "abc123" {
+		t.Errorf("does not store the values")
+	}
+}
+
+func Test_06(t *testing.T) {
+	type foo int
+	type bar int
+
+	m := make(map[any]string)
+
+	m[foo(1)] = "This is Foo"
+	m[bar(1)] = "This is Bar"
+
+	fmt.Printf("%+v", m)
+}
+
+func Test_07(t *testing.T) {
+	type ctxKey int
+	const (
+		ctxUserId ctxKey = iota
+		ctxBank
+	)
+	userId := func(ctx context.Context) string {
+		return ctx.Value(ctxUserId).(string)
+	}
+	bank := func(ctx context.Context) string {
+		return ctx.Value(ctxBank).(string)
+	}
+
+	HandleResponse := func(ctx context.Context) {
+		fmt.Printf("Handling response is id : %+v,%+v", userId(ctx), bank(ctx))
+	}
+	processRequest := func(id, bank string) {
+		ctx := context.WithValue(context.Background(), ctxUserId, id)
+		ctx = context.WithValue(ctx, ctxBank, bank)
+		HandleResponse(ctx)
+	}
+	processRequest("guiwoo", "hyundai")
 }
