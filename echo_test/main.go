@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func main() {
+func callEcho() {
 	e := echo.New()
 	e.GET("/test", func(c echo.Context) error {
 		return c.JSON(200, struct {
@@ -39,4 +39,8 @@ func main() {
 	}()
 
 	log.Error(e.Start(":9086"))
+}
+
+func main() {
+	callPureHttp(":4000")
 }
