@@ -7,7 +7,7 @@ import (
 )
 
 type Command interface {
-	Execute(w http.ResponseWriter,r *http.Request)
+	Execute(w http.ResponseWriter, r *http.Request)
 }
 
 type MyHandler struct {
@@ -17,27 +17,28 @@ type MyHandler struct {
 func (m *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
-	if cmd,ok := m.routes[path];ok {
-		cmd.Execute(w,r)
-	}else{
-		http.NotFound(w,r)
+	if cmd, ok := m.routes[path]; ok {
+		cmd.Execute(w, r)
+	} else {
+		http.NotFound(w, r)
 	}
 }
 
 type FooHandler struct{}
-func (f *FooHandler) Execute(w http.ResponseWriter,r *http.Request){
-	fmt.Fprint(w,"This is Foo Handler")
+
+func (f *FooHandler) Execute(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "This is Foo Handler")
 }
 
 func callPureHttp(port string) {
 
 	handler := &MyHandler{
-		routes: map[string]{
+		routes: map[string]Command{
 			"/foo": &FooHandler{},
 		},
 	}
 
-	log.Fatal(http.ListenAndServe(":4000",handler))
+	log.Fatal(http.ListenAndServe(":4000", handler))
 }
 
 type Strategy interface {
@@ -64,7 +65,7 @@ func (c *Context) ExecuteStrategy(w http.ResponseWriter, r *http.Request) {
 	c.strategy.ServeHTTP(w, r)
 }
 
-func callStrategy(){
+func callStrategy() {
 	strategyA := &StrategyA{}
 	strategyB := &StrategyB{}
 
