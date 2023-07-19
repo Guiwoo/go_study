@@ -31,7 +31,7 @@ type Req struct {
 	Name string `query:"name"`
 }
 
-func hello(c echo.Context) error {
+func Hello(c echo.Context) error {
 	id := c.Param("id")
 	req := &Req{}
 	if err := c.Bind(req); err != nil {
@@ -69,12 +69,15 @@ func hello(c echo.Context) error {
 		}()
 	}
 }
+func SomethingOnYourMind() {
+	fmt.Println("Sibal")
+}
 
 func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.GET("/ws/:id", hello)
+	e.GET("/ws/:id", Hello)
 	e.Logger.Fatal(e.Start(":1323"))
 }

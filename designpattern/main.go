@@ -1,6 +1,6 @@
 package main
 
-import "designpattern/visitor"
+import "designpattern/decorator"
 
 /**
 Complicated object ts aren't designed from scratch
@@ -27,5 +27,5 @@ func twoSum(nums []int, target int) []int {
 }
 
 func main() {
-	visitor.Start()
+	decorator.StartHead()
 }

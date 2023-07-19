@@ -1,111 +1,65 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 func main() {
-	x := solution2([]int{1, 2, 3, 4, 5}, 7)
-	fmt.Println(x)
+	fmt.Println(len(" "))
 }
 
-func solution(sequence []int, k int) []int {
+func solution(merchantNames []string) []string {
+	type real struct {
+		name    string
+		space   int
+		special bool
+	}
 
-	var answer []int
-
-	for i := 0; i < len(sequence); i++ {
-		if sequence[i] == k {
-			return []int{i, i}
-		}
-		left := i
-		sum := sequence[i]
-		for j := i + 1; j < len(sequence); j++ {
-			sum += sequence[j]
-			if sum == k {
-				if len(answer) > 0 {
-					// 비교 해서 넣어주기
-					cur := answer[1] - answer[0]
-					could := j - i
-					if could < cur {
-						answer = []int{i, j}
-					}
-				} else {
-					answer = []int{i, j}
-				}
-			} else if sum > k {
-				sum = -sequence[left]
-				left++
+	spaceCount := func(s string) (int, bool) {
+		special := []rune{'&', '(', ')', '.', ',', '-'}
+		cnt := 0
+		spec := false
+		for _, v := range s {
+			if v == ' ' {
+				cnt++
 			}
-		}
-	}
-	return answer
-}
-
-func solution2(seq []int, k int) []int {
-	prep := make([]int, len(seq))
-	prep[0] = seq[0]
-	for i := 1; i < len(seq); i++ {
-		prep[i] = seq[i] + prep[i-1]
-	}
-	var answer []int
-	for i := 0; i < len(prep); i++ {
-		if prep[i] == k {
-			return []int{0, i}
-		}
-		if prep[i] > k {
-			//앞에 빼줘야하잖아
-			for j := 0; j < i; j++ {
-				target := prep[i] - prep[j]
-				if target == k {
-					if len(answer) > 0 {
-						cur := answer[1] - answer[0]
-						now := i - j
-						if now < cur {
-							answer = []int{j + 1, i}
-						}
-					} else {
-						answer = []int{j + 1, i}
-						break
-					}
-				} else if target < k {
+			for _, r := range special {
+				if v == r {
+					spec = true
 					break
 				}
 			}
 		}
+		return cnt, spec
 	}
-	return answer
-}
 
-func sol3(seq []int, k int) []int {
-	idx := 0
-	sum := seq[0]
-	var answer []int
-
-	for i := 1; i < len(seq); i++ {
-		sum += seq[i]
-		if sum == k {
-			answer = getAnswer(answer, i, idx)
-		} else if sum > k {
-			for sum > k && idx < i {
-				sum -= seq[idx]
-				idx++
-			}
-
-			if sum == k {
-				answer = getAnswer(answer, i, idx)
-			}
+	var answer []string
+	reals := make([]*real, len(merchantNames))
+	for i, v := range merchantNames {
+		space, spec := spaceCount(v)
+		reals[i] = &real{
+			v,
+			len(v) - space,
+			spec,
 		}
 	}
-	return answer
-}
 
-func getAnswer(answer []int, i int, idx int) []int {
-	if len(answer) > 0 {
-		cur := answer[1] - answer[0]
-		now := i - idx
-		if now < cur {
-			answer = []int{idx, i}
+	sort.Slice(reals, func(i, j int) bool {
+		if len(reals[i].name)-reals[i].space != len(reals[j].name)-reals[j].space {
+			return len(reals[i].name)-reals[i].space > len(reals[j].name)-reals[j].space
 		}
-	} else {
-		answer = []int{idx, i}
+		if reals[i].special && !reals[j].special {
+			return true
+		} else if reals[j].special && !reals[i].special {
+			return false
+		}
+		return true
+	})
+
+	for _, v := range reals {
+		fmt.Println(v)
 	}
-	return answer
+	fmt.Println(answer)
+	return nil
 }
