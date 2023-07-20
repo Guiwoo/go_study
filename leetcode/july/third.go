@@ -1,8 +1,13 @@
 package july
 
-import "fmt"
+import (
+	"fmt"
+	"leetcode/may"
+	"sort"
+	"strings"
+)
 
-func deleteDuplicates(head *ListNode) *ListNode {
+func deleteDuplicates(head *may.ListNode) *may.ListNode {
 	res := head
 	for head != nil {
 		for head.Next != nil && head.Next.Val == head.Val {
@@ -46,4 +51,24 @@ func romanToInt(s string) int {
 		answer += m[int(s[len(s)-1])]
 	}
 	return answer
+}
+
+func longestCommonPrefix(strs []string) string {
+	if len(strs) == 0 {
+		return ""
+	}
+
+	sort.Strings(strs)
+	first := strs[0]
+	last := strs[len(strs)-1]
+	var prefix strings.Builder
+
+	for i := 0; i < len(first); i++ {
+		if first[i] != last[i] {
+			break
+		}
+		prefix.WriteByte(first[i])
+	}
+
+	return prefix.String()
 }

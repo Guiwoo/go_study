@@ -188,15 +188,15 @@ func Test_Select_01(t *testing.T) {
 func Test_Select_02(t *testing.T) {
 	start := time.Now()
 
-	c := make(chan interface{})
-	go func() {
+	c := make(chan interface{}) // 채널을 생성한다.
+	go func() {                 // 메인 고루틴에서 새로운 분기로 빠진다.
 		time.Sleep(5 * time.Second)
 		close(c)
 	}()
 
 	fmt.Println("Blocking on read...")
 
-	select {
+	select { // select 블럭에 진입한 이후 5초 대기 이후 프린트가 생성된다.
 	case <-c:
 		fmt.Printf("Unblocked %v later.", time.Since(start))
 	}
@@ -211,6 +211,7 @@ func Test_Multiple_Channel(t *testing.T) {
 	var c1Count, c2Count int
 	for i := 1000; i >= 0; i-- {
 		select {
+		// 채널 c1,c2 를 각각 읽어온다.
 		case <-c1:
 			c1Count++
 		case <-c2:
@@ -218,6 +219,27 @@ func Test_Multiple_Channel(t *testing.T) {
 		}
 	}
 	fmt.Printf("c1Count : %d\nc2Count : %d\n", c1Count, c2Count)
+}
+
+func Test_Ping_Pong(t *testing.T) {
+	type Ball struct{ hits int }
+	player := func(name string, c chan *Ball) {
+		for {
+			target := <-c
+			target.hits++
+			fmt.Println(name, c)
+			time.Sleep(100 * time.Millisecond)
+			c <- target
+		}
+	}
+
+	ball := make(chan *Ball)
+	go player("Ping", ball)
+	go player("Pong", ball)
+
+	ball <- new(Ball)
+	time.Sleep(1 * time.Second)
+	<-ball
 }
 
 func Test_Select_03(t *testing.T) {
