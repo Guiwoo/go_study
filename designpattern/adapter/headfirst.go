@@ -76,3 +76,130 @@ func (e *EnumerationIterator) nextElement() {
 func (e *EnumerationIterator) remove() {
 	log.Errorf("unsupported error")
 }
+
+type PostgreSQL interface {
+	InsertColumn()
+	DeleteColumn()
+	UpdateColumn()
+	ReadColumn()
+}
+
+type PostgreSQL_V15 struct {
+	db string
+}
+
+func (p PostgreSQL_V15) InsertColumn() {
+	fmt.Println("Insert by postgresql version 15")
+}
+
+func (p PostgreSQL_V15) DeleteColumn() {
+	fmt.Println("Delete by posgresql version 15")
+}
+
+func (p PostgreSQL_V15) UpdateColumn() {
+	fmt.Println("Update by postgresql version 15")
+}
+
+func (p PostgreSQL_V15) ReadColumn() {
+	fmt.Println("Read by postgresql version 15")
+}
+
+var _ PostgreSQL = (*PostgreSQL_V15)(nil)
+
+func NewPostgreSQL() PostgreSQL {
+	return &PostgreSQL_V15{"postgresql version 15"}
+}
+
+type MySQL interface {
+	InsertData()
+	DeleteData()
+	UpdateData()
+	ReadData()
+}
+
+type MySQL_V8 struct {
+	db string
+}
+
+func (m MySQL_V8) InsertData() {
+	fmt.Println("Insert by mysql version 8")
+}
+
+func (m MySQL_V8) DeleteData() {
+	fmt.Println("Delete by mysql version 8")
+}
+
+func (m MySQL_V8) UpdateData() {
+	fmt.Println("Update by mysql version 8")
+}
+
+func (m MySQL_V8) ReadData() {
+	fmt.Println("Read  by mysql version 8")
+}
+
+var _ MySQL = (*MySQL_V8)(nil)
+
+func NewMySQL() MySQL {
+	return &MySQL_V8{"mysql version 8"}
+}
+
+type DbBatch interface {
+	BatchInsert()
+	BatchDelete()
+	BatchUpdate()
+	BatchRead()
+}
+
+type MySQL_V8_Batch_Adapter struct {
+	mysql MySQL
+}
+
+func (m MySQL_V8_Batch_Adapter) BatchInsert() {
+	m.mysql.InsertData()
+}
+
+func (m MySQL_V8_Batch_Adapter) BatchDelete() {
+	m.mysql.DeleteData()
+}
+
+func (m MySQL_V8_Batch_Adapter) BatchUpdate() {
+	m.mysql.UpdateData()
+}
+
+func (m MySQL_V8_Batch_Adapter) BatchRead() {
+	m.mysql.ReadData()
+}
+
+var _ DbBatch = (*MySQL_V8_Batch_Adapter)(nil)
+
+func NewDbBatchMySQLAdapter() DbBatch {
+	mysql := NewMySQL()
+	return &MySQL_V8_Batch_Adapter{mysql}
+}
+
+type PostgreSQL_V15_Batch_Adapter struct {
+	postgres PostgreSQL
+}
+
+func (p PostgreSQL_V15_Batch_Adapter) BatchInsert() {
+	p.postgres.InsertColumn()
+}
+
+func (p PostgreSQL_V15_Batch_Adapter) BatchDelete() {
+	p.postgres.DeleteColumn()
+}
+
+func (p PostgreSQL_V15_Batch_Adapter) BatchUpdate() {
+	p.postgres.UpdateColumn()
+}
+
+func (p PostgreSQL_V15_Batch_Adapter) BatchRead() {
+	p.postgres.ReadColumn()
+}
+
+var _ DbBatch = (*PostgreSQL_V15_Batch_Adapter)(nil)
+
+func NewDbBatchPostgreSQLAdapter() DbBatch {
+	postgres := NewPostgreSQL()
+	return &PostgreSQL_V15_Batch_Adapter{postgres}
+}
