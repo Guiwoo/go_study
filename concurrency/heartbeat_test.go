@@ -374,5 +374,5 @@ func TestHeartBeatCopyRequest(t *testing.T) {
 	close(done)
 	wg.Wait()
 
-	fmt.Println("All go answered from %v\n", firstReturned)
+	fmt.Printf("All go answered from %v\n", firstReturned)
 }

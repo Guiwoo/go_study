@@ -1,46 +1,32 @@
 package main
 
 import (
-	"crypto/tls"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
-	"golang.org/x/crypto/acme"
-	"net/http"
 )
 
 func callEcho() {
 	e := echo.New()
 	e.GET("/test", func(c echo.Context) error {
+		fmt.Println("sibal")
 		return c.JSON(200, struct {
 			Name    string `json:"name"`
 			Message string `json:"message"`
 		}{"testing", "From Server !"})
 	})
 
-	e.Pre(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			if c.Request().TLS != nil {
-				redirectURL := "http://" + "localhost:9086" + c.Request().URL.String()
-				return c.Redirect(http.StatusMovedPermanently, redirectURL)
-			}
-			return next(c)
-		}
-	})
-
-	go func() {
-		s := http.Server{
-			Addr:    ":9087",
-			Handler: e,
-			TLSConfig: &tls.Config{
-				NextProtos: []string{acme.ALPNProto},
-			},
-		}
-		log.Error(s.ListenAndServeTLS("/Users/guiwoopark/Documents/cert.pem", "/Users/guiwoopark/Documents/key.pem"))
-	}()
-
-	log.Error(e.Start(":9086"))
+	//s := http.Server{
+	//	Addr:    ":4000",
+	//	Handler: e,
+	//	TLSConfig: &tls.Config{
+	//		NextProtos: []string{acme.ALPNProto},
+	//	},
+	//}
+	//log.Error(s.ListenAndServeTLS("/Users/guiwoopark/Documents/cert.pem", "/Users/guiwoopark/Documents/key.pem"))
+	log.Error(e.Start(":4006"))
 }
 
 func main() {
-	callPureHttp(":4000")
+	callEcho()
 }

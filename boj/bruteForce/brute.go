@@ -236,3 +236,25 @@ func getResult(num []int) int {
 	}
 	return sum
 }
+
+func boj15469(n, m int) string {
+	out := make([]int, m)
+	sb := strings.Builder{}
+	recur(n, 0, 0, out, &sb)
+	return sb.String()
+}
+func recur(n, depth, flag int, out []int, sb *strings.Builder) {
+	if depth == len(out) {
+		s := strings.NewReplacer("[", "", "]", "").Replace(fmt.Sprintf("%v", out))
+		sb.WriteString(s + "\n")
+		return
+	} else {
+		for i := 0; i < n; i++ { // i를 0부터 시작
+			if (flag & (1 << i)) != 0 {
+				continue
+			}
+			out[depth] = i + 1 // 실제 숫자는 i + 1
+			recur(n, depth+1, flag|(1<<i), out, sb)
+		}
+	}
+}

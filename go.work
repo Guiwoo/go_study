@@ -18,4 +18,5 @@ use (
 	./oauth
 	./echo_test
 	./data_structure
+	./echo_proxy
 )
