@@ -258,3 +258,55 @@ func recur(n, depth, flag int, out []int, sb *strings.Builder) {
 		}
 	}
 }
+
+func boj15650(n, m int) string {
+	sb := strings.Builder{}
+	out := make([]int, m)
+	recur2(n, 0, 0, 0, out, &sb)
+	return sb.String()
+}
+
+func recur2(n, start, depth, flag int, out []int, sb *strings.Builder) {
+	if depth == len(out) {
+		result := strings.NewReplacer("[", "", "]", "").Replace(fmt.Sprintf("%v", out))
+		sb.WriteString(result + "\n")
+		return
+	} else {
+		for i := start; i < n; i++ {
+			if flag&(1<<i) != 0 {
+				continue
+			}
+			out[depth] = i + 1
+			recur2(n, i+1, depth+1, flag|(1<<i), out, sb)
+		}
+	}
+}
+
+/*
+*
+fmt.Sprintf 또는 NewReplacer 와 같은 문자열 계산 은 상당한 오버헤드가 발생할수 있어 이런 완탐에서 문제가 발생한다.
+기억하고 있다가 코드 최적화 시에 적용하자.
+*/
+func boj15651(n, m int) string {
+	sb := strings.Builder{}
+	out := make([]int, m)
+	permutation(n, 0, out, &sb)
+	return sb.String()
+}
+
+func permutation(n, depth int, out []int, sb *strings.Builder) {
+	if depth < len(out) {
+		for i := 0; i < n; i++ {
+			out[depth] = i + 1
+			permutation(n, depth+1, out, sb)
+		}
+	} else {
+		for i := 0; i < len(out); i++ {
+			sb.WriteString(strconv.Itoa(out[i]))
+			if i < len(out)-1 {
+				sb.WriteByte(' ')
+			}
+		}
+		sb.WriteByte('\n')
+	}
+}
