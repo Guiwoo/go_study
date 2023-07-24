@@ -9,11 +9,11 @@ import (
 func callEcho() {
 	e := echo.New()
 	e.GET("/test", func(c echo.Context) error {
-		fmt.Println("sibal")
+		fmt.Println("got request")
 		return c.JSON(200, struct {
 			Name    string `json:"name"`
 			Message string `json:"message"`
-		}{"testing", "From Server !"})
+		}{"testing", "From Server ! Here is different server on 9096"})
 	})
 
 	//s := http.Server{
@@ -24,7 +24,7 @@ func callEcho() {
 	//	},
 	//}
 	//log.Error(s.ListenAndServeTLS("/Users/guiwoopark/Documents/cert.pem", "/Users/guiwoopark/Documents/key.pem"))
-	log.Error(e.Start(":4006"))
+	log.Error(e.Start(":9096"))
 }
 
 func main() {

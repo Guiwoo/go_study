@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -24,6 +25,5 @@ func solution() {
 	n, _ := strconv.Atoi(inputs[0])
 	m, _ := strconv.Atoi(strings.TrimSpace(inputs[1]))
 
-	result := boj15651(n, m)
-	writer.WriteString(result)
+	writer.WriteString(fmt.Sprintf("%d  %d", n, m))
 }
