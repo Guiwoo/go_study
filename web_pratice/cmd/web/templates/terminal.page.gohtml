@@ -72,6 +72,23 @@ class="d-block needs-validation charge-form" autocomplete="off" novalidate="">
         processing.classList.remove("d-none");
     }
 
+    const showPayButtons = () => {
+        payButton.classList.remove("d-none");
+        processing.classList.add("d-none");
+    }
+    const showCardError = (message) => {
+        cardMessages.classList.add("alert-danger");
+        cardMessages.classList.remove("d-none");
+        cardMessages.classList.remove("alert-success");
+        cardMessages.innerText = message;
+    }
+    const showCardSuccess = () => {
+        cardMessages.classList.add("alert-success");
+        cardMessages.classList.remove("d-none");
+        cardMessages.classList.remove("alert-danger");
+        cardMessages.innerText = "Card charged successfully";
+    }
+
     const val = ()=>{
         let form = document.getElementById('charge_form');
         if (form.checkValidity() === false) {
@@ -85,7 +102,7 @@ class="d-block needs-validation charge-form" autocomplete="off" novalidate="">
 
         let payload = {
             amount: amountToCharge,
-            currency: 'won',
+            currency: 'usd',
         }
 
         const requestOptions = {
@@ -97,14 +114,40 @@ class="d-block needs-validation charge-form" autocomplete="off" novalidate="">
             body: JSON.stringify(payload),
         }
         fetch("http://localhost:4001/api/payment-intent",requestOptions)
-            .then(res => res.json())
+            .then(res => res.text())
             .then(res => {
                 let data;
                 try {
                     data = JSON.parse(res)
-                    console.log(data)
+                    stripe.confirmCardPayment(data.client_secret,{
+                        payment_method: {
+                            card: card,
+                            billing_details: {
+                                name: document.getElementById("cardholder-name").value,
+                            }
+                        }
+                    }).then(function (result){
+                        if (result.error){
+                            //card declined, or something went wrong with the card
+                            showCardError(result.error.message)
+                            showPayButtons();
+                        }else if(result.paymentIntent){
+                           if (result.paymentIntent.status === "succeeded"){
+                               // have charged card
+                               document.getElementsById("payment_method").value = result.paymentIntent.payment_types[0];
+                               document.getElementsById("payment_intent").value = result.paymentIntent.id;
+                               document.getElementsById("payment_amount").value = result.paymentIntent.amount;
+                               document.getElementsById("payment_currency").value = result.paymentIntent.currency;
+                               processing.classList.add("d-none");
+                               showCardSuccess();
+                               // would submit the form
+                           }
+                        }
+                    })
                 }catch (e){
-                    console.log(e)
+                    console.log(e);
+                    showCardError("Invalid response frompayment gateway !.")
+                    showPayButtons();
                 }
             })
     }
