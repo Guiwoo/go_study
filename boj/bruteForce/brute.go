@@ -310,3 +310,66 @@ func permutation(n, depth int, out []int, sb *strings.Builder) {
 		sb.WriteByte('\n')
 	}
 }
+
+/*
+*
+백준 15652 증가 로 답구하는것
+*/
+func boj15652(n, m int) string {
+	sb := strings.Builder{}
+	out := make([]int, m)
+	permutation(n, 0, out, &sb)
+	return sb.String()
+}
+func permutation2(n, depth int, out []int, sb *strings.Builder) {
+	if depth == len(out) {
+		for _, v := range out {
+			sb.WriteString(fmt.Sprintf("%d ", v))
+		}
+		sb.WriteString("\n")
+		return
+	} else {
+		start := 0
+		if depth != 0 {
+			start = out[depth-1] - 1
+		}
+		for i := start; i < n; i++ {
+			out[depth] = i + 1
+			permutation(n, depth+1, out, sb)
+		}
+	}
+}
+
+/*
+*
+숫자 주고 중간에 한번 정렬해야함
+*/
+func boj15654(n []int, m int) string {
+	sb := strings.Builder{}
+	out := make([]int, m)
+	sort.Ints(n)
+	permutation3(n, out, 0, 0, &sb)
+	return sb.String()
+}
+
+func permutation3(n, out []int, depth, flag int, sb *strings.Builder) {
+	if depth == len(out) {
+		for i, v := range out {
+			if i == len(out)-1 {
+				sb.WriteString(fmt.Sprintf("%d", v))
+				continue
+			}
+			sb.WriteString(fmt.Sprintf("%d ", v))
+		}
+		sb.WriteString("\n")
+		return
+	} else {
+		for i := 0; i < len(n); i++ {
+			if flag&(1<<i) != 0 {
+				continue
+			}
+			out[depth] = n[i]
+			permutation3(n, out, depth+1, flag|(1<<i), sb)
+		}
+	}
+}
