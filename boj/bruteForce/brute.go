@@ -2,6 +2,7 @@ package bruteForce
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"math"
 	"os"
@@ -370,6 +371,61 @@ func permutation3(n, out []int, depth, flag int, sb *strings.Builder) {
 			}
 			out[depth] = n[i]
 			permutation3(n, out, depth+1, flag|(1<<i), sb)
+		}
+	}
+}
+
+/**
+숫자 주고 한번 정렬해서 프린트
+*/
+
+func boj15655(n []int, m int) string {
+	sb := strings.Builder{}
+	out := make([]int, m)
+	recur4(n, out, 0, 0, &sb)
+	return sb.String()
+}
+
+func recur4(n, out []int, depth, flag int, sb *strings.Builder) {
+	if depth == len(out) {
+		for _, v := range out {
+			sb.WriteString(fmt.Sprintf("%d ", v))
+		}
+		sb.WriteString("\n")
+	} else {
+		for i := 0; i < len(n); i++ {
+			if flag&(1<<i) == 0 {
+				if depth == 0 {
+					out[depth] = n[i]
+					recur4(n, out, depth+1, flag|(1<<i), sb)
+				} else if out[depth-1] < n[i] {
+					out[depth] = n[i]
+					recur4(n, out, depth+1, flag|(1<<i), sb)
+				}
+			}
+		}
+	}
+}
+
+var buf bytes.Buffer
+
+func boj15656(n []int, m int) string {
+	out := make([]int, m)
+	boj15656Recursion(n, out, 0)
+	return buf.String()
+}
+
+func boj15656Recursion(n, out []int, depth int) {
+	if depth == len(out) {
+		for i := range out {
+			buf.WriteString(fmt.Sprintf("%d ", out[i]))
+		}
+		buf.WriteByte('\n')
+		return
+	} else {
+		for i := 0; i < len(n); i++ {
+			out[depth] = n[i]
+			boj15656Recursion(n, out, depth+1)
 		}
 	}
 }
