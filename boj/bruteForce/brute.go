@@ -429,3 +429,172 @@ func boj15656Recursion(n, out []int, depth int) {
 		}
 	}
 }
+
+func boj15657(n []int, m int) {
+	out := make([]int, m)
+	boj15657Recur(n, out, 0)
+	fmt.Println(buf.String())
+}
+func boj15657Recur(n, out []int, depth int) {
+	if depth == len(out) {
+		for _, v := range out {
+			buf.WriteString(strconv.Itoa(v) + " ")
+		}
+		buf.WriteByte('\n')
+		return
+	}
+
+	for i := 0; i < len(n); i++ {
+		if depth == 0 || out[depth-1] <= n[i] {
+			out[depth] = n[i]
+			boj15657Recur(n, out, depth+1)
+		}
+	}
+}
+
+var (
+	out     []int
+	checker map[string]bool
+	sb      strings.Builder
+)
+
+func boj15663(arr []int, m int) {
+	out = make([]int, m)
+	checker = make(map[string]bool)
+	sb = strings.Builder{}
+	recurBoj15663(arr, 0, 0)
+	fmt.Printf(sb.String())
+}
+
+// 1nt64 왜 int 값을 벗어날까 ? *10 을 해서 ? ㅂㅅ 임
+func recurBoj15663(arr []int, depth, flag int) {
+	if depth == len(out) {
+		var (
+			target       int
+			targetString string
+		)
+		for _, v := range out {
+			target = target*10 + v
+			targetString += fmt.Sprintf("%d ", v)
+		}
+		if !checker[targetString] {
+			checker[targetString] = true
+			sb.WriteString(fmt.Sprintf("%s\n", targetString))
+		}
+		return
+	} else {
+		for i := 0; i < len(arr); i++ {
+			if flag&(1<<i) == 0 {
+				out[depth] = arr[i]
+				recurBoj15663(arr, depth+1, flag|(1<<i))
+			}
+		}
+	}
+}
+
+func boj15664(arr []int, m int) {
+	out := make([]int, m)
+	sb := strings.Builder{}
+	checker := make(map[string]bool)
+
+	recur15664(arr, out, 0, 0, checker, &sb)
+	fmt.Println(sb.String())
+}
+
+func recur15664(arr, out []int, depth, flag int, checker map[string]bool, sb *strings.Builder) {
+	if depth == len(out) {
+		var (
+			targetSt string
+			prev     int
+		)
+		for _, v := range out {
+			targetSt += fmt.Sprintf("%d ", v)
+			if prev > v {
+				return
+			}
+			prev = v
+		}
+
+		if !checker[targetSt] {
+			checker[targetSt] = true
+			sb.WriteString(fmt.Sprintf("%s\n", targetSt))
+		}
+		return
+	} else {
+		for i := 0; i < len(arr); i++ {
+			if flag&(1<<i) == 0 {
+				out[depth] = arr[i]
+				recur15664(arr, out, depth+1, flag|(1<<i), checker, sb)
+			}
+		}
+	}
+}
+
+func boj15665(arr []int, m int) {
+	out := make([]int, m)
+	sb := strings.Builder{}
+	checker := make(map[string]bool)
+
+	recur15665(arr, out, 0, checker, &sb)
+	fmt.Println(sb.String())
+}
+
+func recur15665(arr, out []int, depth int, checker map[string]bool, sb *strings.Builder) {
+	if depth == len(out) {
+		var (
+			targetSt string
+		)
+		for _, v := range out {
+			targetSt += fmt.Sprintf("%d ", v)
+		}
+
+		sb.WriteString(fmt.Sprintf("%s\n", targetSt))
+		return
+	} else {
+		var pre int
+		for i := 0; i < len(arr); i++ {
+			if pre != arr[i] {
+				out[depth] = arr[i]
+				pre = arr[i]
+				recur15665(arr, out, depth+1, checker, sb)
+			}
+		}
+	}
+}
+
+var (
+	mapper map[string]bool
+)
+
+func boj15666(arr []int, m int) string {
+	out := make([]int, m)
+	sb := strings.Builder{}
+	mapper = make(map[string]bool)
+	recur15666(arr, out, 0, &sb)
+	return sb.String()
+}
+
+func recur15666(arr, out []int, depth int, sb *strings.Builder) {
+	if depth == len(out) {
+		s := ""
+		for _, v := range out {
+			s += fmt.Sprintf("%d ", v)
+		}
+		if !mapper[s] {
+			mapper[s] = true
+			sb.WriteString(s + "\n")
+		}
+		return
+	} else {
+		for i := 0; i < len(arr); i++ {
+			if depth == 0 {
+				out[depth] = arr[i]
+				recur15666(arr, out, depth+1, sb)
+			}
+			if depth > 0 && out[depth-1] <= arr[i] {
+				out[depth] = arr[i]
+				recur15666(arr, out, depth+1, sb)
+			}
+		}
+	}
+}
