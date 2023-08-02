@@ -2,6 +2,7 @@ package table
 
 import (
 	"context"
+	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -16,6 +17,21 @@ type CustomDB struct {
 
 func (c *CustomDB) Insert(t any) error {
 	return c.Db.WithContext(context.Background()).Create(t).Error
+}
+func (c *CustomDB) Count(model any) (cnt int64, err error) {
+	err = c.Db.WithContext(context.Background()).
+		Model(model).
+		Count(&cnt).Error
+
+	return cnt, err
+}
+func (c *CustomDB) Update(field string, model any, id string) error {
+	expr := fmt.Sprintf("%s + ?", field)
+	return c.Db.WithContext(context.Background()).
+		Model(model).
+		Where("poll_id = ?", id).
+		Update(field, gorm.Expr(expr, 1)).
+		Error
 }
 
 var dbInstance *CustomDB

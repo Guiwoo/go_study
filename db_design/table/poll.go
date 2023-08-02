@@ -1,6 +1,8 @@
 package table
 
 import (
+	"context"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -26,6 +28,17 @@ type Poll struct {
 
 func (p *Poll) TableName() string {
 	return "poll"
+}
+
+func (p *Poll) Select(db *gorm.DB) error {
+	return db.WithContext(context.Background()).Model(p).
+		Preload("Contents").
+		Preload("Creator").
+		Preload("Updater").
+		Preload("Questions").
+		Preload("Questions.Choices").
+		Where("content_id = ? ", 1).
+		Take(p).Error
 }
 
 func NewPoll(title string, contentsId, adminId int) *Poll {
