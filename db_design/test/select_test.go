@@ -40,10 +40,22 @@ func TestPoll_Select(t *testing.T) {
 func TestPollStatistic_Select(t *testing.T) {
 	db := table.GetDB()
 	ps := table.PollStatistic{}
-	list, err := ps.Select(db.Db)
+	list, err := ps.Select2(db.Db)
 	if err != nil {
 		t.Errorf("select error on poll statistic %v", err)
 	}
-	fmt.Println("✅")
-	fmt.Println(list)
+	for _, v := range list {
+		fmt.Printf("투표 아이디 : %s/ 질문 아이디 : %s / 보기 아이디 : %s /답변횟수 %d /답변 : %v\n", v.PollId, v.QuestionId, v.ChoiceId, v.Polled, v.Result)
+		fmt.Printf("투표 타이틀 %s / 투표 시작시간 %v / 투표 종료시간 %v / 투표참여자 %d \n", v.Poll.Title, v.Poll.StartTime, v.Poll.EndTime, v.Poll.Participants)
+		for _, vv := range v.Poll.Questions {
+			fmt.Printf("질문 타이틀 %s / 질문 타입 %s / 질문 순서 %v \n", vv.Title, vv.Type, vv.Order)
+		}
+		fmt.Println()
+		//for _, vv := range v.Poll.Questions {
+		//	fmt.Println("질문 : ", vv.Title, vv.Type, vv.IsUse)
+		//	for _, vvv := range vv.Choices {
+		//		fmt.Printf("보기 %s : 답변 %s 득표수 : %d\n", vvv.Choice, v.Result.PollResult, v.Polled)
+		//	}
+		//}
+	}
 }

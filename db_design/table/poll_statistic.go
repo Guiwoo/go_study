@@ -7,10 +7,12 @@ import (
 )
 
 type PollStatistic struct {
-	PollId     string `gorm:"column:poll_id;type:varchar(36)"`
-	QuestionId string `gorm:"column:poll_question_id;type:varchar(36)"`
-	ChoiceId   string `gorm:"column:poll_choice_id;type:varchar(36);primaryKey"`
-	Polled     int    `gorm:"column:polled;type:bigint(20)"`
+	ChoiceId   string         `gorm:"column:poll_choice_id;type:varchar(36);"`
+	PollId     string         `gorm:"column:poll_id;type:varchar(36);"`
+	QuestionId string         `gorm:"column:poll_question_id;type:varchar(36)"`
+	Polled     int            `gorm:"column:polled;type:bigint(20)"`
+	Poll       Poll           `gorm:"foreignKey:poll_id;reference:PollId"`
+	Result     PollResultData `gorm:"foreignKey:poll_choice_id;reference:poll_choice_id"`
 }
 
 func (p *PollStatistic) TableName() string {
@@ -20,10 +22,27 @@ func (p *PollStatistic) TableName() string {
 func (p *PollStatistic) Select(db *gorm.DB) (result []PollStatistic, err error) {
 	err = db.WithContext(context.Background()).Transaction(func(tx *gorm.DB) error {
 		var ids []string
-		if err = tx.Model(&Poll{}).Select("poll_id").Where("status = ?", 2).Find(&ids).Error; err != nil {
+		if err = tx.Model(&Poll{}).Select("poll_id").Where("status = ?", 1).Find(&ids).Error; err != nil {
 			return err
 		}
 		if err = tx.Model(&PollStatistic{}).Where("poll_id in (?)", ids).Find(&result).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+	return result, err
+}
+
+func (p *PollStatistic) Select2(db *gorm.DB) (result []PollStatistic, err error) {
+	err = db.WithContext(context.Background()).Transaction(func(tx *gorm.DB) error {
+		subquery := tx.Model(&Poll{}).Select("poll_id").Where("status = ? ", PollProgress)
+		if err = tx.Model(&PollStatistic{}).
+			Preload("Result").
+			Preload("Poll").
+			Preload("Poll.Questions").
+			Where("poll_id in (?)", subquery).
+			Group("poll_id").Group("poll_question_id").Group("poll_choice_id").
+			Find(&result).Error; err != nil {
 			return err
 		}
 		return nil

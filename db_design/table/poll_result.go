@@ -17,6 +17,20 @@ type PollResult struct {
 	UpdatedAt    time.Time `gorm:"column:updated_at;type:datetime(3)"`
 }
 
+type PollResultData struct {
+	PollResultId string
+	UserId       int
+	PollId       string
+	QuestionId   string
+	PollChoiceId string `gorm:"column:poll_choice_id;primaryKey"`
+	PollResult   string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
+
+func (p *PollResultData) TableName() string {
+	return "poll_result"
+}
 func (p *PollResult) TableName() string {
 	return "poll_result"
 }
