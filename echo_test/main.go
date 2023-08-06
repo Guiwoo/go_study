@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
+	"net/http"
 )
 
 type SearchKeyword struct {
@@ -28,6 +29,8 @@ func callEcho() {
 			Message string `json:"message"`
 		}{"testing", "From Server ! Here is different server on 9096"})
 	})
+
+	:= http.Get("https://localhost:9098")
 	log.Error(e.Start(":9096"))
 }
 

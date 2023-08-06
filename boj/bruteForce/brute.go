@@ -598,3 +598,135 @@ func recur15666(arr, out []int, depth int, sb *strings.Builder) {
 		}
 	}
 }
+
+func boj15661(arr [][]int) {
+	var (
+		ans   = math.MaxInt
+		n     = len(arr)
+		recur func(idx, bit, cnt int)
+	)
+	min := func(a, b int) int {
+		if a > b {
+			return a - b
+		}
+		return b - a
+	}
+	recur = func(idx, bit, cnt int) {
+		if cnt > n/2 {
+			return
+		}
+		var (
+			a, b int
+		)
+		for i := 0; i < n; i++ {
+			for j := i + 1; j < n; j++ {
+				if bit&(1<<i) == 0 && bit&(1<<j) == 0 {
+					a += arr[i][j]
+					a += arr[j][i]
+				} else if bit&(1<<i) != 0 && bit&(1<<j) != 0 {
+					b += arr[i][j]
+					b += arr[j][i]
+				}
+			}
+		}
+		if ans > min(a, b) {
+			ans = min(a, b)
+		}
+		for i := idx + 1; i < n; i++ {
+			recur(i, bit|(1<<i), cnt+1)
+		}
+	}
+
+	for i := 0; i < len(arr); i++ {
+		recur(i, 1<<i, 0)
+	}
+	fmt.Println(ans)
+}
+
+func boj15661Ver2(row, col []int, total int) {
+	var answer = total
+	var recur func(a, b int)
+	abs := func(a int) int {
+		if a < 0 {
+			return -a
+		}
+		return a
+	}
+	min := func(a, b int) int {
+		if a < b {
+			return a
+		}
+		return b
+	}
+
+	recur = func(depth int, sum int) {
+		answer = min(answer, abs(sum))
+		for i := depth + 1; i < len(row); i++ {
+			recur(i, sum-row[i]-col[i])
+		}
+	}
+
+	answer = min(total, answer)
+	recur(0, total)
+
+	fmt.Println(answer)
+}
+
+func boj2580(arr [][]int) {
+	dfs01(arr, 0)
+}
+
+func check(arr [][]int, row, col, i int) bool {
+	// 가로줄 검사
+	for j := 0; j < 9; j++ {
+		if arr[row][j] == i {
+			return false
+		}
+	}
+
+	// 세로줄 검사
+	for j := 0; j < 9; j++ {
+		if arr[j][col] == i {
+			return false
+		}
+	}
+
+	// 3*3 검사
+	row = (row / 3) * 3
+	col = (col / 3) * 3
+	for j := row; j < row+3; j++ {
+		for k := col; k < col+3; k++ {
+			if arr[j][k] == i {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func dfs01(arr [][]int, cur int) {
+	row := cur / 9
+	col := cur % 9
+
+	if cur == 81 {
+		for i := range arr {
+			for j := range arr[i] {
+				fmt.Printf("%d ", arr[i][j])
+			}
+			fmt.Println()
+		}
+		os.Exit(0)
+	}
+
+	if arr[row][col] == 0 {
+		for i := 1; i <= 9; i++ {
+			if check(arr, row, col, i) {
+				arr[row][col] = i
+				dfs01(arr, cur+1)
+				arr[row][col] = 0
+			}
+		}
+	} else {
+		dfs01(arr, cur+1)
+	}
+}
