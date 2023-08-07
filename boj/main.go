@@ -18,50 +18,60 @@ func solution() {
 	var n int
 	fmt.Fscanln(reader, &n)
 
-	arr := make([]string, n)
+	arr := make([]int, n)
 	for i := 0; i < n; i++ {
 		fmt.Fscan(reader, &arr[i])
 	}
-
-	boj2529(arr)
-
-}
-
-var minResult, maxResult string
-
-func boj2529(arr []string) {
-	maxResult, minResult = "", "999999999"
-	for i := 0; i <= 9; i++ {
-		boj2529Recur(arr, []int{i}, 0, 1<<i)
+	oper := make([]int, 4)
+	for i := 0; i < 4; i++ {
+		fmt.Fscan(reader, &oper[i])
 	}
-	fmt.Println(maxResult)
-	fmt.Println(minResult)
+	boj14888(arr, oper)
 }
 
-func boj2529Recur(arr []string, result []int, idx, flag int) {
-	if len(result) == len(arr)+1 {
-		var str string
-		for _, v := range result {
-			str += fmt.Sprintf("%d", v)
+var max = -1000000000
+var min = 1000000000
+
+// + - * % 개수
+func boj14888(arr, oper []int) {
+	boj14888Recur(arr, oper, 0, arr[0])
+	fmt.Println(max, min)
+}
+func boj14888Recur(arr, oper []int, idx, rs int) {
+	if idx == len(arr)-1 {
+		if rs > max {
+			max = rs
 		}
-		if str > maxResult {
-			maxResult = str
-		}
-		if str < minResult {
-			minResult = str
+		if rs < min {
+			min = rs
 		}
 		return
 	} else {
-		if arr[idx] == "<" {
-			for i := result[idx] + 1; i <= 9; i++ {
-				if flag&(1<<i) == 0 {
-					boj2529Recur(arr, append(result, i), idx+1, flag|(1<<i))
+		for i := 0; i < len(oper); i++ {
+			switch i {
+			case 0:
+				if oper[i] > 0 {
+					oper[i]--
+					boj14888Recur(arr, oper, idx+1, rs+arr[idx+1])
+					oper[i]++
 				}
-			}
-		} else {
-			for i := result[idx] - 1; i >= 0; i-- {
-				if flag&(1<<i) == 0 {
-					boj2529Recur(arr, append(result, i), idx+1, flag|(1<<i))
+			case 1:
+				if oper[i] > 0 {
+					oper[i]--
+					boj14888Recur(arr, oper, idx+1, rs-arr[idx+1])
+					oper[i]++
+				}
+			case 2:
+				if oper[i] > 0 {
+					oper[i]--
+					boj14888Recur(arr, oper, idx+1, rs*arr[idx+1])
+					oper[i]++
+				}
+			default:
+				if oper[i] > 0 {
+					oper[i]--
+					boj14888Recur(arr, oper, idx+1, rs/arr[idx+1])
+					oper[i]++
 				}
 			}
 		}

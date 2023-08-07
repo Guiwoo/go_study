@@ -730,3 +730,44 @@ func dfs01(arr [][]int, cur int) {
 		dfs01(arr, cur+1)
 	}
 }
+
+var minResult, maxResult string
+
+func boj2529(arr []string) {
+	maxResult, minResult = "", "999999999"
+	for i := 0; i <= 9; i++ {
+		boj2529Recur(arr, []int{i}, 0, 1<<i)
+	}
+	fmt.Println(maxResult)
+	fmt.Println(minResult)
+}
+
+func boj2529Recur(arr []string, result []int, idx, flag int) {
+	if len(result) == len(arr)+1 {
+		var str string
+		for _, v := range result {
+			str += fmt.Sprintf("%d", v)
+		}
+		if str > maxResult {
+			maxResult = str
+		}
+		if str < minResult {
+			minResult = str
+		}
+		return
+	} else {
+		if arr[idx] == "<" {
+			for i := result[idx] + 1; i <= 9; i++ {
+				if flag&(1<<i) == 0 {
+					boj2529Recur(arr, append(result, i), idx+1, flag|(1<<i))
+				}
+			}
+		} else {
+			for i := result[idx] - 1; i >= 0; i-- {
+				if flag&(1<<i) == 0 {
+					boj2529Recur(arr, append(result, i), idx+1, flag|(1<<i))
+				}
+			}
+		}
+	}
+}
