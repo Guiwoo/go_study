@@ -771,3 +771,39 @@ func boj2529Recur(arr []string, result []int, idx, flag int) {
 		}
 	}
 }
+
+func boj14888(arr, oper []int) (int, int) {
+	max, min := -1000000000, 1000000000
+	boj14888Recur(arr, oper, 0, arr[0], &max, &min)
+	return max, min
+}
+
+func boj14888Recur(arr, oper []int, idx, rs int, max, min *int) {
+	if idx == len(arr)-1 {
+		if rs > *max {
+			*max = rs
+		}
+		if rs < *min {
+			*min = rs
+		}
+		return
+	}
+	for i := 0; i < len(oper); i++ {
+		if oper[i] > 0 {
+			oper[i]--
+			nextVal := rs
+			switch i {
+			case 0:
+				nextVal += arr[idx+1]
+			case 1:
+				nextVal -= arr[idx+1]
+			case 2:
+				nextVal *= arr[idx+1]
+			default:
+				nextVal /= arr[idx+1]
+			}
+			boj14888Recur(arr, oper, idx+1, nextVal, max, min)
+			oper[i]++
+		}
+	}
+}
