@@ -1,8 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"golang.org/x/time/rate"
+	"log"
 	"math/rand"
+	"os"
+	"sort"
 	"sync"
 	"testing"
 	"time"
@@ -375,4 +380,331 @@ func TestHeartBeatCopyRequest(t *testing.T) {
 	wg.Wait()
 
 	fmt.Printf("All go answered from %v\n", firstReturned)
+}
+
+/*
+*
+루틴 여러개를 만들어서 요청을 처리하고 그중 가장 빠르게 응답오는 답을 돌려주는 방법 이러면 ? 리소스를 많이사용하게 되잖아.... 부자들만 할수 있는 패턴이네..
+메모리 상에서의 복제는 괜찮지만 , 핸들러 복제, 프로세스,서버 데이터 센터 복제는 ? 비용이 많이든다 ? 메모리 상의 복제가 무엇을 의미하는지 잘 모르겠다.
+*/
+func TestCopiedRequest(t *testing.T) {
+	dowork := func(done <-chan interface{}, id int, wg *sync.WaitGroup, result chan<- int) {
+		started := time.Now()
+		defer wg.Done()
+
+		simulatedLoadTime := time.Duration(1+rand.Intn(5)) * time.Second
+		select {
+		case <-done:
+		case <-time.After(simulatedLoadTime):
+		}
+
+		select {
+		case <-done:
+		case result <- id:
+		}
+
+		took := time.Since(started)
+
+		if took < simulatedLoadTime {
+			took = simulatedLoadTime
+		}
+		fmt.Printf("%v took %v \n", id, took)
+	}
+
+	done := make(chan interface{})
+	result := make(chan int)
+
+	var wg sync.WaitGroup
+	wg.Add(10)
+
+	for i := 0; i < 10; i++ {
+		go dowork(done, i, &wg, result)
+	}
+
+	firstReturned := <-result
+	close(done)
+	wg.Wait()
+
+	fmt.Printf("Received an answer from %v \n", firstReturned)
+}
+
+// 지금까지 본것중에 제일 어이없ㄱ는 패턴
+
+/*
+ */
+type RateLimiter interface {
+	Wait(ctx context.Context) error
+	Limit() rate.Limit
+}
+
+func MultiLimiter(limiters ...RateLimiter) *multiLimiter {
+	byLimit := func(i, j int) bool {
+		return limiters[i].Limit() < limiters[j].Limit()
+	}
+	sort.Slice(limiters, byLimit)
+	return &multiLimiter{limiters: limiters}
+}
+
+type multiLimiter struct {
+	limiters []RateLimiter
+}
+
+func (l *multiLimiter) Wait(ctx context.Context) error {
+	for _, l := range l.limiters {
+		if err := l.Wait(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func (l *multiLimiter) Limit() rate.Limit {
+	return l.limiters[0].Limit()
+}
+
+func Per(i int, t time.Duration) rate.Limit {
+	return rate.Every(t / time.Duration(i))
+}
+func Open() *APIConnection {
+	return &APIConnection{
+		apiLimit: MultiLimiter(
+			rate.NewLimiter(Per(2, time.Second), 1),
+			rate.NewLimiter(Per(10, time.Minute), 10),
+		),
+		diskLimit:    MultiLimiter(rate.NewLimiter(rate.Limit(1), 1)),
+		networkLimit: MultiLimiter(rate.NewLimiter(Per(3, time.Second), 3)),
+	}
+}
+
+type APIConnection struct {
+	networkLimit,
+	diskLimit,
+	apiLimit RateLimiter
+}
+
+func (a *APIConnection) ReadFile(ctx context.Context) error {
+	err := MultiLimiter(a.apiLimit, a.networkLimit, a.diskLimit).Wait(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (a *APIConnection) ResolveAddress(ctx context.Context) error {
+	err := MultiLimiter(a.diskLimit, a.apiLimit, a.networkLimit).Wait(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func TestLimitSpeed(t *testing.T) {
+	defer log.Printf("Done \n")
+	log.SetOutput(os.Stdout)
+	log.SetFlags(log.Ltime | log.LUTC)
+
+	apiConnection := Open()
+	var wg sync.WaitGroup
+
+	wg.Add(20)
+
+	for i := 0; i < 10; i++ {
+		go func() {
+			defer wg.Done()
+			err := apiConnection.ReadFile(context.Background())
+			if err != nil {
+				log.Printf("cannot readFile : %v\n", err)
+			}
+			log.Printf("ReadFile")
+		}()
+	}
+
+	for i := 0; i < 10; i++ {
+		go func() {
+			defer wg.Done()
+			err := apiConnection.ResolveAddress(context.Background())
+			if err != nil {
+				log.Printf("cannot resolve address : %v\n", err)
+			}
+			log.Printf("ResolveAddress")
+		}()
+	}
+
+	wg.Wait()
+}
+
+/**
+비정상 고루틴 치료
+*/
+
+type startGoruotine func(done <-chan interface{}, pluseInterval time.Duration) (heartbeat <-chan interface{})
+
+func TestRecoverGoroutine(t *testing.T) {
+	or := func(one <-chan interface{}, two <-chan interface{}) <-chan interface{} {
+		stream := make(chan interface{})
+		go func() {
+			defer close(stream)
+			select {
+			case stream <- one:
+			case stream <- two:
+			}
+		}()
+		return stream
+	}
+	orDone := func(done, c <-chan interface{}) <-chan interface{} {
+		valStream := make(chan interface{})
+		go func() {
+			defer close(valStream)
+			for {
+				select {
+				case <-done:
+					return
+				case v, ok := <-c:
+					if ok == false {
+						return
+					}
+					select {
+					case valStream <- v:
+					case <-done:
+					}
+				}
+			}
+		}()
+		return valStream
+	}
+	newSteward := func(timeout time.Duration, goruotine startGoruotine) startGoruotine {
+		return func(done <-chan interface{}, pluseInterval time.Duration) <-chan interface{} {
+			heartbeat := make(chan interface{})
+			go func() {
+				defer close(heartbeat)
+
+				var wardDone chan interface{}
+				var wardHeartbeat <-chan interface{}
+
+				startWard := func() {
+					wardDone = make(chan interface{})
+					wardHeartbeat = goruotine(or(wardDone, done), timeout/2)
+				}
+				startWard()
+				pulse := time.Tick(pluseInterval)
+
+			monitorLoop:
+				for {
+					timeoutSignal := time.After(timeout)
+					for {
+						select {
+						case <-pulse:
+							select {
+							case heartbeat <- struct{}{}:
+							default:
+							}
+						case <-wardHeartbeat:
+							continue monitorLoop
+						case <-timeoutSignal:
+							log.Println("stward: ward unhealthy; restarting")
+							close(wardDone)
+							startWard()
+							continue monitorLoop
+						case <-done:
+							return
+						}
+					}
+				}
+			}()
+
+			return heartbeat
+		}
+	}
+
+	log.SetOutput(os.Stdout)
+	log.SetFlags(log.Ltime | log.LUTC)
+
+	bridge := func(done <-chan interface{}, intStream <-chan <-chan interface{}) <-chan interface{} {
+		valStream := make(chan interface{})
+		go func() {
+			defer close(valStream)
+			for {
+				var stream <-chan interface{}
+				select {
+				case maybeStream, ok := <-intStream:
+					if ok == false {
+						return
+					}
+					stream = maybeStream
+				case <-done:
+					return
+				}
+				for val := range orDone(done, stream) {
+					select {
+					case valStream <- val:
+					case <-done:
+					}
+				}
+			}
+		}()
+		return valStream
+	}
+
+	doWork := func(done <-chan interface{}, _ time.Duration) <-chan interface{} {
+		log.Printf("ward : Hello, I'm irreponsible!")
+		go func() {
+			<-done
+			log.Println("ward : I am halting.")
+		}()
+		return nil
+	}
+	doWorkFn := func(done <-chan interface{}, intList ...int) (startGoruotine, <-chan interface{}) {
+		intChanStream := make(chan (<-chan interface{}))
+		intStream := bridge(done, intChanStream)
+		doWork := func(done <-chan interface{}, pulseInterval time.Duration) <-chan interface{} {
+			intStream := make(chan interface{})
+			heartbeat := make(chan interface{})
+			go func() {
+				defer close(intStream)
+				select {
+				case intChanStream <- intStream:
+				case <-done:
+					return
+				}
+				pluse := time.Tick(pulseInterval)
+				for {
+				valueLoop:
+					for _, intVal := range intList {
+						if intVal < 0 {
+							log.Printf("negative value : %v\n", intVal)
+							return
+						}
+						for {
+							select {
+							case <-pluse:
+								select {
+								case heartbeat <- struct{}{}:
+								default:
+								}
+							case intStream <- intVal:
+								continue valueLoop
+							case <-done:
+								return
+							}
+						}
+					}
+
+				}
+			}()
+			return heartbeat
+		}
+		return doWork, intStream
+	}
+
+	done := make(chan interface{})
+	doWork, intStream := doWorkFn(done, 1, 2, -1, 3, 4, 1, 2)
+	doWorkWIthSteward := newSteward(1*time.Millisecond, doWork)
+
+	time.AfterFunc(9*time.Second, func() {
+		log.Println("main : halting steward and ward.")
+		close(done)
+	})
+	doWorkWIthSteward(done, 1*time.Hour)
+	for intVal := range take(done, intStream, 6) {
+		fmt.Printf("Received : %v\n", intVal)
+	}
+	log.Println("Done")
 }

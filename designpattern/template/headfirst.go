@@ -1,8 +1,7 @@
 package template
 
 import (
-	"context"
-	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -17,6 +16,40 @@ type ServiceTemplate interface {
 	GetRequest() error
 	GetParam() error
 	Process() error
+}
+
+type ServiceHandler struct {
+	service ServiceTemplate
+}
+
+func (s *ServiceHandler) Init(service ServiceTemplate) *ServiceHandler {
+	s.service = service
+	return s
+}
+func (s *ServiceHandler) ParentsFeature01() {
+	fmt.Println("부모의 기능01")
+}
+func (s *ServiceHandler) ParentsFeature02() {
+	fmt.Println("부모의 기능02")
+}
+
+func (s *ServiceHandler) Run(w http.ResponseWriter, r *http.Request) {
+
+	s.ParentsFeature01()
+	s.ParentsFeature02()
+
+	if s.service.IsRequireAuth() {
+		fmt.Println("인증이 필요한경우 여기서 구현")
+	}
+	if err := s.service.GetRequest(); err != nil {
+		fmt.Println("GetRequest 에러 처리")
+	}
+	if err := s.service.GetParam(); err != nil {
+		fmt.Println("GetParam 에러 처리")
+	}
+	if err := s.service.Process(); err != nil {
+		fmt.Println("Process 에러 처리")
+	}
 }
 
 type ServiceGetTest struct{}
@@ -67,75 +100,24 @@ func (s ServicePostTest) Process() error {
 
 var _ ServiceTemplate = (*ServicePostTest)(nil)
 
-type ServiceStruct struct {
-	GetTest  ServiceTemplate
-	PostTest ServiceTemplate
-}
-
-func (s *ServiceStruct) HandleFunc(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "GET":
-		if err := s.GetTest.Process(); err != nil {
-			log.Println(err)
-			value, err := json.Marshal(struct {
-				Code int    `json:"code"`
-				Err  string `json:"err"`
-			}{
-				Code: 500,
-				Err:  err.Error(),
-			})
-			if err == nil {
-				panic(err)
-			}
-			w.Write(value)
-		}
-		w.Write([]byte("success"))
-	case "POST":
-		if err := s.PostTest.Process(); err != nil {
-			log.Println(err)
-			value, err := json.Marshal(struct {
-				Code int    `json:"code"`
-				Err  string `json:"err"`
-			}{
-				Code: 500,
-				Err:  err.Error(),
-			})
-			if err == nil {
-				panic(err)
-			}
-			w.Write(value)
-		}
-		w.Write([]byte("success"))
-	}
-}
-
-func newServiceStruct() *ServiceStruct {
-	return &ServiceStruct{
-		GetTest:  &ServiceGetTest{},
-		PostTest: &ServicePostTest{},
-	}
-}
-
 type MyContext struct {
-	ctx     context.Context
 	mux     *http.ServeMux
-	service *ServiceStruct
+	service *ServiceHandler
 }
 
 func (m *MyContext) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	m.mux.ServeHTTP(w, r)
 }
 func (m *MyContext) InitRouting() {
-	m.mux.HandleFunc("/get", m.service.HandleFunc)
-	m.mux.HandleFunc("/post", m.service.HandleFunc)
+	m.mux.HandleFunc("/get", m.service.Init(ServiceGetTest{}).Run)
+	m.mux.HandleFunc("/post", m.service.Init(ServicePostTest{}).Run)
 }
 
 func ProcessService() {
 
 	myHandler := &MyContext{
-		ctx:     context.Background(),
 		mux:     http.NewServeMux(),
-		service: newServiceStruct(),
+		service: &ServiceHandler{},
 	}
 
 	http.NewServeMux()

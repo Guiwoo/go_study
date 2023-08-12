@@ -99,7 +99,6 @@ func take(done, val <-chan interface{}, rp int) <-chan interface{} {
 				case byte:
 					valueStream <- t
 				default:
-					fmt.Println("something wrong")
 				}
 			}
 		}
