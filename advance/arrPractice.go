@@ -15,7 +15,7 @@ func ex01() {
 	books[2] = "The Go is Conqueror the world"
 	books[3] = "Hoit"
 
-	fmt.Println("books : %T\n", books)
+	fmt.Printf("books : %T\n", books)
 
 	var (
 		wBooks [winter]string

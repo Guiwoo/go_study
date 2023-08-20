@@ -30,7 +30,12 @@ func callEcho() {
 		}{"testing", "From Server ! Here is different server on 9096"})
 	})
 
-	:= http.Get("https://localhost:9098")
+	data, err := http.Get("https://localhost:9098")
+	if err != nil {
+		log.Error(err)
+	} else {
+		log.Infof("got data %v\n", data)
+	}
 	log.Error(e.Start(":9096"))
 }
 

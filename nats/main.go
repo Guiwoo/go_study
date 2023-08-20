@@ -36,5 +36,4 @@ func main() {
 	}
 	defer nc.Close()
 	synchronous(nc)
-	guiwoo.SomethingOnYourMind()
 }

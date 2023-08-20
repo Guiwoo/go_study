@@ -14,7 +14,6 @@ func main() {
 
 	logger := log.New(os.Stdout, "[something.customLog]", log.LstdFlags|log.Ltime)
 	logger.Println("Start echo")
-	logger.SetOutput()
 
 	e := echo.New()
 

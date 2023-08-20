@@ -37,7 +37,7 @@ func main() {
 	//		NextProtos: []string{acme.ALPNProto},
 	//	},
 	//}
-	//log.Error(s.ListenAndServeTLS(serverCert, serverKey))
+	//customLog.Error(s.ListenAndServeTLS(serverCert, serverKey))
 
 	http.Get("https://im.plea.kr:9098/test")
 	log.Error(e.Start(":9098"))

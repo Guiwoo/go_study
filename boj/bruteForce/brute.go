@@ -11,160 +11,6 @@ import (
 	"strings"
 )
 
-func p_01() {
-	reader := bufio.NewReader(os.Stdin)
-	writer := bufio.NewWriter(os.Stdout)
-
-	defer writer.Flush()
-
-	list := make([]int, 9)
-
-	var (
-		total, a, b int
-	)
-
-	for i := range list {
-		fmt.Fscanln(reader, &list[i])
-		total += list[i]
-	}
-
-exit:
-	for i := 0; i < len(list); i++ {
-		for j := i + 1; j < len(list); j++ {
-			if total-list[i]-list[j] == 100 {
-				a = list[i]
-				b = list[j]
-				break exit
-			}
-		}
-	}
-
-	sort.Ints(list)
-
-	for _, v := range list {
-		if v == a || v == b {
-			continue
-		}
-		fmt.Fprintln(writer, v)
-	}
-
-	return
-}
-
-func p_02() {
-	reader := bufio.NewReader(os.Stdin)
-	writer := bufio.NewWriter(os.Stdout)
-	defer writer.Flush()
-
-	var list [][]int
-	for {
-		input, _, _ := reader.ReadLine()
-		sub := strings.Split(string(input), " ")
-
-		if sub[0] == "0" {
-			break
-		}
-
-		subList := make([]int, len(sub)-1)
-
-		for i := 1; i < len(sub); i++ {
-			subList[i-1], _ = strconv.Atoi(sub[i])
-		}
-		sort.Ints(subList)
-		list = append(list, subList)
-	}
-
-	for _, v := range list {
-		generateCombinations(v, 6, []int{}, writer)
-		fmt.Fprintln(writer, "")
-	}
-}
-
-func generateCombinations(arr []int, length int, current []int, writer *bufio.Writer) {
-	if len(current) == length {
-		for _, num := range current {
-			fmt.Fprint(writer, num, " ")
-		}
-		fmt.Fprintln(writer, "")
-		return
-	}
-
-	for i, val := range arr {
-		if i > len(arr)-(length-len(current)) {
-			break
-		}
-		generateCombinations(arr[i+1:], length, append(current, val), writer)
-	}
-}
-
-var arr []int
-var (
-	answer, target int
-)
-
-func p_03() {
-	sc := bufio.NewScanner(os.Stdin)
-
-	rs := toArr(sc)
-	for i := range rs {
-		x, _ := strconv.Atoi(rs[i])
-		if i == 0 {
-			arr = make([]int, x)
-		} else {
-			target = x
-		}
-	}
-
-	rs = toArr(sc)
-	for i := range rs {
-		x, _ := strconv.Atoi(rs[i])
-		arr[i] = x
-	}
-	subArray(0, 0)
-	if target == 0 {
-		answer--
-	}
-	fmt.Println(answer)
-}
-
-func subArray(idx, sum int) {
-	if idx == len(arr) {
-		if sum == target {
-			answer++
-		}
-		return
-	}
-	subArray(idx+1, sum+arr[idx])
-	subArray(idx+1, sum)
-}
-
-func toArr(sc *bufio.Scanner) []string {
-	sc.Scan()
-	input := sc.Text()
-	rs := strings.Split(input, " ")
-	return rs
-}
-
-func ps_03_02() {
-	sc := bufio.NewScanner(os.Stdin)
-
-	params := toArr(sc)
-	arrLen, _ := strconv.Atoi(params[0])
-	target, _ := strconv.Atoi(params[1])
-
-	arr := make([]int, arrLen)
-	nums := toArr(sc)
-	for i, numStr := range nums {
-		arr[i], _ = strconv.Atoi(numStr)
-	}
-
-	answer := subArray_02(arr, target)
-	if target == 0 {
-		answer--
-	}
-	fmt.Println(answer)
-}
-
 func subArray_02(arr []int, target int) int {
 	answer := 0
 	n := len(arr)
@@ -807,3 +653,87 @@ func boj14888Recur(arr, oper []int, idx, rs int, max, min *int) {
 		}
 	}
 }
+
+func boj15686() {
+	answer := 1 << 31
+	var distance [][]int
+	abs := func(a int) int {
+		if a < 0 {
+			return -a
+		}
+		return a
+	}
+	min := func(a, b int) int {
+		if a < b {
+			return a
+		}
+		return b
+	}
+
+	minValue := func(include []int, distance [][]int) int {
+		result := 0
+		for i := 0; i < len(distance); i++ {
+			step := 1 << 31
+			for j := 0; j < len(distance[i]); j++ {
+				for k := 0; k < len(include); k++ {
+					if j == include[k] {
+						step = min(step, distance[i][j])
+					}
+				}
+			}
+			result += step
+		}
+		return result
+	}
+
+	helper := func(num, depth, limit, flag, start int, out []int) {}
+	helper = func(num, depth, limit, flag, start int, out []int) {
+		if depth == limit {
+			answer = min(answer, minValue(out, distance))
+			return
+		} else {
+			for i := start; i < num; i++ {
+				if flag&(1<<i) == 0 {
+					helper(num, depth+1, limit, flag|(1<<i), i+1, append(out, i))
+				}
+			}
+		}
+	}
+	reader := bufio.NewReader(os.Stdin)
+
+	var (
+		a, b int
+	)
+	fmt.Fscanln(reader, &a, &b)
+	house := make([][]int, 0)
+	chicken := make([][]int, 0)
+
+	for i := 0; i < a; i++ {
+		for j := 0; j < a; j++ {
+			var tmp int
+			fmt.Fscan(reader, &tmp)
+			if tmp == 1 {
+				house = append(house, []int{i, j})
+			} else if tmp == 2 {
+				chicken = append(chicken, []int{i, j})
+			}
+		}
+	}
+
+	distance = make([][]int, len(house))
+	for i := 0; i < len(house); i++ {
+		distance[i] = make([]int, len(chicken))
+		for j := 0; j < len(chicken); j++ {
+			distance[i][j] = abs(house[i][0]-chicken[j][0]) + abs(house[i][1]-chicken[j][1])
+		}
+	}
+
+	/**
+	고민해야할 사항 : 치킨집의 개수가 최대 13개이므로, 치킨집의 개수에서 M개를 뽑는 조합을 구하면 된다. (13C6) = 1716 * 집이 최대 50개이므로, 1716 * 50 = 85800
+	*/
+	helper(len(chicken), 0, b, 0, 0, []int{})
+
+	fmt.Println(answer)
+}
+
+func boj15

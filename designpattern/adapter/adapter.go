@@ -32,7 +32,7 @@ func NewRectangle(width, height int) *VectorImage {
 
 // This is the interface you are given
 
-// the interface we have
+// Point the interface we have
 type Point struct {
 	X, Y int
 }

@@ -39,7 +39,7 @@ func deepCopyingProblem() {
 	// it doesn't affect for the copy the object it might occur the problem to pointer copies
 }
 
-// make a receiver function
+// DeepCopy function make a receiver function
 func (a *address) DeepCopy() *address {
 	return &address{}
 }
