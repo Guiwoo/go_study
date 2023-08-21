@@ -736,4 +736,138 @@ func boj15686() {
 	fmt.Println(answer)
 }
 
-func boj15
+func boj14500() {
+	reader := bufio.NewReader(os.Stdin)
+	getMax := func(a, b int) int {
+		if a > b {
+			return a
+		}
+		return b
+	}
+	stick := func(arr [][]int, row, col int) (rs int) {
+		//right 3steps more
+		if col+3 < len(arr[0]) {
+			rs = getMax(rs, arr[row][col]+arr[row][col+1]+arr[row][col+2]+arr[row][col+3])
+		}
+		//down 3steps more
+		if row+3 < len(arr) {
+			rs = getMax(rs, arr[row][col]+arr[row+1][col]+arr[row+2][col]+arr[row+3][col])
+		}
+		return rs
+	}
+	square := func(arr [][]int, row, col int) (rs int) {
+		// right 1step down 1step
+		if row+1 < len(arr) && col+1 < len(arr[0]) {
+			rs = getMax(rs, arr[row][col]+arr[row][col+1]+arr[row+1][col]+arr[row+1][col+1])
+		}
+		return rs
+	}
+	nieun := func(arr [][]int, row, col int) (rs int) {
+		// right 2steps down 1step
+		if row+1 < len(arr) && col+2 < len(arr[0]) {
+			rs = getMax(rs, arr[row][col]+arr[row+1][col]+arr[row+1][col+1]+arr[row+1][col+2])
+		}
+		// left 2steps down 1step
+		if row+1 < len(arr) && col-2 >= 0 {
+			rs = getMax(rs, arr[row][col]+arr[row+1][col]+arr[row+1][col-1]+arr[row+1][col-2])
+		}
+		// top 1step right 2steps
+		if row-1 >= 0 && col+2 < len(arr[0]) {
+			rs = getMax(rs, arr[row][col]+arr[row-1][col]+arr[row-1][col+1]+arr[row-1][col+2])
+		}
+		// top 1step left 2steps
+		if row-1 >= 0 && col-2 >= 0 {
+			rs = getMax(rs, arr[row][col]+arr[row-1][col]+arr[row-1][col-1]+arr[row-1][col-2])
+		}
+
+		//right 1step down 2steps
+		if row+2 < len(arr) && col+1 < len(arr[0]) {
+			rs = getMax(rs, arr[row][col]+arr[row][col+1]+arr[row+1][col+1]+arr[row+2][col+1])
+		}
+		//right 1step top 2steps
+		if row-2 >= 0 && col+1 < len(arr[0]) {
+			rs = getMax(rs, arr[row][col]+arr[row][col+1]+arr[row-1][col+1]+arr[row-2][col+1])
+		}
+		// left 1step down 2steps
+		if row+2 < len(arr) && col-1 >= 0 {
+			rs = getMax(rs, arr[row][col]+arr[row][col-1]+arr[row+1][col-1]+arr[row+2][col-1])
+		}
+		// left 1step top 2steps
+		if row-2 >= 0 && col-1 >= 0 {
+			rs = getMax(rs, arr[row][col]+arr[row][col-1]+arr[row-1][col-1]+arr[row-2][col-1])
+		}
+		return rs
+	}
+	triangle := func(arr [][]int, row, col int) (rs int) {
+		// right 2steps up 1step
+		if row-1 >= 0 && col+2 < len(arr[0]) {
+			rs = getMax(rs, arr[row][col]+arr[row][col+1]+arr[row][col+2]+arr[row-1][col+1])
+		}
+		//right 2steps down 1step
+		if row+1 < len(arr) && col+2 < len(arr[0]) {
+			rs = getMax(rs, arr[row][col]+arr[row][col+1]+arr[row][col+2]+arr[row+1][col+1])
+		}
+
+		// down 2steps right 1step
+		if row+2 < len(arr) && col+1 < len(arr[0]) {
+			rs = getMax(rs, arr[row][col]+arr[row+1][col]+arr[row+2][col]+arr[row+1][col+1])
+		}
+		// down 2steps left 1step
+		if row+2 < len(arr) && col-1 >= 0 {
+			rs = getMax(rs, arr[row][col]+arr[row+1][col]+arr[row+2][col]+arr[row+1][col-1])
+		}
+		return rs
+	}
+	etc := func(arr [][]int, row, col int) (rs int) {
+		// right 2steps up 1step
+		if row-1 >= 0 && col+2 < len(arr[0]) {
+			rs = getMax(rs, arr[row][col]+arr[row][col+1]+arr[row-1][col+1]+arr[row-1][col+2])
+		}
+		//right 2steps down 1step
+		if row+1 < len(arr) && col+2 < len(arr[0]) {
+			rs = getMax(rs, arr[row][col]+arr[row][col+1]+arr[row+1][col+1]+arr[row+1][col+2])
+		}
+
+		//down 2steps right 1step
+		if row+2 < len(arr) && col+1 < len(arr[0]) {
+			rs = getMax(rs, arr[row][col]+arr[row+1][col]+arr[row+1][col+1]+arr[row+2][col+1])
+		}
+		//down2steps left 1step
+		if row+2 < len(arr) && col-1 >= 0 {
+			rs = getMax(rs, arr[row][col]+arr[row+1][col]+arr[row+1][col-1]+arr[row+2][col-1])
+		}
+		return rs
+	}
+
+	check := func(arr [][]int, row, col int) int {
+		result := getMax(square(arr, row, col), stick(arr, row, col))
+		result2 := getMax(nieun(arr, row, col), triangle(arr, row, col))
+		return getMax(result, getMax(result2, etc(arr, row, col)))
+	}
+
+	var answer int
+	helper := func(arr [][]int, size int) {}
+	helper = func(arr [][]int, size int) {
+		if size == len(arr[0])*len(arr) {
+			return
+		}
+		row, col := size/len(arr[0]), size%len(arr[0])
+		answer = getMax(answer, check(arr, row, col))
+		helper(arr, size+1)
+	}
+
+	var n, m int
+
+	fmt.Fscanln(reader, &n, &m)
+
+	arr := make([][]int, n)
+	for i := range arr {
+		arr[i] = make([]int, m)
+		for j := range arr[i] {
+			fmt.Fscan(reader, &arr[i][j])
+		}
+	}
+
+	helper(arr, 0)
+	fmt.Println(answer)
+}
