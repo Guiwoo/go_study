@@ -1,390 +1,66 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
-	"math"
-	"net"
-	"os"
+	"net/http"
+	_ "net/http/pprof"
 	"sync"
-	"text/tabwriter"
 	"time"
 )
 
-func fork() {
-	var wg sync.WaitGroup
-	sayHello := func() {
-		defer wg.Done()
-		fmt.Println("Hello")
-	}
-	wg.Add(1)
-	go sayHello()
-	wg.Wait()
-}
+var (
+	global_one = time.NewTicker(1 * time.Second)
+	global_two = time.NewTicker(2 * time.Second)
+	chan_map   = make(map[int]chan interface{})
+	sc         = &sync.Mutex{}
+)
 
-func fork2() {
-	salutation := "Hello"
-	run := make(chan bool, 1)
+func streamGen(done <-chan interface{}) <-chan interface{} {
+	stream := make(chan interface{})
 	go func() {
-		run <- true
-		salutation = "Welcome"
-	}()
-	<-run
-	fmt.Println(salutation)
-}
-
-func fork3() {
-	var wg sync.WaitGroup
-	for _, salutation := range []string{"Hello", "Greetings", "Good Day"} {
-		wg.Add(1)
-		go func(s string) {
-			defer wg.Done()
-			fmt.Println(s)
-		}(salutation)
-	}
-	wg.Wait()
-}
-
-func waitGroup() {
-	hello := func(wg *sync.WaitGroup, id int) {
-		defer wg.Done()
-		fmt.Printf("%d : Hello\n", id)
-	}
-
-	const numGreet = 5
-	var wg sync.WaitGroup
-	wg.Add(numGreet)
-	for i := 0; i < numGreet; i++ {
-		go hello(&wg, i)
-	}
-	wg.Wait()
-}
-
-func mutx() {
-	var count int
-	var lock sync.Mutex
-
-	increment := func() {
-		lock.Lock()
-		defer lock.Unlock()
-		count++
-		fmt.Printf("Incrementing : %d\n", count)
-	}
-	decrement := func() {
-		lock.Lock()
-		defer lock.Unlock()
-		count--
-		fmt.Printf("Decrementing : %d\n", count)
-	}
-
-	var arithmetic sync.WaitGroup
-	for i := 0; i <= 5; i++ {
-		arithmetic.Add(1)
-		go func() {
-			defer arithmetic.Done()
-			increment()
-		}()
-	}
-
-	for i := 0; i <= 5; i++ {
-		arithmetic.Add(1)
-		go func() {
-			defer arithmetic.Done()
-			decrement()
-		}()
-	}
-
-	arithmetic.Wait()
-	fmt.Println("Arithmetic complete.")
-}
-
-func rwmtx() {
-	producer := func(wg *sync.WaitGroup, l sync.Locker) {
-		defer wg.Done()
-		for i := 5; i > 0; i-- {
-			l.Lock()
-			l.Unlock()
-			time.Sleep(1)
-		}
-	}
-
-	observer := func(wg *sync.WaitGroup, l sync.Locker) {
-		defer wg.Done()
-		l.Lock()
-		defer l.Unlock()
-	}
-
-	test := func(count int, mutex, rwMutex sync.Locker) time.Duration {
-		var wg sync.WaitGroup
-		wg.Add(count + 1)
-
-		beginTestTime := time.Now()
-		go producer(&wg, mutex)
-
-		for i := count; i > 0; i-- {
-			go observer(&wg, rwMutex)
-		}
-
-		wg.Wait()
-		return time.Since(beginTestTime)
-	}
-
-	tw := tabwriter.NewWriter(os.Stdout, 0, 1, 2, ' ', 0)
-	defer tw.Flush()
-
-	var m sync.RWMutex
-	fmt.Printf("Readers\tRWMutex\tMutex\n")
-	for i := 0; i < 20; i++ {
-		count := int(math.Pow(2, float64(i)))
-		fmt.Fprintf(tw, "%d\t%v\t%v\n", count, test(count, &m, m.RLocker()), test(count, &m, &m))
-		test(count, &m, m.RLocker())
-		test(count, &m, &m)
-	}
-}
-
-func cond() {
-	c := sync.NewCond(&sync.Mutex{})
-	c.L.Lock()
-	for true {
-		c.Wait()
-	}
-	c.L.Unlock()
-}
-
-func cond2() {
-	c := sync.NewCond(&sync.Mutex{})
-
-	queue := make([]interface{}, 0, 10)
-
-	removeFromQueue := func(delay time.Duration) {
-		time.Sleep(delay)
-		c.L.Lock()
-		queue = queue[1:]
-		fmt.Println("Removed from queue")
-		c.L.Unlock()
-		c.Signal()
-	}
-
-	for i := 0; i < 10; i++ {
-		c.L.Lock()
-		for len(queue) == 2 {
-			c.Wait()
-		}
-		fmt.Println("Adding to queue")
-		queue = append(queue, struct{}{})
-		go removeFromQueue(10 * time.Second)
-		c.L.Unlock()
-	}
-}
-
-func cond3() {
-	type Button struct {
-		Clicked *sync.Cond
-	}
-
-	button := Button{Clicked: sync.NewCond(&sync.Mutex{})}
-
-	subscribe := func(c *sync.Cond, fn func()) {
-		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			wg.Done()
-			c.L.Lock()
-			defer c.L.Unlock()
-			c.Wait()
-			fn()
-		}()
-		wg.Wait()
-	}
-
-	var clickRegistered sync.WaitGroup
-	clickRegistered.Add(3)
-	subscribe(button.Clicked, func() {
-		fmt.Println("Maximizing windows.")
-		clickRegistered.Done()
-	})
-	subscribe(button.Clicked, func() {
-		fmt.Println("Displaying annoying dialog box!")
-		clickRegistered.Done()
-	})
-	subscribe(button.Clicked, func() {
-		fmt.Println("Mouse clicked.")
-		clickRegistered.Done()
-	})
-
-	button.Clicked.Broadcast()
-	clickRegistered.Wait()
-}
-
-func on() {
-	var count int
-	increment := func() {
-		count++
-	}
-
-	var once sync.Once
-
-	var increments sync.WaitGroup
-	increments.Add(100)
-	for i := 0; i < 100; i++ {
-		go func() {
-			defer increments.Done()
-			once.Do(increment)
-		}()
-	}
-	increments.Wait()
-	fmt.Printf("Count is %d\n", count)
-}
-
-func pool() {
-	myPool := sync.Pool{
-		New: func() interface{} {
-			fmt.Println("Creating new instance.")
-			return struct{}{}
-		},
-	}
-	myPool.Get()
-	a := myPool.Get()
-	myPool.Put(a)
-	myPool.Get()
-}
-
-func pool2() {
-	var numCalcsCreated int
-	calcPool := &sync.Pool{
-		New: func() interface{} {
-			numCalcsCreated++
-			mem := make([]byte, 1024)
-			return &mem
-		},
-	}
-	calcPool.Put(calcPool.New())
-	calcPool.Put(calcPool.New())
-	calcPool.Put(calcPool.New())
-	calcPool.Put(calcPool.New())
-
-	const numWorkers = 1024 * 1024
-
-	var wg sync.WaitGroup
-	wg.Add(numWorkers)
-	for i := numWorkers; i > 0; i-- {
-		go func() {
-			defer wg.Done()
-			mem := calcPool.Get().(*[]byte)
-			defer calcPool.Put(mem)
-		}()
-	}
-
-	wg.Wait()
-	fmt.Printf("%d calculators were created.", numCalcsCreated)
-}
-
-func connectToService() interface{} {
-	time.Sleep(1 * time.Second)
-	return struct{}{}
-}
-
-func startNetworkDaemon() *sync.WaitGroup {
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		server, err := net.Listen("tcp", "localhost:8080")
-		if err != nil {
-			log.Fatalf("cannot listen: %v", err)
-		}
-		defer server.Close()
-		wg.Done()
+		defer close(stream)
 		for {
-			conn, err := server.Accept()
-			if err != nil {
-				log.Printf("cannot accept connection: %v", err)
-				continue
+			select {
+			case <-done:
+				return
+			case <-global_one.C:
+				stream <- "ticker sent data"
 			}
-
-			connectToService()
-			fmt.Fprintln(conn, "")
-			conn.Close()
 		}
 	}()
-	return &wg
+	return stream
 }
 
 func main() {
-	var wg sync.WaitGroup
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	wg.Add(2)
 
-	locale := func(ctx context.Context) (string, error) {
-		if deadline, ok := ctx.Deadline(); ok {
-			if deadline.Sub(time.Now().Add(1*time.Minute)) <= 0 {
-				return "", fmt.Errorf("unsupported locale")
+	go func() {
+		http.ListenAndServe("localhost:4000", nil)
+	}()
+
+	go func() {
+		defer fmt.Println("함수종료 왜 ?")
+		for {
+			target := int(time.Now().Unix() % 2)
+			select {
+			case <-global_two.C:
+				if target%2 == 0 {
+					if _, ok := chan_map[target]; !ok {
+						// 채널 생성해서 넣어주고
+						chan_map[target] = make(chan interface{})
+					}
+					for data := range streamGen(chan_map[target]) {
+						log.Println(data)
+					}
+				} else {
+					sc.Lock()
+					close(chan_map[target])
+					delete(chan_map, target)
+					sc.Unlock()
+				}
 			}
 		}
-		select {
-		case <-ctx.Done():
-			return "", ctx.Err()
-		case <-time.After(3 * time.Second):
-			return "EN/US", nil
-		}
-	}
-
-	genGreeting := func(ctx context.Context) (string, error) {
-		ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
-		defer cancel()
-		defer wg.Done()
-
-		switch loc, err := locale(ctx); {
-		case err != nil:
-			return "", err
-		case loc == "EN/US":
-			return "hello", nil
-		}
-		return "", fmt.Errorf("unsupported")
-	}
-
-	genFarewell := func(ctx context.Context) (string, error) {
-		switch loc, err := locale(ctx); {
-		case err != nil:
-			return "", err
-		case loc == "EN/US":
-			return "Good bye", nil
-		}
-		return "", fmt.Errorf("unsupported")
-	}
-
-	printGreeting := func(ctx context.Context) error {
-		greeting, err := genGreeting(ctx)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("%s world!\n", greeting)
-		return nil
-	}
-	printFarewell := func(ctx context.Context) error {
-		defer wg.Done()
-		farewell, err := genFarewell(ctx)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("%s world \n", farewell)
-		return nil
-	}
-
-	go func() {
-		if err := printGreeting(ctx); err != nil {
-			fmt.Printf("Erorr ouccr on print Greeting : %s\n", err)
-			cancel()
-		}
 	}()
 
-	go func() {
-		if err := printFarewell(ctx); err != nil {
-			fmt.Printf("Error occur on print Farewell : %s\n", err)
-		}
-	}()
-
-	wg.Wait()
-	fmt.Println("All go routines done")
+	fmt.Println("finish as normal exit")
 }
