@@ -52,6 +52,7 @@ func connect() error {
 		Logger: newLogger.LogMode(logger.Info),
 		//SkipDefaultTransaction: true,
 	})
+	db.AutoMigrate(&Workout{})
 	//err = dbInstance.AutoMigrate(&table.User{}, &table.Contents{}, &table.Survey{})
 	dbInstance = &CustomDB{db}
 	return err
