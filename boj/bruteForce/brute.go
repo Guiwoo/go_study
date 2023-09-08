@@ -871,3 +871,35 @@ func boj14500() {
 	helper(arr, 0)
 	fmt.Println(answer)
 }
+
+func boj_nqueen() {
+	reader := bufio.NewReader(os.Stdin)
+
+	var n int
+	fmt.Fscanln(reader, &n)
+
+	var answer int
+
+	col := make([]bool, n)
+	diag1 := make([]bool, 2*n-1) // main diagonals
+	diag2 := make([]bool, 2*n-1) // anti-diagonals
+
+	var dfs func(row int)
+	dfs = func(row int) {
+		if row == n {
+			answer++
+			return
+		}
+		for colIdx := 0; colIdx < n; colIdx++ {
+			if col[colIdx] || diag1[row+colIdx] || diag2[row-colIdx+n-1] {
+				continue
+			}
+			col[colIdx], diag1[row+colIdx], diag2[row-colIdx+n-1] = true, true, true
+			dfs(row + 1)
+			col[colIdx], diag1[row+colIdx], diag2[row-colIdx+n-1] = false, false, false
+		}
+	}
+
+	dfs(0)
+	fmt.Println(answer)
+}
