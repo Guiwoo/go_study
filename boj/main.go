@@ -4,70 +4,70 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func main() {
 	solution()
 }
 
-/**
-6 5
-1 2
-2 5
-5 1
-3 4
-4 6
-*/
-
 func solution() {
 	reader := bufio.NewReader(os.Stdin)
+	writer := bufio.NewWriter(os.Stdout)
+	defer writer.Flush()
 
-	var a, b int
-	fmt.Fscanln(reader, &a, &b)
+	var total int
+	fmt.Fscanln(reader, &total)
 
-	arr := make([][]int, a+1)
+	for i := 0; i < total; i++ {
+		var r, c int
+		fmt.Fscanln(reader, &r, &c)
 
-	for i := 0; i < b; i++ {
-		var start, end int
-		fmt.Fscanln(reader, &start, &end)
-		arr[start] = append(arr[start], end)
-		arr[end] = append(arr[end], start)
-	}
-	visit := make([]bool, a+1)
-	ans := 0
-	for i := 1; i <= a; i++ {
-		if !visit[i] {
-			visit[i] = true
-			bfs(i, arr, visit)
-			ans++
+		arr := make([][]string, r)
+
+		for j := 0; j < r; j++ {
+			var input string
+			fmt.Fscanln(reader, &input)
+			arr[j] = strings.Split(input, "")
 		}
+
+		writer.WriteString(bfs(arr) + "\n")
 	}
-	fmt.Println(ans)
 }
 
-// dfs 가 조금더 빠른것으로 보임 왜그런지 확인하고 코드 작성해보기
-func bfs(start int, arr [][]int, visit []bool) {
-	q := []int{start}
+func bfs(arr [][]string) string {
+	ans := 0
+	dirs := []int{0, 1, 0, -1, 0}
 
-	for len(q) > 0 {
-		cur := q[0]
-		q = q[1:]
+	for i := range arr {
+		for j := range arr[i] {
+			if arr[i][j] == "#" {
+				q := make([][]int, 1)
+				q[0] = []int{i, j}
 
-		for i := 0; i < len(arr[cur]); i++ {
-			if !visit[arr[cur][i]] {
-				visit[arr[cur][i]] = true
-				check := false
-				for _, v := range arr[arr[cur][i]] {
-					if !visit[v] {
-						check = true
-						break
+				for len(q) > 0 {
+					cur := q[0]
+					q = q[1:]
+					arr[cur[0]][cur[1]] = "."
+					//4방향 체크
+					for k := 1; k < len(dirs); k++ {
+						nextRow := cur[0] + dirs[k-1]
+						nextCol := cur[1] + dirs[k]
+
+						if nextRow < 0 || nextCol < 0 || nextRow >= len(arr) || nextCol >= len(arr[0]) {
+							continue
+						}
+						if arr[nextRow][nextCol] == "#" {
+							arr[nextRow][nextCol] = "."
+							q = append(q, []int{nextRow, nextCol})
+						}
 					}
 				}
-				if check {
-					q = append(q, arr[cur][i])
-				}
+				ans++
 			}
-
 		}
 	}
+
+	return strconv.Itoa(ans)
 }
