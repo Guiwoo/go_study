@@ -102,7 +102,7 @@ func boj11724() {
 	for i := 1; i <= a; i++ {
 		if !visit[i] {
 			visit[i] = true
-			bfs_11724(i, arr, visit)
+			boj11724Bfs(i, arr, visit)
 			ans++
 		}
 	}
@@ -110,7 +110,7 @@ func boj11724() {
 }
 
 // dfs 가 조금더 빠른것으로 보임 왜그런지 확인하고 코드 작성해보기
-func bfs_11724(start int, arr [][]int, visit []bool) {
+func boj11724Bfs(start int, arr [][]int, visit []bool) {
 	q := []int{start}
 
 	for len(q) > 0 {
@@ -134,4 +134,92 @@ func bfs_11724(start int, arr [][]int, visit []bool) {
 
 		}
 	}
+}
+
+func boj11123() {
+	reader := bufio.NewReader(os.Stdin)
+	writer := bufio.NewWriter(os.Stdout)
+	defer writer.Flush()
+
+	var total int
+	fmt.Fscanln(reader, &total)
+
+	for i := 0; i < total; i++ {
+		var r, c int
+		fmt.Fscanln(reader, &r, &c)
+
+		arr := make([][]string, r)
+
+		for j := 0; j < r; j++ {
+			var input string
+			fmt.Fscanln(reader, &input)
+			arr[j] = strings.Split(input, "")
+		}
+
+		writer.WriteString(boj11123Bfs(arr) + "\n")
+	}
+}
+
+func boj11123Bfs(arr [][]string) string {
+	ans := 0
+	dirs := []int{0, 1, 0, -1, 0}
+
+	for i := range arr {
+		for j := range arr[i] {
+			if arr[i][j] == "#" {
+				q := make([][]int, 1)
+				q[0] = []int{i, j}
+
+				for len(q) > 0 {
+					cur := q[0]
+					q = q[1:]
+					arr[cur[0]][cur[1]] = "."
+					//4방향 체크
+					for k := 1; k < len(dirs); k++ {
+						nextRow := cur[0] + dirs[k-1]
+						nextCol := cur[1] + dirs[k]
+
+						if nextRow < 0 || nextCol < 0 || nextRow >= len(arr) || nextCol >= len(arr[0]) {
+							continue
+						}
+						if arr[nextRow][nextCol] == "#" {
+							arr[nextRow][nextCol] = "."
+							q = append(q, []int{nextRow, nextCol})
+						}
+					}
+				}
+				ans++
+			}
+		}
+	}
+
+	return strconv.Itoa(ans)
+}
+
+func boj11123Dfs(arr [][]string) string {
+	ans := 0
+	recur := func(i, j int) {}
+
+	recur = func(i, j int) {
+		if i < 0 || j < 0 || i >= len(arr) || j >= len(arr[0]) || arr[i][j] != "#" {
+			return
+		}
+		if arr[i][j] == "#" {
+			arr[i][j] = "."
+		}
+		recur(i-1, j)
+		recur(i, j-1)
+		recur(i+1, j)
+		recur(i, j+1)
+	}
+
+	for i := 0; i < len(arr); i++ {
+		for j := 0; j < len(arr[i]); j++ {
+			if arr[i][j] == "#" {
+				recur(i, j)
+				ans++
+			}
+		}
+	}
+	return strconv.Itoa(ans)
 }

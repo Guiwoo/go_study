@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 )
 
 func main() {
@@ -17,54 +16,52 @@ func solution() {
 	writer := bufio.NewWriter(os.Stdout)
 	defer writer.Flush()
 
-	var total int
-	fmt.Fscanln(reader, &total)
+	var cases int
+	fmt.Fscanln(reader, &cases)
 
-	for i := 0; i < total; i++ {
-		var r, c int
-		fmt.Fscanln(reader, &r, &c)
+	for i := 0; i < cases; i++ {
+		var row, col, lines int
+		fmt.Fscanln(reader, &row, &col, &lines)
 
-		arr := make([][]string, r)
+		arr := make([][]int, row)
+		for r := range arr {
+			arr[r] = make([]int, col)
+		}
 
-		for j := 0; j < r; j++ {
-			var input string
-			fmt.Fscanln(reader, &input)
-			arr[j] = strings.Split(input, "")
+		for j := 0; j < lines; j++ {
+			var tRow, tCol int
+			fmt.Fscanln(reader, &tRow, &tCol)
+			arr[tRow][tCol] = 1
 		}
 
 		writer.WriteString(bfs(arr) + "\n")
 	}
 }
 
-func bfs(arr [][]string) string {
-	ans := 0
+func bfs(arr [][]int) string {
 	dirs := []int{0, 1, 0, -1, 0}
+	var ans int
 
 	for i := range arr {
 		for j := range arr[i] {
-			if arr[i][j] == "#" {
-				q := make([][]int, 1)
-				q[0] = []int{i, j}
-
+			if arr[i][j] == 1 {
+				ans++
+				arr[i][j] = -1
+				q := [][]int{{i, j}}
 				for len(q) > 0 {
 					cur := q[0]
 					q = q[1:]
-					arr[cur[0]][cur[1]] = "."
-					//4방향 체크
 					for k := 1; k < len(dirs); k++ {
-						nextRow := cur[0] + dirs[k-1]
-						nextCol := cur[1] + dirs[k]
+						nRow := cur[0] + dirs[k-1]
+						nCol := cur[1] + dirs[k]
 
-						if nextRow < 0 || nextCol < 0 || nextRow >= len(arr) || nextCol >= len(arr[0]) {
+						if nRow < 0 || nCol < 0 || nRow >= len(arr) || nCol >= len(arr[i]) || arr[nRow][nCol] < 1 {
 							continue
 						}
-						if arr[nextRow][nextCol] == "#" {
-							arr[nextRow][nextCol] = "."
-							q = append(q, []int{nextRow, nextCol})
-						}
+						arr[nRow][nCol] = -1
+						q = append(q, []int{nRow, nCol})
 					}
 				}
-				ans++
 			}
 		}
 	}
