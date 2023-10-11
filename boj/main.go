@@ -4,84 +4,61 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sort"
 )
 
 func main() {
 	solution()
 }
 
-/**
-7
-0110100
-0110101
-1110101
-0000111
-0100000
-0111110
-0111000
-*/
-
 func solution() {
 	reader := bufio.NewReader(os.Stdin)
 
-	var num int
-	fmt.Fscanln(reader, &num)
+	var size int
+	fmt.Fscanln(reader, &size)
 
-	arr := make([][]int, num)
+	graph := make([][]int, size)
+
+	arr := make([][]int, size)
 	for i := range arr {
-		arr[i] = make([]int, num)
-		var input string
-		fmt.Fscanln(reader, &input)
-		for j := 0; j < len(input); j++ {
-			arr[i][j] = int(input[j] - '0')
+		sub := make([]int, size)
+		for j := range sub {
+			var a int
+			fmt.Fscan(reader, &a)
+			if a == 1 {
+				graph[i] = append(graph[i], j)
+			}
+			sub[j] = a
 		}
+		arr[i] = sub
 	}
 
-	var (
-		ans    int
-		amount []int
-	)
+	answer := make([][]int, size)
 
-	for i := range arr {
-		for j := range arr[i] {
-			if arr[i][j] == 1 {
-				ans++
-				arr[i][j] = 0
-				amount = append(amount, bfs(i, j, arr))
+	for i := 0; i < len(graph); i++ {
+		visit := make([]bool, len(graph))
+		dfs(i, graph, visit)
+		sub := make([]int, size)
+		for j := 0; j < len(sub); j++ {
+			if visit[j] {
+				sub[j] = 1
 			}
 		}
+		answer[i] = sub
 	}
 
-	fmt.Println(ans)
-	sort.Ints(amount)
-	for _, v := range amount {
-		fmt.Println(v)
+	for _, v := range answer {
+		for _, vv := range v {
+			fmt.Printf("%d ", vv)
+		}
+		fmt.Println()
 	}
 }
 
-func bfs(row, col int, arr [][]int) int {
-	var ans int
-	dirs := []int{0, 1, 0, -1, 0}
-
-	q := [][]int{{row, col}}
-
-	for len(q) > 0 {
-		cur := q[0]
-		ans++
-		q = q[1:]
-		for i := 1; i < len(dirs); i++ {
-			nRow := cur[0] + dirs[i-1]
-			nCol := cur[1] + dirs[i]
-
-			if nRow < 0 || nCol < 0 || nRow >= len(arr) || nCol >= len(arr[0]) || arr[nRow][nCol] != 1 {
-				continue
-			}
-			arr[nRow][nCol] = 0
-			q = append(q, []int{nRow, nCol})
+func dfs(idx int, graph [][]int, visit []bool) {
+	for i := 0; i < len(graph[idx]); i++ {
+		if !visit[graph[idx][i]] {
+			visit[graph[idx][i]] = true
+			dfs(graph[idx][i], graph, visit)
 		}
-
 	}
-
-	return ans
 }
