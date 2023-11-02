@@ -3,62 +3,57 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
+	"sort"
 )
 
 func main() {
 	solution()
 }
 
+// M은 20억 까지
+// A의 최대값은 10억
+// 1,2,3,4,5 주어진 차이 3
+
+// 1부터 루프 돌아
+
 func solution() {
 	reader := bufio.NewReader(os.Stdin)
 
-	var size int
-	fmt.Fscanln(reader, &size)
+	var len int
+	fmt.Fscanln(reader, &len)
 
-	graph := make([][]int, size)
-
-	arr := make([][]int, size)
+	arr := make([]int, len)
 	for i := range arr {
-		sub := make([]int, size)
-		for j := range sub {
-			var a int
-			fmt.Fscan(reader, &a)
-			if a == 1 {
-				graph[i] = append(graph[i], j)
-			}
-			sub[j] = a
-		}
-		arr[i] = sub
+		var num int
+		fmt.Fscan(reader, &num)
+		arr[i] = num
 	}
 
-	answer := make([][]int, size)
+	sort.Ints(arr)
 
-	for i := 0; i < len(graph); i++ {
-		visit := make([]bool, len(graph))
-		dfs(i, graph, visit)
-		sub := make([]int, size)
-		for j := 0; j < len(sub); j++ {
-			if visit[j] {
-				sub[j] = 1
-			}
+	left, right, value := 0, len-1, math.MaxInt
+	index := make([]int, 2)
+
+	for left < right {
+		v := arr[left] + arr[right]
+		if abs(v) < value {
+			value = abs(v)
+			index = []int{arr[left], arr[right]}
+		} else if v > 0 {
+			right--
+		} else {
+			left++
 		}
-		answer[i] = sub
 	}
 
-	for _, v := range answer {
-		for _, vv := range v {
-			fmt.Printf("%d ", vv)
-		}
-		fmt.Println()
-	}
+	fmt.Println(index)
 }
 
-func dfs(idx int, graph [][]int, visit []bool) {
-	for i := 0; i < len(graph[idx]); i++ {
-		if !visit[graph[idx][i]] {
-			visit[graph[idx][i]] = true
-			dfs(graph[idx][i], graph, visit)
-		}
+func abs(a int) int {
+	if a < 0 {
+		return -a
 	}
+	return a
 }
