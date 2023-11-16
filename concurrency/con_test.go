@@ -11,11 +11,6 @@ import (
 	"time"
 )
 
-func init() {
-	daemonStarted := startNetworkDaemon()
-	daemonStarted.Wait()
-}
-
 func BenchmarkPool(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		conn, err := net.Dial("tcp", "localhost:8080")

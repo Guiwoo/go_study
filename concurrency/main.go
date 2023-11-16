@@ -8,6 +8,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -85,8 +86,7 @@ func NewHandler() *Handler {
 	}
 }
 
-func main() {
-
+func mainTestRoutine() {
 	go func() {
 		http.ListenAndServe("localhost:4000", nil)
 	}()
@@ -110,4 +110,48 @@ func main() {
 	}
 
 	log.Println("go routine done")
+}
+
+func systemCall() {
+	fmt.Println("system call ")
+	file, _ := syscall.Open("./atask_user.log", syscall.O_RDONLY, uint32(0666))
+
+	defer syscall.Close(file) // 파일 닫기 (defer를 사용하여 함수 종료 시 닫히도록 함)
+
+	// 파일 읽기
+	const bufferSize = 1024
+	buf := make([]byte, bufferSize)
+	for {
+		// 파일에서 데이터 읽기
+		n, err := syscall.Read(file, buf)
+		if err != nil {
+			fmt.Println("Error reading file:", err)
+			break
+		}
+
+		// 더 이상 읽을 데이터가 없으면 종료
+		if n == 0 {
+			break
+		}
+
+		// 읽은 데이터 출력 또는 원하는 작업 수행
+	}
+
+	fmt.Println("system call done")
+}
+
+func main() {
+	var wg sync.WaitGroup
+	wg.Add(1)
+	//
+	//for i := 0; i < 1000; i++ {
+	//	go systemCall()
+	//}
+
+	go func() {
+		defer wg.Done()
+		http.ListenAndServe("localhost:4000", nil)
+	}()
+
+	wg.Wait()
 }
