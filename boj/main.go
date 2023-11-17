@@ -4,113 +4,89 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func main() {
 	solution()
 }
 
+//물을 붓는방법
+// a->b
+// a->c
+// b->a
+// b->c
+// c->a
+// c->b
+
+// a물통 이 비어있으면 값을 추가
 func solution() {
-	reader := bufio.NewReader(os.Stdin)
-
-	var len int
-	fmt.Fscanln(reader, &len)
-
-	arr := make([][]string, len)
-
-	for i := range arr {
-		sub := make([]string, len)
-		var a string
-		fmt.Fscanln(reader, &a)
-		for i, v := range a {
-			sub[i] = string(v)
-		}
-		arr[i] = sub
-	}
-
-	abNormal := bfsAbnormal(copySlice(arr))
-	normal := bfsNormal(copySlice(arr))
-
-	fmt.Println(normal, abNormal)
-}
-
-func copySlice(src [][]string) [][]string {
-	dst := make([][]string, len(src))
-	for i, sub := range src {
-		dst[i] = make([]string, len(sub))
-		copy(dst[i], sub)
-	}
-	return dst
-}
-
-func bfsNormal(arr [][]string) int {
 	var (
-		answer int
-		dirs   []int = []int{0, 1, 0, -1, 0}
-	)
-	for i := range arr {
-		for j := range arr[i] {
-			if arr[i][j] != "A" {
-				// do something
-				first := arr[i][j]
-				arr[i][j] = "A"
-				q := [][]int{{i, j}}
-				for len(q) > 0 {
-					cur := q[0]
-					q = q[1:]
-					for k := 1; k < len(dirs); k++ {
-						nRow := cur[0] + dirs[k-1]
-						nCol := cur[1] + dirs[k]
-						if nRow < 0 || nCol < 0 || nRow >= len(arr) || nCol >= len(arr) || arr[nRow][nCol] == "A" || arr[nRow][nCol] != first {
-							continue
-						}
-						arr[nRow][nCol] = "A"
-						q = append(q, []int{nRow, nCol})
-					}
-				}
+		reader = bufio.NewReader(os.Stdin)
+		length = 3
 
-				answer++
-			}
+		arr   = make([]int, 0, length)
+		check = [201][201]bool{}
+
+		answer = [201]bool{}
+		dfs    = func(a, b, c int) {}
+	)
+
+	for i := 0; i < length; i++ {
+		var a int
+		fmt.Fscan(reader, &a)
+		arr = append(arr, a)
+	}
+
+	dfs = func(a, b, c int) {
+		if check[a][b] {
+			return
+		}
+		if a == 0 {
+			answer[c] = true
+		}
+		check[a][b] = true
+
+		// a => b
+		if a+b > arr[1] {
+			dfs((a+b)-arr[1], arr[1], c)
+		} else {
+			dfs(0, a+b, c)
+		}
+		// b => a
+		if a+b > arr[0] {
+			dfs(arr[0], a+b-arr[0], c)
+		} else {
+			dfs(a+b, 0, c)
+		}
+
+		// c => a
+		if a+c > arr[0] {
+			dfs(arr[0], b, a+c-arr[0])
+		} else {
+			dfs(a+c, b, 0)
+		}
+
+		// c => b
+		if c+b > arr[1] {
+			dfs(a, arr[1], c+b-arr[1])
+		} else {
+			dfs(a, c+b, 0)
+		}
+
+		// a => c
+		dfs(a, 0, b+c)
+		// b => c
+		dfs(0, b, a+c)
+	}
+
+	dfs(0, 0, arr[2])
+
+	sb := strings.Builder{}
+	for i := range answer {
+		if answer[i] {
+			sb.WriteString(fmt.Sprintf("%d ", i))
 		}
 	}
-	return answer
-}
-
-func bfsAbnormal(arr [][]string) int {
-	var (
-		answer int
-		dirs   []int = []int{0, 1, 0, -1, 0}
-	)
-	for i := range arr {
-		for j := range arr[i] {
-			if arr[i][j] != "A" {
-				// do something
-				first := arr[i][j]
-				arr[i][j] = "A"
-				q := [][]int{{i, j}}
-				for len(q) > 0 {
-					cur := q[0]
-					q = q[1:]
-					for k := 1; k < len(dirs); k++ {
-						nRow := cur[0] + dirs[k-1]
-						nCol := cur[1] + dirs[k]
-						if nRow < 0 || nCol < 0 || nRow >= len(arr) || nCol >= len(arr) || arr[nRow][nCol] == "A" {
-							continue
-						}
-						if first == "B" && arr[nRow][nCol] != first {
-							continue
-						}
-						if first != "B" && arr[nRow][nCol] == "B" {
-							continue
-						}
-						arr[nRow][nCol] = "A"
-						q = append(q, []int{nRow, nCol})
-					}
-				}
-
-				answer++
-			}
-		}
-	}
-	return answer
+	fmt.Println(sb.String())
 }
