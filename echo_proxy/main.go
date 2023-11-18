@@ -11,8 +11,8 @@ var (
 	cert string = "/Users/guiwoopark/Documents/cert.pem"
 	key  string = "/Users/guiwoopark/Documents/key.pem"
 
-	serverCert = "/home/kbp/etc/ssl/cert.pem"
-	serverKey  = "/home/kbp/etc/ssl/key.pem"
+	serverCert = "/home/kbp/dynamo_util/ssl/cert.pem"
+	serverKey  = "/home/kbp/dynamo_util/ssl/key.pem"
 
 	targetServer  = "http://im.plea.kr:9096"
 	currentServer = "/test"

@@ -7,7 +7,7 @@ import (
 
 /**
 Need to define a new operation on an entire type hierarchy
-- Given a document model(lists,paragraphs,etc.), we want to add printing functionality
+- Given a document model(lists,paragraphs,dynamo_util.), we want to add printing functionality
 - Do not want to keep modifying every type in the hierarchy
 - Want to have the new functionality separate (SRP)
 This approach is often used for traversal

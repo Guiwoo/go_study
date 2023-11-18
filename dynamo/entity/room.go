@@ -48,14 +48,15 @@ type RoomChat struct {
 }
 
 func createRoomChat(room Room, chat Chat) RoomChat {
+	time := dynamo_util.ParseDate(time.Now())
 	return RoomChat{
 		PK:      room.PK,
-		SK:      RPREFIX + chat.PK + "#" + time.Now().String(),
+		SK:      RPREFIX + chat.PK + "#",
 		Entity:  dynamo_util.ChatEntity,
 		Title:   room.Title,
 		Message: chat.Message,
 		Roll:    chat.Roll,
-		Date:    time.Now(),
+		Date:    time,
 	}
 }
 

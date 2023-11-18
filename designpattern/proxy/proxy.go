@@ -105,5 +105,5 @@ Proxy vs Decorator
 Proxy has the same interface as the underlying object
 To create a proxy, simply replicate the existing interface of an object
 Add relevant functionality to the redefined methods
-Different proxies (communication, logging, caching, etc.) have completely different behaviors
+Different proxies (communication, logging, caching, dynamo_util.) have completely different behaviors
 */

@@ -8,7 +8,7 @@ An iterator is a type that facilitates the traversal
 	- keeps a pointer to the current element
 	- Knows how to move to a different element
 Go allows iteration with range
-	- built-in support in many objects(arrays,slice,etc(map)
+	- built-in support in many objects(arrays,slice,dynamo_util(map)
 	- Can be supported in out own structs
 
 Iterator An object that facilitates the traversal of a data structure
