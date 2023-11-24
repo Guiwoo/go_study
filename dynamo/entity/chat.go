@@ -12,12 +12,12 @@ const (
 )
 
 type Chat struct {
-	PK        string
-	SK        string
-	Entity    dynamo_util.EntityType
-	Roll      dynamo_util.Roll
-	Message   string
-	CreatedAt time.Time
+	PK      string
+	SK      string
+	Entity  dynamo_util.EntityType
+	Roll    dynamo_util.Roll
+	Message string
+	Date    time.Time
 }
 
 func createChat(roll dynamo_util.Roll, message string) Chat {
@@ -25,12 +25,12 @@ func createChat(roll dynamo_util.Roll, message string) Chat {
 	pk := CPrefix + core
 	sk := CPrefix + Detail + core
 	return Chat{
-		PK:        pk,
-		SK:        sk,
-		Entity:    dynamo_util.ChatEntity,
-		Roll:      roll,
-		Message:   message,
-		CreatedAt: time.Now(),
+		PK:      pk,
+		SK:      sk,
+		Entity:  dynamo_util.ChatEntity,
+		Roll:    roll,
+		Message: message,
+		Date:    dynamo_util.ParseDate(time.Now()),
 	}
 }
 

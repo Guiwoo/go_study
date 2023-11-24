@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func newClient(profile string) (*dynamodb.Client, error) {
+func newClient(key, secret string) (*dynamodb.Client, error) {
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithRegion("ap-northeast-2"),
 		//config.WithEndpointResolverWithOptions(aws.EndpointResolverWithOptionsFunc(
@@ -21,8 +21,8 @@ func newClient(profile string) (*dynamodb.Client, error) {
 		//	})),
 		config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
 			Value: aws.Credentials{
-				AccessKeyID:     "",
-				SecretAccessKey: "",
+				AccessKeyID:     key,
+				SecretAccessKey: secret,
 			},
 		}),
 	)
@@ -47,6 +47,10 @@ func createTable(ctx context.Context, c *dynamodb.Client) (*types.TableDescripti
 				AttributeName: aws.String("SK"),
 				AttributeType: types.ScalarAttributeTypeS,
 			},
+			{
+				AttributeName: aws.String("Date"),
+				AttributeType: types.ScalarAttributeTypeS,
+			},
 		},
 		KeySchema: []types.KeySchemaElement{
 			{
@@ -60,8 +64,31 @@ func createTable(ctx context.Context, c *dynamodb.Client) (*types.TableDescripti
 		},
 		TableName: aws.String(dynamo_util.TableName),
 		ProvisionedThroughput: &types.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(10),
-			WriteCapacityUnits: aws.Int64(10),
+			ReadCapacityUnits:  aws.Int64(5),
+			WriteCapacityUnits: aws.Int64(5),
+		},
+		GlobalSecondaryIndexes: []types.GlobalSecondaryIndex{
+			{
+				IndexName: aws.String("Date"),
+				KeySchema: []types.KeySchemaElement{
+					{
+						AttributeName: aws.String("PK"),
+						KeyType:       types.KeyTypeHash,
+					},
+					{
+						AttributeName: aws.String("Date"),
+						KeyType:       types.KeyTypeRange,
+					},
+				},
+				Projection: &types.Projection{
+					NonKeyAttributes: nil,
+					ProjectionType:   types.ProjectionTypeKeysOnly,
+				},
+				ProvisionedThroughput: &types.ProvisionedThroughput{
+					ReadCapacityUnits:  aws.Int64(5),
+					WriteCapacityUnits: aws.Int64(5),
+				},
+			},
 		},
 	})
 
