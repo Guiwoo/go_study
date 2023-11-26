@@ -4,131 +4,79 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func main() {
 	solution()
 }
 
-// v,o 를 loop 탐색으로 찾고 bfs v,o 숫자 비교하기
-// o 가 더많다면 ? v를 쫗아내고 생존가능
-
 /**
-6 6
-...#..
-.##v#.
-#v.#.#
-#.o#.#
-.###.#
-...###
 
-0 2
+1번도시의 슈퍼히어로 미노만 이동 가능 첫번쨰 줄 에는 n,m 이 주어지고
+m 개의 줄에 걸쳐 x => y 로 이동할수 있는 도시의 번호를 주어진다 .
 
-8 8
-.######.
-#..o...#
-#.####.#
-#.#v.#.#
-#.#.o#o#
-#o.##..#
-#.v..v.#
-.######.
+1. Create Graph with input values
 
-3 1
+2. the start point is first and should move to 6
 
-9 12
-.###.#####..
-#.oo#...#v#.
-#..o#.#.#.#.
-#..##o#...#.
-#.#v#o###.#.
-#..#v#....#.
-#...v#v####.
-.####.#vv.o#
-.......####.
-
-3 5
+3. so move theory twice
 */
 
 func solution() {
 	var (
-		row, col int
-		reader   = bufio.NewReader(os.Stdin)
+		areas, edges, input int
+		reader              = bufio.NewReader(os.Stdin)
+		ans                 = strings.Builder{}
 	)
+	fmt.Fscanln(reader, &areas, &edges)
+	graph := setGraph(areas, edges, reader)
 
-	fmt.Fscanln(reader, &row, &col)
-
-	area := setArea(row, col, reader)
-
-	aliveSheep, aliveWolf := aliveCheck(area)
-	fmt.Println(aliveSheep, aliveWolf)
-}
-
-func aliveCheck(area [][]rune) (int, int) {
-	var totalSheep, totalWolf int
-	for i := range area {
-		for j := range area[i] {
-			if area[i][j] == 'o' || area[i][j] == 'v' {
-				sheep, wolf := bfs(area, i, j)
-
-				totalSheep += sheep
-				totalWolf += wolf
-			}
+	fmt.Fscanln(reader, &input)
+	for i := 0; i < input; i++ {
+		var bomb int
+		fmt.Fscanln(reader, &bomb)
+		if findWay(1, bomb, graph) && findWay(bomb, areas, graph) {
+			ans.WriteString("Defend the CTP\n")
+		} else {
+			ans.WriteString("Destroyed the CTP\n")
 		}
 	}
-	return totalSheep, totalWolf
+	fmt.Println(ans.String())
 }
-
-func bfs(area [][]rune, row, col int) (int, int) {
-	var (
-		sheep, wolves int
-	)
-	if area[row][col] == 'o' {
-		sheep++
-	} else if area[row][col] == 'v' {
-		wolves++
+func findWay(from, to int, graph map[int][]int) bool {
+	visit := make([]bool, len(graph)+1)
+	visit[from] = true
+	q := []int{}
+	for i := 0; i < len(graph[from]); i++ {
+		visit[graph[from][i]] = true
+		q = append(q, graph[from][i])
 	}
-
-	dirs := []int{0, 1, 0, -1, 0}
-	q := [][]int{[]int{row, col}}
-	area[row][col] = '#'
 	for len(q) > 0 {
 		cur := q[0]
 		q = q[1:]
-		for i := 1; i < len(dirs); i++ {
-			nRow := cur[0] + dirs[i-1]
-			nCol := cur[1] + dirs[i]
-
-			if nRow < 0 || nCol < 0 || nRow >= len(area) || nCol >= len(area[0]) || area[nRow][nCol] == '#' {
-				continue
+		if cur == to {
+			return true
+		}
+		for i := 0; i < len(graph[cur]); i++ {
+			next := graph[cur][i]
+			if visit[next] == false {
+				q = append(q, next)
 			}
-			if area[nRow][nCol] == 'o' {
-				sheep++
-			} else if area[nRow][nCol] == 'v' {
-				wolves++
-			}
-			area[nRow][nCol] = '#'
-			q = append(q, []int{nRow, nCol})
 		}
 	}
-
-	if sheep > wolves {
-		return sheep, 0
-	} else {
-		return 0, wolves
-	}
+	return false
 }
 
-func setArea(row int, col int, reader *bufio.Reader) [][]rune {
-	area := make([][]rune, row)
-	for i := range area {
-		var input string
-		subArea := make([]rune, 0, col)
-		fmt.Fscanln(reader, &input)
-		for _, char := range input {
-			subArea = append(subArea, char)
-		}
-		area[i] = subArea
+func setGraph(areas, edges int, reader *bufio.Reader) map[int][]int {
+	graph := make(map[int][]int)
+	for i := 0; i <= areas; i++ {
+		graph[i] = make([]int, 0)
 	}
-	return area
+	for i := 0; i < edges; i++ {
+		var from, to int
+		fmt.Fscanln(reader, &from, &to)
+		graph[from] = append(graph[from], to)
+	}
+	return graph
 }
