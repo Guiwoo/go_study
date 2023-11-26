@@ -83,3 +83,5 @@ func Test_Recur_loop(t *testing.T) {
 		fmt.Println("===============")
 	}
 }
+
+func TestBoj(t *testing.T) {}

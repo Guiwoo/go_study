@@ -7,6 +7,13 @@ import (
 	"strings"
 )
 
+var (
+	areas, edges, input int
+	reader              = bufio.NewReader(os.Stdin)
+	ans                 = strings.Builder{}
+	visit               = [2][100001]bool{}
+)
+
 func main() {
 	solution()
 }
@@ -24,19 +31,18 @@ m 개의 줄에 걸쳐 x => y 로 이동할수 있는 도시의 번호를 주어
 */
 
 func solution() {
-	var (
-		areas, edges, input int
-		reader              = bufio.NewReader(os.Stdin)
-		ans                 = strings.Builder{}
-	)
+
 	fmt.Fscanln(reader, &areas, &edges)
-	graph := setGraph(areas, edges, reader)
+	graph, reverse := setGraph(areas, edges, reader)
+
+	findWay(1, areas, 0, graph)
+	findWay(areas, 1, 1, reverse)
 
 	fmt.Fscanln(reader, &input)
 	for i := 0; i < input; i++ {
 		var bomb int
 		fmt.Fscanln(reader, &bomb)
-		if findWay(1, bomb, graph) && findWay(bomb, areas, graph) {
+		if visit[0][bomb] && visit[1][bomb] {
 			ans.WriteString("Defend the CTP\n")
 		} else {
 			ans.WriteString("Destroyed the CTP\n")
@@ -44,32 +50,26 @@ func solution() {
 	}
 	fmt.Println(ans.String())
 }
-func findWay(from, to int, graph map[int][]int) bool {
-	visit := make([]bool, len(graph)+1)
-	visit[from] = true
-	q := []int{}
-	for i := 0; i < len(graph[from]); i++ {
-		visit[graph[from][i]] = true
-		q = append(q, graph[from][i])
-	}
+func findWay(from, to, way int, graph map[int][]int) {
+	visit[way][from] = true
+	q := []int{from}
 	for len(q) > 0 {
 		cur := q[0]
 		q = q[1:]
-		if cur == to {
-			return true
-		}
 		for i := 0; i < len(graph[cur]); i++ {
 			next := graph[cur][i]
-			if visit[next] == false {
+			if visit[way][next] == false {
+				visit[way][next] = true
 				q = append(q, next)
 			}
 		}
 	}
-	return false
+	return
 }
 
-func setGraph(areas, edges int, reader *bufio.Reader) map[int][]int {
+func setGraph(areas, edges int, reader *bufio.Reader) (map[int][]int, map[int][]int) {
 	graph := make(map[int][]int)
+	reverse := make(map[int][]int)
 	for i := 0; i <= areas; i++ {
 		graph[i] = make([]int, 0)
 	}
@@ -77,6 +77,7 @@ func setGraph(areas, edges int, reader *bufio.Reader) map[int][]int {
 		var from, to int
 		fmt.Fscanln(reader, &from, &to)
 		graph[from] = append(graph[from], to)
+		reverse[to] = append(reverse[to], from)
 	}
-	return graph
+	return graph, reverse
 }
