@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"os"
 )
 
@@ -12,76 +11,58 @@ func main() {
 }
 
 /**
-5 5
-1 3
-1 4
-4 5
-4 3
-3 2
-
-3
-
-
-임의의 두사람이 최소 몇단계 만에 이어질수 있는가 계산하는 법칙
-모든 사람에게 갈수 있는 경로를 파악하고 ++
+최대 100
 */
 
 func solution() {
 	var (
-		reader           = bufio.NewReader(os.Stdin)
-		users, relations int
-		index            int
+		reader   = bufio.NewReader(os.Stdin)
+		row, col int
 	)
 
-	fmt.Fscanln(reader, &users, &relations)
-	graph := make([][]int, users+1)
-	answer := make([]int, users+1)
-	for i := range answer {
-		answer[i] = math.MaxInt
+	fmt.Fscanln(reader, &row, &col)
+
+	maze := make([][]string, row)
+	for i := 0; i < row; i++ {
+		var input string
+		fmt.Fscanln(reader, &input)
+		sub := make([]string, len(input))
+		for i, v := range input {
+			sub[i] = string(v)
+		}
+		maze[i] = sub
 	}
 
-	for i := range graph {
-		graph[i] = make([]int, 0)
+	answer := bfs(0, 0, maze)
+	fmt.Println(answer)
+}
+
+func bfs(row, col int, maze [][]string) int {
+	type step struct {
+		row, col, step int
 	}
 
-	for i := 0; i < relations; i++ {
-		var who, know int
-		fmt.Fscanln(reader, &who, &know)
-		graph[who] = append(graph[who], know)
-		graph[know] = append(graph[know], who)
-	}
+	dirs := []int{0, 1, 0, -1, 0}
+	q := []step{step{}}
+	maze[0][0] = "-1"
 
-	for user := 1; user <= users; user++ {
-		var (
-			cnt   = 0
-			q     = []int{user}
-			visit = make([]bool, users+1)
-			run   = 0
-		)
+	for len(q) > 0 {
+		cur := q[0]
+		q = q[1:]
+		if cur.row == len(maze)-1 && cur.col == len(maze[0])-1 {
+			return cur.step + 1
+		}
+		for i := 1; i < len(dirs); i++ {
+			nRow := cur.row + dirs[i-1]
+			nCol := cur.col + dirs[i]
 
-		visit[user] = true
-
-		for len(q) > 0 {
-			size := len(q)
-			for i := 0; i < size; i++ {
-				cur := q[0]
-				cnt += run
-				q = q[1:]
-				for _, v := range graph[cur] {
-					if visit[v] == false {
-						visit[v] = true
-						q = append(q, v)
-					}
-				}
+			if nRow < 0 || nCol < 0 || nRow >= len(maze) || nCol >= len(maze[0]) ||
+				maze[nRow][nCol] == "0" || maze[nRow][nCol] == "-1" {
+				continue
 			}
-			run++
-		}
-
-		if answer[index] > cnt {
-			index = user
-			answer[index] = cnt
+			maze[nRow][nCol] = "-1"
+			q = append(q, step{nRow, nCol, cur.step + 1})
 		}
 	}
-
-	fmt.Println(index)
+	return -1
 }

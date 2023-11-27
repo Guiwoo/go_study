@@ -3,6 +3,7 @@ package dfs_bfs
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"sort"
 	"strconv"
@@ -785,4 +786,64 @@ func setGraph(areas, edges int, reader *bufio.Reader) (map[int][]int, map[int][]
 		reverse[to] = append(reverse[to], from)
 	}
 	return graph, reverse
+}
+
+func solution1389() {
+	var (
+		reader           = bufio.NewReader(os.Stdin)
+		users, relations int
+		index            int
+	)
+
+	fmt.Fscanln(reader, &users, &relations)
+	graph := make([][]int, users+1)
+	answer := make([]int, users+1)
+	for i := range answer {
+		answer[i] = math.MaxInt
+	}
+
+	for i := range graph {
+		graph[i] = make([]int, 0)
+	}
+
+	for i := 0; i < relations; i++ {
+		var who, know int
+		fmt.Fscanln(reader, &who, &know)
+		graph[who] = append(graph[who], know)
+		graph[know] = append(graph[know], who)
+	}
+
+	for user := 1; user <= users; user++ {
+		var (
+			cnt   = 0
+			q     = []int{user}
+			visit = make([]bool, users+1)
+			run   = 0
+		)
+
+		visit[user] = true
+
+		for len(q) > 0 {
+			size := len(q)
+			for i := 0; i < size; i++ {
+				cur := q[0]
+				cnt += run
+				q = q[1:]
+				for _, v := range graph[cur] {
+					if visit[v] == false {
+						visit[v] = true
+						q = append(q, v)
+					}
+				}
+			}
+			run++
+		}
+
+		if answer[index] > cnt {
+			index = user
+			answer[index] = cnt
+		}
+	}
+
+	fmt.Println(index)
 }
