@@ -847,3 +847,113 @@ func solution1389() {
 
 	fmt.Println(index)
 }
+
+func solution2178() {
+	var (
+		reader   = bufio.NewReader(os.Stdin)
+		row, col int
+	)
+
+	fmt.Fscanln(reader, &row, &col)
+
+	maze := make([][]string, row)
+	for i := 0; i < row; i++ {
+		var input string
+		fmt.Fscanln(reader, &input)
+		sub := make([]string, len(input))
+		for i, v := range input {
+			sub[i] = string(v)
+		}
+		maze[i] = sub
+	}
+
+	answer := bfs2178(0, 0, maze)
+	fmt.Println(answer)
+}
+
+func bfs2178(row, col int, maze [][]string) int {
+	type step struct {
+		row, col, step int
+	}
+
+	dirs := []int{0, 1, 0, -1, 0}
+	q := []step{step{}}
+	maze[0][0] = "-1"
+
+	for len(q) > 0 {
+		cur := q[0]
+		q = q[1:]
+		if cur.row == len(maze)-1 && cur.col == len(maze[0])-1 {
+			return cur.step + 1
+		}
+		for i := 1; i < len(dirs); i++ {
+			nRow := cur.row + dirs[i-1]
+			nCol := cur.col + dirs[i]
+
+			if nRow < 0 || nCol < 0 || nRow >= len(maze) || nCol >= len(maze[0]) ||
+				maze[nRow][nCol] == "0" || maze[nRow][nCol] == "-1" {
+				continue
+			}
+			maze[nRow][nCol] = "-1"
+			q = append(q, step{nRow, nCol, cur.step + 1})
+		}
+	}
+	return -1
+}
+
+func solution7556() {
+	var (
+		reader                   = bufio.NewReader(os.Stdin)
+		row, col, tomatoes, days int
+		q                        = make([][]int, 0)
+	)
+	fmt.Fscanln(reader, &col, &row)
+
+	arr := make([][]string, row)
+	for i := range arr {
+		text, _, _ := reader.ReadLine()
+		sub := strings.Split(string(text), " ")
+		for j, v := range sub {
+			if v == "0" {
+				tomatoes++
+			} else if v == "1" {
+				q = append(q, []int{i, j})
+			}
+		}
+		arr[i] = sub
+	}
+
+	for len(q) > 0 {
+		if tomatoes == 0 {
+			break
+		}
+		size := len(q)
+		for i := 0; i < size; i++ {
+			cur := q[0]
+			q = q[1:]
+
+			bfs7556(&q, arr, cur[0]-1, cur[1], &tomatoes)
+			bfs7556(&q, arr, cur[0], cur[1]-1, &tomatoes)
+			bfs7556(&q, arr, cur[0]+1, cur[1], &tomatoes)
+			bfs7556(&q, arr, cur[0], cur[1]+1, &tomatoes)
+		}
+		days++
+	}
+
+	if tomatoes == 0 {
+		fmt.Println(days)
+	} else {
+		fmt.Println(-1)
+	}
+}
+
+func bfs7556(q *[][]int, arr [][]string, nRow, nCol int, tomatoes *int) {
+	if nRow < 0 || nCol < 0 || nRow >= len(arr) || nCol >= len(arr[0]) {
+		return
+	}
+	if arr[nRow][nCol] == "0" {
+		arr[nRow][nCol] = "-99"
+		*tomatoes--
+		*q = append(*q, []int{nRow, nCol})
+	}
+}
