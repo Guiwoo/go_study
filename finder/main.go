@@ -22,7 +22,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		found := findWord(file, "Select")
+		found := findWord(file, "Delete")
 		fmt.Println(found)
 
 		r := bufio.NewReader(os.Stdin)
@@ -38,12 +38,12 @@ func findWord(file *os.File, text string) []string {
 	for reader.Scan() {
 		sb := strings.Builder{}
 		line := reader.Text()
-		if strings.Contains(line, text) {
+		if strings.Contains(line, "AxDBResult") && strings.Contains(line, text) {
 			sb.WriteString(line + "\n")
 			for reader.Scan() {
 				line := reader.Text()
 				sb.WriteString(line + "\n")
-				if strings.Contains(line, "try {") {
+				if strings.Contains(line, "return") {
 					break
 				}
 			}

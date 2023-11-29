@@ -957,3 +957,45 @@ func bfs7556(q *[][]int, arr [][]string, nRow, nCol int, tomatoes *int) {
 		*q = append(*q, []int{nRow, nCol})
 	}
 }
+
+func solution1679() {
+	var (
+		reader        = bufio.NewReader(os.Stdin)
+		mover, target int
+	)
+
+	fmt.Fscanln(reader, &mover, &target)
+	bfs1679(mover, target)
+}
+
+/*
+*
+수빈이가 5-10-9-18-17 순으로 가면 4초만에 동생을 찾을 수 있다.
+4,6,10 1초
+
+3,8
+7,12 2초
+*/
+func bfs1679(move, target int) int {
+	type mover struct {
+		move, sec int
+	}
+	visit := make([]int, 100001)
+	q := []int{move}
+	for len(q) > 0 {
+		cur := q[0]
+		q = q[1:]
+		if cur == target {
+			fmt.Println(visit[target])
+			break
+		}
+		for _, v := range []int{1, -1, cur} {
+			n := v + cur
+			if 0 <= n && n <= 100000 && visit[n] == 0 {
+				visit[n] = visit[cur] + 1
+				q = append(q, n)
+			}
+		}
+	}
+	return visit[target]
+}
