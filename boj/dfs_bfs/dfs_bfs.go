@@ -999,3 +999,96 @@ func bfs1679(move, target int) int {
 	}
 	return visit[target]
 }
+
+func solution12851() {
+	var (
+		reader        = bufio.NewReader(os.Stdin)
+		mover, target int
+	)
+
+	fmt.Fscanln(reader, &mover, &target)
+	bfs12851(mover, target)
+}
+
+/**
+5 10 9 18 17
+5 4 8 16 17
+
+0 1 2 3
+0 1 2 3
+*/
+
+func bfs12851(move, target int) {
+	visit := make([]int, 100001)
+	for i := range visit {
+		visit[i] = -1
+	}
+	visit[move] = 0
+	path := make([]int, 100001)
+	path[move] = 1
+	q := []int{move}
+	for len(q) > 0 {
+		cur := q[0]
+		q = q[1:]
+		for _, v := range []int{1, -1, cur} {
+			n := v + cur
+			if 0 <= n && n <= 100000 {
+				if visit[n] == -1 {
+					visit[n] = visit[cur] + 1
+					path[n] = path[cur]
+					q = append(q, n)
+				} else {
+					if visit[n] == visit[cur]+1 {
+						path[n] += path[cur]
+					}
+				}
+			}
+		}
+	}
+	fmt.Println(visit[target], path[target])
+}
+
+func solution13549() {
+	var (
+		reader        = bufio.NewReader(os.Stdin)
+		mover, target int
+	)
+
+	fmt.Fscanln(reader, &mover, &target)
+	bfs13549(mover, target)
+}
+
+func bfs13549(move, target int) {
+	visit := make([]int, 100001)
+	for i := range visit {
+		visit[i] = -1
+	}
+	visit[move] = 0
+	q := []int{move}
+	for len(q) > 0 {
+		cur := q[0]
+		q = q[1:]
+		if cur == target {
+			fmt.Println(visit[target])
+			break
+		}
+		for _, v := range []int{cur, 1, -1} {
+			n := v + cur
+			if 0 <= n && n <= 100000 {
+				if v == cur {
+					visit[n] = visit[cur]
+					q = append(q, n)
+				} else {
+					num := visit[cur] + 1
+					if visit[n] == -1 {
+						visit[n] = num
+						q = append(q, n)
+					} else if visit[n] > num {
+						visit[n] = num
+						q = append(q, n)
+					}
+				}
+			}
+		}
+	}
+}

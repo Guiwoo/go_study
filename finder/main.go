@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	target := "/Users/guiwoopark/Desktop/RLS"
+	target := "/Users/guiwoopark/Desktop/OAS"
 	suffix := ".cpp"
 
 	fileList, err := getFilePaths(target, suffix)
@@ -18,16 +18,9 @@ func main() {
 	}
 
 	for _, v := range fileList {
-		file, err := getFile(v)
-		if err != nil {
-			panic(err)
-		}
-		found := findWord(file, "Delete")
-		fmt.Println(found)
-
-		r := bufio.NewReader(os.Stdin)
-		var a string
-		fmt.Fscanln(r, &a)
+		file, _ := getFile(v)
+		rs := findWord(file, "SELECT")
+		fmt.Println(rs)
 	}
 }
 func findWord(file *os.File, text string) []string {
@@ -38,15 +31,8 @@ func findWord(file *os.File, text string) []string {
 	for reader.Scan() {
 		sb := strings.Builder{}
 		line := reader.Text()
-		if strings.Contains(line, "AxDBResult") && strings.Contains(line, text) {
+		if strings.Contains(line, text) {
 			sb.WriteString(line + "\n")
-			for reader.Scan() {
-				line := reader.Text()
-				sb.WriteString(line + "\n")
-				if strings.Contains(line, "return") {
-					break
-				}
-			}
 			found = append(found, sb.String()+"\n")
 		}
 	}

@@ -2,58 +2,61 @@ package main
 
 import (
 	"bufio"
+	"container/list"
 	"fmt"
 	"os"
 )
 
 func main() {
-	solution12851()
+	solution13913()
 }
 
-func solution12851() {
-	var (
-		reader        = bufio.NewReader(os.Stdin)
-		mover, target int
-	)
+var (
+	reader   = bufio.NewReader(os.Stdin)
+	writer   = bufio.NewWriter(os.Stdout)
+	from, to int
 
-	fmt.Fscanln(reader, &mover, &target)
-	bfs12851(mover, target)
-}
+	visit [100001]int
+	path  [100001]int
+)
 
-/**
-5 10 9 18 17
-5 4 8 16 17
+func solution13913() {
 
-0 1 2 3
-0 1 2 3
-*/
+	defer writer.Flush()
+	fmt.Fscan(reader, &from, &to)
 
-func bfs12851(move, target int) {
-	visit := make([]int, 100001)
-	for i := range visit {
-		visit[i] = -1
-	}
-	visit[move] = 0
-	path := make([]int, 100001)
-	path[move] = 1
-	q := []int{move}
-	for len(q) > 0 {
-		cur := q[0]
-		q = q[1:]
-		for _, v := range []int{1, -1, cur} {
-			n := v + cur
-			if 0 <= n && n <= 100000 {
-				if visit[n] == -1 {
-					visit[n] = visit[cur] + 1
-					path[n] = path[cur]
-					q = append(q, n)
-				} else {
-					if visit[n] == visit[cur]+1 {
-						path[n] += path[cur]
-					}
-				}
+	q := list.New()
+
+	visit[from] = 1
+	path[from] = from
+	q.PushBack(from)
+
+	for q.Len() > 0 {
+		cur := q.Front().Value.(int)
+		q.Remove(q.Front())
+
+		if cur == to {
+			break
+		}
+		for _, v := range []int{-1, cur, 1} {
+			next := v + cur
+			if next >= 0 && next <= 100000 && visit[next] == 0 {
+				visit[next] = visit[cur] + 1
+				path[next] = cur
+				q.PushBack(next)
 			}
 		}
 	}
-	fmt.Println(visit[target], path[target])
+
+	fmt.Fprintln(writer, visit[to]-1)
+	getPath(to)
+}
+
+func getPath(u int) {
+	if u == path[u] {
+		fmt.Fprint(writer, u, " ")
+		return
+	}
+	getPath(path[u])
+	fmt.Fprint(writer, u, " ")
 }
