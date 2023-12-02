@@ -5,96 +5,81 @@ import (
 	"container/list"
 	"fmt"
 	"os"
+	"strconv"
 )
 
-/**
-
-3
-8
-0 0
-7 0
-100
-0 0
-30 50
-10
-1 1
-1 1
-
-
-5
-28
-0
-*/
-
 func main() {
-	solution7562()
+	solution15558()
 }
 
-func solution7562() {
+func solution15558() {
 	var (
-		reader = bufio.NewReader(os.Stdin)
-		writer = bufio.NewWriter(os.Stdout)
-		total  int
+		reader       = bufio.NewReader(os.Stdin)
+		writer       = bufio.NewWriter(os.Stdout)
+		length, jump int
 	)
+
+	fmt.Fscanln(reader, &length, &jump)
 	defer writer.Flush()
-
-	fmt.Fscanln(reader, &total)
-	for i := 0; i < total; i++ {
-		size, cur, target := getInput(reader)
-		if checkEqual(cur, target) {
-			fmt.Fprintln(writer, 0)
-			continue
-		}
-		minSteps := bfs7562(size, cur, target)
-		fmt.Fprintln(writer, minSteps)
+	arr := setMap(reader, length)
+	visit := make([][]bool, 2)
+	for i := range visit {
+		visit[i] = make([]bool, length)
 	}
-}
 
-func bfs7562(size int, cur, target []int) int {
-	answer := 0
-	dirs := [][]int{{-2, 1}, {-2, -1}, {-1, -2}, {-1, 2}, {1, -2}, {1, 2}, {2, -1}, {2, 1}}
-	board := make([][]int, size)
-	for i := range board {
-		board[i] = make([]int, size)
-	}
 	q := list.New()
-	board[cur[0]][cur[1]] = -1
-	q.PushBack(cur)
+	q.PushBack([]int{0, 0}) // 0 left 1 right
+	visit[0][0] = true
+	sec := 0
 	for q.Len() > 0 {
-		qSize := q.Len()
-		for i := 0; i < qSize; i++ {
-			c := q.Front()
-			current := c.Value.([]int)
-			q.Remove(c)
-			for j := 0; j < len(dirs); j++ {
-				row := current[0] + dirs[j][0]
-				col := current[1] + dirs[j][1]
-
-				if row < 0 || col < 0 || row >= size || col >= size || board[row][col] == -1 {
-					continue
+		size := q.Len()
+		for i := 0; i < size; i++ {
+			el := q.Front()
+			q.Remove(el)
+			cur := el.Value.([]int)
+			if cur[1] >= length {
+				fmt.Fprintln(writer, 1)
+				return
+			}
+			for k, v := range []int{1, -1, jump} {
+				nextIdx := cur[1] + v
+				if nextIdx >= length {
+					fmt.Fprintln(writer, 1)
+					return
 				}
-				if checkEqual([]int{row, col}, target) {
-					return answer + 1
+				if k == 2 {
+					//건너뛴경우
+					if cur[0] == 0 && arr[1][nextIdx] == 1 && !visit[1][nextIdx] {
+						visit[1][nextIdx] = true
+						q.PushBack([]int{1, nextIdx})
+					} else if cur[0] == 1 && arr[0][nextIdx] == 1 && !visit[0][nextIdx] {
+						visit[0][nextIdx] = true
+						q.PushBack([]int{0, nextIdx})
+					}
+				} else {
+					if nextIdx > sec && arr[cur[0]][nextIdx] == 1 && !visit[cur[0]][nextIdx] {
+						visit[cur[0]][nextIdx] = true
+						q.PushBack([]int{cur[0], nextIdx})
+					}
 				}
-				board[row][col] = -1
-				q.PushBack([]int{row, col})
 			}
 		}
-		answer++
+		sec++
 	}
-	return answer
-}
-func checkEqual(a, b []int) bool {
-	return a[0] == b[0] && a[1] == b[1]
+	fmt.Fprintln(writer, 0)
+	return
 }
 
-func getInput(reader *bufio.Reader) (int, []int, []int) {
-	var (
-		size, curX, curY, targetX, targetY int
-	)
-	fmt.Fscanln(reader, &size)
-	fmt.Fscanln(reader, &curX, &curY)
-	fmt.Fscanln(reader, &targetX, &targetY)
-
-	return size, []int{curX, curY}, []int{targetX, targetY}
+func setMap(reader *bufio.Reader, length int) [][]int {
+	arr := make([][]int, 2)
+	for k := range arr {
+		sub := make([]int, length)
+		var num string
+		fmt.Fscanln(reader, &num)
+		for i, v := range num {
+			sub[i], _ = strconv.Atoi(string(v))
+		}
+		arr[k] = sub
+	}
+	return arr
 }
