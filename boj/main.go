@@ -8,19 +8,22 @@ import (
 	"strconv"
 )
 
+type Position struct {
+	row, col int
+}
+
 func main() {
 	solution15558()
 }
 
 func solution15558() {
-	var (
-		reader       = bufio.NewReader(os.Stdin)
-		writer       = bufio.NewWriter(os.Stdout)
-		length, jump int
-	)
-
-	fmt.Fscanln(reader, &length, &jump)
+	reader := bufio.NewReader(os.Stdin)
+	writer := bufio.NewWriter(os.Stdout)
 	defer writer.Flush()
+
+	var length, jump int
+	fmt.Fscanln(reader, &length, &jump)
+
 	arr := setMap(reader, length)
 	visit := make([][]bool, 2)
 	for i := range visit {
@@ -28,46 +31,40 @@ func solution15558() {
 	}
 
 	q := list.New()
-	q.PushBack([]int{0, 0}) // 0 left 1 right
+	q.PushBack(Position{0, 0}) // 0 left 1 right
 	visit[0][0] = true
+
 	sec := 0
 	for q.Len() > 0 {
 		size := q.Len()
 		for i := 0; i < size; i++ {
-			el := q.Front()
-			q.Remove(el)
-			cur := el.Value.([]int)
-			if cur[1] >= length {
+			cur := q.Remove(q.Front()).(Position)
+			if cur.col >= length {
 				fmt.Fprintln(writer, 1)
 				return
 			}
-			for k, v := range []int{1, -1, jump} {
-				nextIdx := cur[1] + v
+			for _, v := range []int{1, -1, jump} {
+				nextIdx := cur.col + v
 				if nextIdx >= length {
 					fmt.Fprintln(writer, 1)
 					return
 				}
-				if k == 2 {
-					//건너뛴경우
-					if cur[0] == 0 && arr[1][nextIdx] == 1 && !visit[1][nextIdx] {
-						visit[1][nextIdx] = true
-						q.PushBack([]int{1, nextIdx})
-					} else if cur[0] == 1 && arr[0][nextIdx] == 1 && !visit[0][nextIdx] {
-						visit[0][nextIdx] = true
-						q.PushBack([]int{0, nextIdx})
+				if v == jump {
+					// 건너뛴 경우
+					otherRow := 1 - cur.row
+					if arr[otherRow][nextIdx] == 1 && !visit[otherRow][nextIdx] {
+						visit[otherRow][nextIdx] = true
+						q.PushBack(Position{otherRow, nextIdx})
 					}
-				} else {
-					if nextIdx > sec && arr[cur[0]][nextIdx] == 1 && !visit[cur[0]][nextIdx] {
-						visit[cur[0]][nextIdx] = true
-						q.PushBack([]int{cur[0], nextIdx})
-					}
+				} else if nextIdx > sec && arr[cur.row][nextIdx] == 1 && !visit[cur.row][nextIdx] {
+					visit[cur.row][nextIdx] = true
+					q.PushBack(Position{cur.row, nextIdx})
 				}
 			}
 		}
 		sec++
 	}
 	fmt.Fprintln(writer, 0)
-	return
 }
 
 func setMap(reader *bufio.Reader, length int) [][]int {
