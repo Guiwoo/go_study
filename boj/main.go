@@ -8,84 +8,56 @@ import (
 )
 
 func main() {
-	solution16948()
+	solution5014()
 }
 
 /**
-r, c)라면, (r-2, c-1), (r-2, c+1), (r, c-2), (r, c+2), (r+2, c-1), (r+2, c+1)로
-첫째 줄에 데스 나이트가 (r1, c1)에서 (r2, c2)로 이동하는 최소 이동 횟수를 출력한다. 이동할 수 없는 경우에는 -1을 출력한다.
-
-7
-6 6 0 1
-
-4
-
-6
-5 1 0 5
-
--1
-
-7
-0 3 4 3
-
-2
+F층 으로 이루어진 고층 건ㄹ물
+G층 스타링크, S층 에 위치
+버튼은 2개만 존재 위로 U만큼 이동 또는 D아래로
+G층에 도달 못할시 use the stairs 출력
+100,000 범위
 */
 
-func solution16948() {
+func solution5014() {
 	var (
-		reader               = bufio.NewReader(os.Stdin)
-		writer               = bufio.NewWriter(os.Stdout)
-		size, steps          int
-		startRow, startCol   int
-		targetRow, targetCol int
-		dirs                 = [][]int{{-2, -1}, {-2, +1}, {0, -2}, {0, 2}, {2, -1}, {2, 1}}
+		reader          = bufio.NewReader(os.Stdin)
+		writer          = bufio.NewWriter(os.Stdout)
+		level, from, to int
+		up, down        int
 	)
 	defer writer.Flush()
 
-	fmt.Fscanln(reader, &size)
-
-	arr := make([][]int, size)
-
-	for i := range arr {
-		arr[i] = make([]int, size)
-	}
-
-	fmt.Fscanln(reader, &startRow, &startCol, &targetRow, &targetCol)
-
+	fmt.Fscanln(reader, &level, &from, &to, &up, &down)
+	visit := make([]bool, level+1)
 	q := list.New()
-	arr[startRow][startCol] = -1
-	q.PushBack([]int{startRow, startCol})
-
+	q.PushBack(from)
+	visit[from] = true
+	cnt := 0
 	for q.Len() > 0 {
-		length := q.Len()
-		for i := 0; i < length; i++ {
-			value := q.Front()
-			q.Remove(value)
-			cur := value.Value.([]int)
-
-			if cur[0] == targetRow && cur[1] == targetCol {
-				fmt.Fprintln(writer, steps)
+		size := q.Len()
+		for i := 0; i < size; i++ {
+			curVal := q.Front()
+			q.Remove(curVal)
+			cur := curVal.Value.(int)
+			if cur == to {
+				fmt.Fprintln(writer, cnt)
 				return
 			}
-
-			for _, v := range dirs {
-				nextRow := cur[0] + v[0]
-				nextCol := cur[1] + v[1]
-
-				if nextRow < 0 || nextCol < 0 || nextRow >= size || nextCol >= size || arr[nextRow][nextCol] == -1 {
+			for _, v := range []int{up, -down} {
+				next := cur + v
+				if next <= 0 || next > level || visit[next] {
 					continue
 				}
-
-				arr[nextRow][nextCol] = -1
-				if nextRow == targetRow && nextCol == targetCol {
-					fmt.Fprintln(writer, steps+1)
+				if next == to {
+					fmt.Fprintln(writer, cnt+1)
 					return
 				}
-				q.PushBack([]int{nextRow, nextCol})
+				q.PushBack(next)
+				visit[next] = true
 			}
 		}
-		steps++
+		cnt++
 	}
-
-	fmt.Fprintln(writer, -1)
+	fmt.Fprintln(writer, "use the stairs")
 }
