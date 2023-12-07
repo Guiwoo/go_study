@@ -84,4 +84,16 @@ func Test_Recur_loop(t *testing.T) {
 	}
 }
 
-func TestBoj(t *testing.T) {}
+func TestBoj(t *testing.T) {
+	aFunc := func(arr []int) []int {
+		fmt.Printf("%p\n", arr)
+		arr[0] = 9999
+		return arr
+	}
+
+	arr := []int{123}
+
+	arr2 := aFunc(arr)
+	fmt.Println(arr, arr2)
+	fmt.Printf("%p,%p", arr, arr2)
+}

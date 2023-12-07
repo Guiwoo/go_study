@@ -1281,3 +1281,46 @@ func setMap(reader *bufio.Reader, length int) [][]int {
 	}
 	return arr
 }
+
+func solution5014() {
+	var (
+		reader          = bufio.NewReader(os.Stdin)
+		writer          = bufio.NewWriter(os.Stdout)
+		level, from, to int
+		up, down        int
+	)
+	defer writer.Flush()
+
+	fmt.Fscanln(reader, &level, &from, &to, &up, &down)
+	visit := make([]bool, level+1)
+	q := list.New()
+	q.PushBack(from)
+	visit[from] = true
+	cnt := 0
+	for q.Len() > 0 {
+		size := q.Len()
+		for i := 0; i < size; i++ {
+			curVal := q.Front()
+			q.Remove(curVal)
+			cur := curVal.Value.(int)
+			if cur == to {
+				fmt.Fprintln(writer, cnt)
+				return
+			}
+			for _, v := range []int{up, -down} {
+				next := cur + v
+				if next <= 0 || next > level || visit[next] {
+					continue
+				}
+				if next == to {
+					fmt.Fprintln(writer, cnt+1)
+					return
+				}
+				q.PushBack(next)
+				visit[next] = true
+			}
+		}
+		cnt++
+	}
+	fmt.Fprintln(writer, "use the stairs")
+}
