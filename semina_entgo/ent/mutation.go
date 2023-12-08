@@ -6,9 +6,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"semina_entgo/custom"
 	"semina_entgo/ent/car"
 	"semina_entgo/ent/group"
 	"semina_entgo/ent/predicate"
+	"semina_entgo/ent/tester"
 	"semina_entgo/ent/user"
 	"sync"
 	"time"
@@ -26,9 +28,10 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeCar   = "Car"
-	TypeGroup = "Group"
-	TypeUser  = "User"
+	TypeCar    = "Car"
+	TypeGroup  = "Group"
+	TypeTester = "Tester"
+	TypeUser   = "User"
 )
 
 // CarMutation represents an operation that mutates the Car nodes in the graph.
@@ -895,6 +898,548 @@ func (m *GroupMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Group edge %s", name)
+}
+
+// TesterMutation represents an operation that mutates the Tester nodes in the graph.
+type TesterMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	_PascalCase   *string
+	let_me_check  *string
+	size          *tester.Size
+	shape         *custom.Shape
+	level         *custom.Level
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Tester, error)
+	predicates    []predicate.Tester
+}
+
+var _ ent.Mutation = (*TesterMutation)(nil)
+
+// testerOption allows management of the mutation configuration using functional options.
+type testerOption func(*TesterMutation)
+
+// newTesterMutation creates new mutation for the Tester entity.
+func newTesterMutation(c config, op Op, opts ...testerOption) *TesterMutation {
+	m := &TesterMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTester,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTesterID sets the ID field of the mutation.
+func withTesterID(id int) testerOption {
+	return func(m *TesterMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Tester
+		)
+		m.oldValue = func(ctx context.Context) (*Tester, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Tester.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTester sets the old Tester of the mutation.
+func withTester(node *Tester) testerOption {
+	return func(m *TesterMutation) {
+		m.oldValue = func(context.Context) (*Tester, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TesterMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TesterMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TesterMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TesterMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Tester.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetPascalCase sets the "PascalCase" field.
+func (m *TesterMutation) SetPascalCase(s string) {
+	m._PascalCase = &s
+}
+
+// PascalCase returns the value of the "PascalCase" field in the mutation.
+func (m *TesterMutation) PascalCase() (r string, exists bool) {
+	v := m._PascalCase
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPascalCase returns the old "PascalCase" field's value of the Tester entity.
+// If the Tester object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TesterMutation) OldPascalCase(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPascalCase is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPascalCase requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPascalCase: %w", err)
+	}
+	return oldValue.PascalCase, nil
+}
+
+// ResetPascalCase resets all changes to the "PascalCase" field.
+func (m *TesterMutation) ResetPascalCase() {
+	m._PascalCase = nil
+}
+
+// SetLetMeCheck sets the "let_me_check" field.
+func (m *TesterMutation) SetLetMeCheck(s string) {
+	m.let_me_check = &s
+}
+
+// LetMeCheck returns the value of the "let_me_check" field in the mutation.
+func (m *TesterMutation) LetMeCheck() (r string, exists bool) {
+	v := m.let_me_check
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLetMeCheck returns the old "let_me_check" field's value of the Tester entity.
+// If the Tester object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TesterMutation) OldLetMeCheck(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLetMeCheck is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLetMeCheck requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLetMeCheck: %w", err)
+	}
+	return oldValue.LetMeCheck, nil
+}
+
+// ResetLetMeCheck resets all changes to the "let_me_check" field.
+func (m *TesterMutation) ResetLetMeCheck() {
+	m.let_me_check = nil
+}
+
+// SetSize sets the "size" field.
+func (m *TesterMutation) SetSize(t tester.Size) {
+	m.size = &t
+}
+
+// Size returns the value of the "size" field in the mutation.
+func (m *TesterMutation) Size() (r tester.Size, exists bool) {
+	v := m.size
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSize returns the old "size" field's value of the Tester entity.
+// If the Tester object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TesterMutation) OldSize(ctx context.Context) (v tester.Size, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSize is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSize requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSize: %w", err)
+	}
+	return oldValue.Size, nil
+}
+
+// ResetSize resets all changes to the "size" field.
+func (m *TesterMutation) ResetSize() {
+	m.size = nil
+}
+
+// SetShape sets the "shape" field.
+func (m *TesterMutation) SetShape(c custom.Shape) {
+	m.shape = &c
+}
+
+// Shape returns the value of the "shape" field in the mutation.
+func (m *TesterMutation) Shape() (r custom.Shape, exists bool) {
+	v := m.shape
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldShape returns the old "shape" field's value of the Tester entity.
+// If the Tester object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TesterMutation) OldShape(ctx context.Context) (v custom.Shape, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldShape is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldShape requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldShape: %w", err)
+	}
+	return oldValue.Shape, nil
+}
+
+// ResetShape resets all changes to the "shape" field.
+func (m *TesterMutation) ResetShape() {
+	m.shape = nil
+}
+
+// SetLevel sets the "level" field.
+func (m *TesterMutation) SetLevel(c custom.Level) {
+	m.level = &c
+}
+
+// Level returns the value of the "level" field in the mutation.
+func (m *TesterMutation) Level() (r custom.Level, exists bool) {
+	v := m.level
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLevel returns the old "level" field's value of the Tester entity.
+// If the Tester object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TesterMutation) OldLevel(ctx context.Context) (v custom.Level, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLevel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLevel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLevel: %w", err)
+	}
+	return oldValue.Level, nil
+}
+
+// ResetLevel resets all changes to the "level" field.
+func (m *TesterMutation) ResetLevel() {
+	m.level = nil
+}
+
+// Where appends a list predicates to the TesterMutation builder.
+func (m *TesterMutation) Where(ps ...predicate.Tester) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the TesterMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TesterMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Tester, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *TesterMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TesterMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Tester).
+func (m *TesterMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TesterMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m._PascalCase != nil {
+		fields = append(fields, tester.FieldPascalCase)
+	}
+	if m.let_me_check != nil {
+		fields = append(fields, tester.FieldLetMeCheck)
+	}
+	if m.size != nil {
+		fields = append(fields, tester.FieldSize)
+	}
+	if m.shape != nil {
+		fields = append(fields, tester.FieldShape)
+	}
+	if m.level != nil {
+		fields = append(fields, tester.FieldLevel)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TesterMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case tester.FieldPascalCase:
+		return m.PascalCase()
+	case tester.FieldLetMeCheck:
+		return m.LetMeCheck()
+	case tester.FieldSize:
+		return m.Size()
+	case tester.FieldShape:
+		return m.Shape()
+	case tester.FieldLevel:
+		return m.Level()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TesterMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case tester.FieldPascalCase:
+		return m.OldPascalCase(ctx)
+	case tester.FieldLetMeCheck:
+		return m.OldLetMeCheck(ctx)
+	case tester.FieldSize:
+		return m.OldSize(ctx)
+	case tester.FieldShape:
+		return m.OldShape(ctx)
+	case tester.FieldLevel:
+		return m.OldLevel(ctx)
+	}
+	return nil, fmt.Errorf("unknown Tester field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TesterMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case tester.FieldPascalCase:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPascalCase(v)
+		return nil
+	case tester.FieldLetMeCheck:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLetMeCheck(v)
+		return nil
+	case tester.FieldSize:
+		v, ok := value.(tester.Size)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSize(v)
+		return nil
+	case tester.FieldShape:
+		v, ok := value.(custom.Shape)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetShape(v)
+		return nil
+	case tester.FieldLevel:
+		v, ok := value.(custom.Level)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLevel(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Tester field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TesterMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TesterMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TesterMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Tester numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TesterMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TesterMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TesterMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Tester nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TesterMutation) ResetField(name string) error {
+	switch name {
+	case tester.FieldPascalCase:
+		m.ResetPascalCase()
+		return nil
+	case tester.FieldLetMeCheck:
+		m.ResetLetMeCheck()
+		return nil
+	case tester.FieldSize:
+		m.ResetSize()
+		return nil
+	case tester.FieldShape:
+		m.ResetShape()
+		return nil
+	case tester.FieldLevel:
+		m.ResetLevel()
+		return nil
+	}
+	return fmt.Errorf("unknown Tester field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TesterMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TesterMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TesterMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TesterMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TesterMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TesterMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TesterMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Tester unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TesterMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Tester edge %s", name)
 }
 
 // UserMutation represents an operation that mutates the User nodes in the graph.

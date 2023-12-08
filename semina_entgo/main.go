@@ -6,9 +6,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"math/rand"
+	"semina_entgo/custom"
 	"semina_entgo/ent"
 	"semina_entgo/ent/car"
 	"semina_entgo/ent/group"
+	"semina_entgo/ent/tester"
 	"semina_entgo/ent/user"
 	"time"
 )
@@ -237,6 +239,21 @@ func QueryGroupWithUsers(ctx context.Context, client *ent.Client) error {
 	return nil
 }
 
+func TestInsertValidateReturnError(ctx context.Context, client *ent.Client) error {
+	tsr, err := client.Tester.Create().
+		SetPascalCase("work?").
+		SetLetMeCheck("let me check ?").
+		SetSize(tester.SizeBig).
+		SetShape(custom.Rectangle).
+		SetLevel(custom.High).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+	fmt.Println(tsr)
+	return nil
+}
+
 func main() {
 	client, err := ent.Open("mysql", "guiwoo:guiwoo@tcp(localhost:3306)/guiwoo?parseTime=true")
 	if err != nil {
@@ -245,7 +262,7 @@ func main() {
 	defer func(client *ent.Client) {
 		err := client.Close()
 		if err != nil {
-
+			panic(err)
 		}
 	}(client)
 
@@ -254,8 +271,7 @@ func main() {
 		log.Fatalf("failed to create entity %v", err)
 	}
 
-	if err := QueryGroupWithUsers(context.Background(), client); err != nil {
-		log.Fatalf("fail to query korea group %+v", err)
+	if err := TestInsertValidateReturnError(context.Background(), client); err != nil {
+		log.Fatalf("fail to test insert data error %+v", err)
 	}
-
 }

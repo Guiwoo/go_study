@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"semina_entgo/ent/car"
 	"semina_entgo/ent/group"
+	"semina_entgo/ent/tester"
 	"semina_entgo/ent/user"
 	"sync"
 
@@ -75,9 +76,10 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			car.Table:   car.ValidColumn,
-			group.Table: group.ValidColumn,
-			user.Table:  user.ValidColumn,
+			car.Table:    car.ValidColumn,
+			group.Table:  group.ValidColumn,
+			tester.Table: tester.ValidColumn,
+			user.Table:   user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

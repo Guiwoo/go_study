@@ -40,6 +40,21 @@ var (
 		Columns:    GroupsColumns,
 		PrimaryKey: []*schema.Column{GroupsColumns[0]},
 	}
+	// TestersColumns holds the columns for the "testers" table.
+	TestersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "pascal_case", Type: field.TypeString},
+		{Name: "let_me_check", Type: field.TypeString},
+		{Name: "size", Type: field.TypeEnum, Enums: []string{"big", "small"}},
+		{Name: "shape", Type: field.TypeEnum, Enums: []string{"정사각형", "사각형", "삼각형"}},
+		{Name: "level", Type: field.TypeEnum, Enums: []string{"Low", "Middle", "High"}},
+	}
+	// TestersTable holds the schema information for the "testers" table.
+	TestersTable = &schema.Table{
+		Name:       "testers",
+		Columns:    TestersColumns,
+		PrimaryKey: []*schema.Column{TestersColumns[0]},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -81,6 +96,7 @@ var (
 	Tables = []*schema.Table{
 		CarsTable,
 		GroupsTable,
+		TestersTable,
 		UsersTable,
 		GroupUsersTable,
 	}

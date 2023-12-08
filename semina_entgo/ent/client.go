@@ -13,6 +13,7 @@ import (
 
 	"semina_entgo/ent/car"
 	"semina_entgo/ent/group"
+	"semina_entgo/ent/tester"
 	"semina_entgo/ent/user"
 
 	"entgo.io/ent"
@@ -30,6 +31,8 @@ type Client struct {
 	Car *CarClient
 	// Group is the client for interacting with the Group builders.
 	Group *GroupClient
+	// Tester is the client for interacting with the Tester builders.
+	Tester *TesterClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -45,6 +48,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Car = NewCarClient(c.config)
 	c.Group = NewGroupClient(c.config)
+	c.Tester = NewTesterClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -140,6 +144,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config: cfg,
 		Car:    NewCarClient(cfg),
 		Group:  NewGroupClient(cfg),
+		Tester: NewTesterClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
 }
@@ -162,6 +167,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config: cfg,
 		Car:    NewCarClient(cfg),
 		Group:  NewGroupClient(cfg),
+		Tester: NewTesterClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
 }
@@ -193,6 +199,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.Car.Use(hooks...)
 	c.Group.Use(hooks...)
+	c.Tester.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -201,6 +208,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Car.Intercept(interceptors...)
 	c.Group.Intercept(interceptors...)
+	c.Tester.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
 
@@ -211,6 +219,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Car.mutate(ctx, m)
 	case *GroupMutation:
 		return c.Group.mutate(ctx, m)
+	case *TesterMutation:
+		return c.Tester.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -516,6 +526,139 @@ func (c *GroupClient) mutate(ctx context.Context, m *GroupMutation) (Value, erro
 	}
 }
 
+// TesterClient is a client for the Tester schema.
+type TesterClient struct {
+	config
+}
+
+// NewTesterClient returns a client for the Tester from the given config.
+func NewTesterClient(c config) *TesterClient {
+	return &TesterClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `tester.Hooks(f(g(h())))`.
+func (c *TesterClient) Use(hooks ...Hook) {
+	c.hooks.Tester = append(c.hooks.Tester, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `tester.Intercept(f(g(h())))`.
+func (c *TesterClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Tester = append(c.inters.Tester, interceptors...)
+}
+
+// Create returns a builder for creating a Tester entity.
+func (c *TesterClient) Create() *TesterCreate {
+	mutation := newTesterMutation(c.config, OpCreate)
+	return &TesterCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Tester entities.
+func (c *TesterClient) CreateBulk(builders ...*TesterCreate) *TesterCreateBulk {
+	return &TesterCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TesterClient) MapCreateBulk(slice any, setFunc func(*TesterCreate, int)) *TesterCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TesterCreateBulk{err: fmt.Errorf("calling to TesterClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TesterCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TesterCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Tester.
+func (c *TesterClient) Update() *TesterUpdate {
+	mutation := newTesterMutation(c.config, OpUpdate)
+	return &TesterUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TesterClient) UpdateOne(t *Tester) *TesterUpdateOne {
+	mutation := newTesterMutation(c.config, OpUpdateOne, withTester(t))
+	return &TesterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TesterClient) UpdateOneID(id int) *TesterUpdateOne {
+	mutation := newTesterMutation(c.config, OpUpdateOne, withTesterID(id))
+	return &TesterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Tester.
+func (c *TesterClient) Delete() *TesterDelete {
+	mutation := newTesterMutation(c.config, OpDelete)
+	return &TesterDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TesterClient) DeleteOne(t *Tester) *TesterDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TesterClient) DeleteOneID(id int) *TesterDeleteOne {
+	builder := c.Delete().Where(tester.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TesterDeleteOne{builder}
+}
+
+// Query returns a query builder for Tester.
+func (c *TesterClient) Query() *TesterQuery {
+	return &TesterQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTester},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Tester entity by its id.
+func (c *TesterClient) Get(ctx context.Context, id int) (*Tester, error) {
+	return c.Query().Where(tester.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TesterClient) GetX(ctx context.Context, id int) *Tester {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TesterClient) Hooks() []Hook {
+	return c.hooks.Tester
+}
+
+// Interceptors returns the client interceptors.
+func (c *TesterClient) Interceptors() []Interceptor {
+	return c.inters.Tester
+}
+
+func (c *TesterClient) mutate(ctx context.Context, m *TesterMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TesterCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TesterUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TesterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TesterDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Tester mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -684,9 +827,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Car, Group, User []ent.Hook
+		Car, Group, Tester, User []ent.Hook
 	}
 	inters struct {
-		Car, Group, User []ent.Interceptor
+		Car, Group, Tester, User []ent.Interceptor
 	}
 )
