@@ -23,7 +23,10 @@ func (User) Fields() []ent.Field {
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("cars", Car.Type),
+		edge.To("pets", Pet.Type),
 		edge.From("groups", Group.Type).
 			Ref("users"),
+		edge.From("card", Card.Type).
+			Ref("owner").Unique(),
 	}
 }

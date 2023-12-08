@@ -3,15 +3,27 @@
 package ent
 
 import (
+	"semina_entgo/ent/card"
 	"semina_entgo/ent/group"
 	"semina_entgo/ent/schema"
 	"semina_entgo/ent/user"
+	"time"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	cardFields := schema.Card{}.Fields()
+	_ = cardFields
+	// cardDescNumber is the schema descriptor for number field.
+	cardDescNumber := cardFields[0].Descriptor()
+	// card.NumberValidator is a validator for the "number" field. It is called by the builders before save.
+	card.NumberValidator = cardDescNumber.Validators[0].(func(string) error)
+	// cardDescExpiredAt is the schema descriptor for expired_at field.
+	cardDescExpiredAt := cardFields[1].Descriptor()
+	// card.DefaultExpiredAt holds the default value on creation for the expired_at field.
+	card.DefaultExpiredAt = cardDescExpiredAt.Default.(time.Time)
 	groupFields := schema.Group{}.Fields()
 	_ = groupFields
 	// groupDescName is the schema descriptor for name field.
