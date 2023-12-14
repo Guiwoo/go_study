@@ -1324,3 +1324,166 @@ func solution5014() {
 	}
 	fmt.Fprintln(writer, "use the stairs")
 }
+
+func solution7569() {
+	var (
+		reader              = bufio.NewReader(os.Stdin)
+		writer              = bufio.NewWriter(os.Stdout)
+		row, column, height int
+	)
+
+	defer writer.Flush()
+
+	fmt.Fscanln(reader, &column, &row, &height)
+
+	arr := make([][]int, row*height)
+
+	dirRow := []int{0, 0, 1, -1, row, -row}
+	dirCol := []int{1, -1, 0, 0, 0, 0}
+
+	q := list.New()
+	days := 0
+	tomato := 0
+
+	for i := range arr {
+		sub := make([]int, column)
+		line, _ := reader.ReadString('\n')
+		lines := strings.Split(strings.TrimSpace(line), " ")
+		for j, v := range lines {
+			sub[j], _ = strconv.Atoi(v)
+			if sub[j] == 1 {
+				q.PushBack([]int{i, j})
+			} else if sub[j] == 0 {
+				tomato++
+			}
+		}
+		arr[i] = sub
+	}
+
+	for q.Len() > 0 {
+		size := q.Len()
+		if tomato == 0 {
+			fmt.Fprintln(writer, days)
+			return
+		}
+		for i := 0; i < size; i++ {
+			front := q.Front()
+			q.Remove(front)
+			cur := front.Value.([]int)
+			for j := 0; j < len(dirCol); j++ {
+				if j <= 3 {
+					rRangeStart := (cur[0] / row) * row
+					nRow := cur[0] + dirRow[j]
+					nCol := cur[1] + dirCol[j]
+					if nRow < 0 || nCol < 0 || nRow >= len(arr) || nCol >= column || arr[nRow][nCol] == -1 || arr[nRow][nCol] == 1 {
+						continue
+					}
+					if rRangeStart <= nRow && nRow <= rRangeStart+row-1 {
+						tomato--
+						arr[nRow][nCol] = 1
+						q.PushBack([]int{nRow, nCol})
+					}
+				} else {
+					nRow := cur[0] + dirRow[j]
+					nCol := cur[1] + dirCol[j]
+					if nRow < 0 || nCol < 0 || nRow >= len(arr) || nCol >= column || arr[nRow][nCol] == -1 || arr[nRow][nCol] == 1 {
+						continue
+					}
+					tomato--
+					arr[nRow][nCol] = 1
+					q.PushBack([]int{nRow, nCol})
+				}
+			}
+		}
+		days++
+	}
+
+	for i := range arr {
+		for _, v := range arr[i] {
+			if v == 0 {
+				fmt.Fprintln(writer, -1)
+				return
+			}
+		}
+	}
+	fmt.Fprintln(writer, days)
+}
+
+func solution2206() {
+	type mover struct {
+		row, col int
+		steps    int
+		boom     int
+	}
+	var (
+		reader   = bufio.NewReader(os.Stdin)
+		writer   = bufio.NewWriter(os.Stdout)
+		dirs     = []int{0, 1, 0, -1, 0}
+		row, col int
+	)
+	defer writer.Flush()
+
+	fmt.Fscanln(reader, &row, &col)
+
+	arr := make([][]int, row)
+	visit := make([][][2]bool, row)
+	for i := range visit {
+		sub := make([][2]bool, col)
+		for j := range sub {
+			sub[j] = [2]bool{}
+		}
+		visit[i] = sub
+	}
+	for i := range arr {
+		sub := make([]int, col)
+		line, _ := reader.ReadString('\n')
+		for j, v := range strings.Trim(line, "\n") {
+			sub[j], _ = strconv.Atoi(string(v))
+		}
+		arr[i] = sub
+	}
+
+	q := list.New()
+	q.PushBack(mover{0, 0, 1, 0}) // 0 has bomb , 1 used bomb
+	visit[0][0][0] = true
+
+	for q.Len() > 0 {
+		current := q.Front()
+		q.Remove(current)
+		curMover := current.Value.(mover)
+		if curMover.row == row-1 && curMover.col == col-1 {
+			fmt.Fprintln(writer, curMover.steps)
+			return
+		}
+		for i := 1; i < len(dirs); i++ {
+			nRow := curMover.row + dirs[i]
+			nCol := curMover.col + dirs[i-1]
+
+			if nRow < 0 || nCol < 0 || nRow >= row || nCol >= col {
+				continue
+			}
+
+			if nRow == row-1 && nCol == col-1 {
+				fmt.Fprintln(writer, curMover.steps+1)
+				return
+			}
+
+			if arr[nRow][nCol] == 1 && curMover.boom == 0 {
+				visit[nRow][nCol][1] = true
+				q.PushBack(mover{nRow, nCol, curMover.steps + 1, 1})
+			}
+
+			if arr[nRow][nCol] == 0 {
+				if curMover.boom == 0 && visit[nRow][nCol][0] == false {
+					visit[nRow][nCol][0] = true
+					q.PushBack(mover{nRow, nCol, curMover.steps + 1, 0})
+				} else if curMover.boom == 1 && visit[nRow][nCol][1] == false {
+					visit[nRow][nCol][1] = true
+					q.PushBack(mover{nRow, nCol, curMover.steps + 1, 1})
+				}
+			}
+		}
+	}
+
+	fmt.Fprintln(writer, -1)
+}
