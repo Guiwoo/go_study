@@ -1,12 +1,8 @@
 package main
 
 import (
-	"bufio"
-	"container/list"
+	"container/heap"
 	"fmt"
-	"os"
-	"strconv"
-	"strings"
 )
 
 func main() {
@@ -14,114 +10,77 @@ func main() {
 }
 
 /**
-N×M의 행렬로 표현되는 맵이 있다. 맵에서 0은 이동할 수 있는 곳을 나타내고, 1은 이동할 수 없는 벽이 있는 곳을 나타낸다. 당신은 (1, 1)에서 (N, M)의 위치까지 이동하려 하는데, 이때 최단 경로로 이동하려 한다. 최단경로는 맵에서 가장 적은 개수의 칸을 지나는 경로를 말하는데, 이때 시작하는 칸과 끝나는 칸도 포함해서 센다. 이동하지 않고 같은 칸에 머물러있는 경우도 가능하다. 이 경우도 방문한 칸의 개수가 하나 늘어나는 것으로 생각해야 한다.
+방향성이 없는 그래프가 주어진다. 세준이는 1번 정점에서 N번 정점으로 최단 거리로 이동하려고 한다.
+또한 세준이는 두 가지 조건을 만족하면서 이동하는 특정한 최단 경로를 구하고 싶은데, 그것은 바로 임의로 주어진 두 정점은 반드시 통과해야 한다는 것이다.
 
-이번 문제에서는 낮과 밤이 번갈아가면서 등장한다. 가장 처음에 이동할 때는 낮이고, 한 번 이동할 때마다 낮과 밤이 바뀌게 된다. 이동하지 않고 같은 칸에 머무르는 경우에도 낮과 밤이 바뀌게 된다.
+세준이는 한번 이동했던 정점은 물론, 한번 이동했던 간선도 다시 이동할 수 있다.
+하지만 반드시 최단 경로로 이동해야 한다는 사실에 주의하라.
+1번 정점에서 N번 정점으로 이동할 때, 주어진 두 정점을 반드시 거치면서 최단 경로로 이동하는 프로그램을 작성하시오.
 
-만약에 이동하는 도중에 벽을 부수고 이동하는 것이 좀 더 경로가 짧아진다면, 벽을 K개 까지 부수고 이동하여도 된다. 단, 벽은 낮에만 부술 수 있다.
+첫째 줄에 정점의 개수 N과 간선의 개수 E가 주어진다.
+(2 ≤ N ≤ 800, 0 ≤ E ≤ 200,000) 둘째 줄부터 E개의 줄에 걸쳐서 세 개의 정수 a, b, c가 주어지는데, a번 정점에서 b번 정점까지 양방향 길이 존재하며,
+그 거리가 c라는 뜻이다. (1 ≤ c ≤ 1,000) 다음 줄에는 반드시 거쳐야 하는 두 개의 서로 다른 정점 번호 v1과 v2가 주어진다. (v1 ≠ v2, v1 ≠ N, v2 ≠ 1) 임의의 두 정점 u와 v사이에는 간선이 최대 1개 존재한다.
 
-한 칸에서 이동할 수 있는 칸은 상하좌우로 인접한 칸이다.
+첫째 줄에 두 개의 정점을 지나는 최단 경로의 길이를 출력한다. 그러한 경로가 없을 때에는 -1을 출력한다.
 
-맵이 주어졌을 때, 최단 경로를 구해 내는 프로그램을 작성하시오.
+4 6
+
+1 2 3
+2 3 3
+3 4 1
+1 3 5
+2 4 5
+1 4 4
+2 3
+
+7
 */
-/**
-1 4 1
-0010
 
-5
+type item struct {
+	cur, value int
+}
 
-1 4 1
-0100
+type PriorityQ []*item
 
-4
+func (pq *PriorityQ) Len() int {
+	q := *pq
+	return len(q)
+}
+func (pq *PriorityQ) Swap(i, j int) {
+	q := *pq
+	q[i], q[j] = q[j], q[i]
+}
+func (pq *PriorityQ) Less(i, j int) bool {
+	q := *pq
+	return q[i].value < q[j].value
+}
 
-6 4 1
-0100
-1110
-1000
-0000
-0111
-0000
-
-15
-
-6 4 2
-0100
-1110
-1000
-0000
-0111
-0000
-
-9
-*/
+func (pq *PriorityQ) Push(x any) {
+	item := x.(*item)
+	*pq = append(*pq, item)
+}
+func (pq *PriorityQ) Pop() any {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	old[n-1] = nil
+	*pq = old[0 : n-1]
+	return item
+}
 
 func boj16933() {
-	var (
-		reader          = bufio.NewReader(os.Stdin)
-		writer          = bufio.NewWriter(os.Stdout)
-		row, col, booms int
-		dirs            = []int{0, 1, 0, -1, 0}
-		visit           [1001][1001][11]bool
-	)
-	type mover struct {
-		x, y, steps, booms int
-		isDay              bool
+	pq := make(PriorityQ, 0)
+	heap.Init(&pq)
+
+	heap.Push(&pq, &item{2, 8})
+	heap.Push(&pq, &item{5, 5})
+	heap.Push(&pq, &item{4, 6})
+	heap.Push(&pq, &item{3, 7})
+	heap.Push(&pq, &item{1, 9})
+	heap.Push(&pq, &item{6, 4})
+
+	for pq.Len() > 0 {
+		item := heap.Pop(&pq)
+		fmt.Printf("item : %+v\n", item)
 	}
-	defer writer.Flush()
-
-	fmt.Fscanln(reader, &row, &col, &booms)
-
-	arr := make([][]int, row)
-	for i := range arr {
-		sub := make([]int, col)
-		str, _ := reader.ReadString('\n')
-		for j := range strings.TrimSpace(str) {
-			sub[j], _ = strconv.Atoi(string(str[j]))
-		}
-		arr[i] = sub
-	}
-
-	q := list.New()
-	q.PushBack(mover{0, 0, 1, booms, true})
-	visit[0][0][booms] = true
-
-	for q.Len() > 0 {
-		current := q.Front()
-		q.Remove(current)
-		cur := current.Value.(mover)
-		if cur.x == row-1 && cur.y == col-1 {
-			fmt.Fprintln(writer, cur.steps)
-			return
-		}
-		for i := 1; i < len(dirs); i++ {
-			nRow := cur.x + dirs[i-1]
-			nCol := cur.y + dirs[i]
-
-			if nRow < 0 || nCol < 0 || nRow >= row || nCol >= col {
-				continue
-			}
-
-			if nRow == row-1 && nCol == col-1 {
-				fmt.Fprintln(writer, cur.steps+1)
-				return
-			}
-
-			if arr[nRow][nCol] == 1 && cur.booms > 0 && visit[nRow][nCol][cur.booms-1] == false {
-				if cur.isDay {
-					visit[nRow][nCol][cur.booms-1] = true
-					q.PushBack(mover{nRow, nCol, cur.steps + 1, cur.booms - 1, !cur.isDay})
-				} else {
-					q.PushBack(mover{cur.x, cur.y, cur.steps + 1, cur.booms, !cur.isDay})
-				}
-			}
-
-			if arr[nRow][nCol] == 0 && visit[nRow][nCol][cur.booms] == false {
-				visit[nRow][nCol][cur.booms] = true
-				q.PushBack(mover{nRow, nCol, cur.steps + 1, cur.booms, !cur.isDay})
-			}
-		}
-	}
-
-	fmt.Fprintln(writer, -1)
 }
