@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"sort"
 )
 
 type item struct {
@@ -114,4 +115,98 @@ func dijkstra1504(from, to int, graph []map[int]int) int {
 		}
 	}
 	return visit[to]
+}
+
+func boj9370() {
+	var (
+		reader     = bufio.NewReader(os.Stdin)
+		writer     = bufio.NewWriter(os.Stdout)
+		simulation int
+	)
+	fmt.Fscanln(reader, &simulation)
+	defer writer.Flush()
+
+	for i := 0; i < simulation; i++ {
+		answer := lookingForHeadingTo(reader)
+		writer.WriteString(answer + "\n")
+	}
+}
+
+func lookingForHeadingTo(reader *bufio.Reader) string {
+	var (
+		vertexes, edges, candidates int
+		start, cur1, cur2           int
+	)
+
+	fmt.Fscanln(reader, &vertexes, &edges, &candidates)
+	fmt.Fscanln(reader, &start, &cur1, &cur2)
+
+	graph := make([]map[int]int, vertexes+1)
+
+	for i := range graph {
+		graph[i] = make(map[int]int)
+	}
+
+	for i := 0; i < edges; i++ {
+		var (
+			from, to, value int
+		)
+		fmt.Fscanln(reader, &from, &to, &value)
+		graph[from][to] = value
+		graph[to][from] = value
+	}
+
+	candArr := make([]int, candidates)
+	for i := 0; i < candidates; i++ {
+		var x int
+		fmt.Fscanln(reader, &x)
+		candArr[i] = x
+	}
+
+	all := dijkstra9370(graph, start, vertexes)
+	startToFirst := dijkstra9370(graph, cur1, vertexes)
+	startToSecond := dijkstra9370(graph, cur2, vertexes)
+
+	answer := make([]int, 0)
+	for _, v := range candArr {
+
+		if all[v] == all[cur1]+startToFirst[cur2]+startToSecond[v] ||
+			all[v] == all[cur2]+startToSecond[cur1]+startToFirst[v] {
+			answer = append(answer, v)
+			continue
+		}
+	}
+	sort.Ints(answer)
+	str := ""
+	for _, v := range answer {
+		str += fmt.Sprintf("%d ", v)
+	}
+	return str
+}
+
+func dijkstra9370(graph []map[int]int, start int, vertexes int) []int {
+	dp := make([]int, vertexes+1)
+	for i := range dp {
+		dp[i] = math.MaxInt
+	}
+
+	var pq PriorityQ
+	heap.Init(&pq)
+
+	dp[start] = 0
+	heap.Push(&pq, &item{cur: start, value: 0})
+
+	for pq.Len() > 0 {
+		current := pq.Pop().(*item)
+
+		for next, value := range graph[current.cur] {
+			nextValue := current.value + value
+			if nextValue < dp[next] {
+				dp[next] = nextValue
+				heap.Push(&pq, &item{next, nextValue})
+			}
+		}
+	}
+
+	return dp
 }
