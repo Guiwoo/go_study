@@ -345,3 +345,81 @@ func relaxd(dp []int, graph []map[int][]int, edges int) bool {
 	}
 	return relaxed
 }
+
+func boj11404() {
+	var (
+		reader      = bufio.NewReader(os.Stdin)
+		writer      = bufio.NewWriter(os.Stdout)
+		cities, bus int
+	)
+
+	defer writer.Flush()
+
+	fmt.Fscanln(reader, &cities)
+	fmt.Fscanln(reader, &bus)
+
+	graph := make([]map[int][]int, cities+1)
+	for i := range graph {
+		graph[i] = make(map[int][]int)
+	}
+	dp := make([][]int, cities+1)
+	for i := range dp {
+		sub := make([]int, cities+1)
+		for j := range sub {
+			sub[j] = 1e8
+			if i == j {
+				sub[j] = 0
+			}
+		}
+		dp[i] = sub
+
+	}
+
+	for i := 0; i < bus; i++ {
+		var from, to, value int
+		fmt.Fscanln(reader, &from, &to, &value)
+		graph[from][to] = append(graph[from][to], value)
+		if dp[from][to] != 0 {
+			dp[from][to] = min(dp[from][to], value)
+		} else {
+			dp[from][to] = value
+		}
+	}
+
+	other := floyed(cities, dp)
+
+	fmt.Fprintln(writer, other)
+}
+func floyed(cities int, dp [][]int) string {
+	for k := 1; k <= cities; k++ {
+		for i := 1; i <= cities; i++ {
+			for j := 1; j <= cities; j++ {
+				if i == j {
+					dp[i][j] = 0
+					continue
+				}
+				dp[i][j] = min(dp[i][j], dp[i][k]+dp[k][j])
+			}
+		}
+	}
+
+	answer := ""
+	for i, row := range dp {
+		if i == 0 {
+			continue
+		}
+		sub := ""
+		for j, val := range row {
+			if j == 0 {
+				continue
+			}
+			if val == 1e8 {
+				sub += fmt.Sprintf("%d ", 0)
+			} else {
+				sub += fmt.Sprintf("%d ", val)
+			}
+		}
+		answer += sub + "\n"
+	}
+	return answer
+}
