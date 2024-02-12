@@ -51,6 +51,7 @@ func main() {
 	)
 
 	defer writer.Flush()
+	fmt.Fscanln(reader, &J, &B)
 
 	jewels := make([]jewel, 0, J)
 	for i := 0; i < J; i++ {
@@ -63,7 +64,7 @@ func main() {
 		if jewels[i].Price == jewels[j].Price {
 			return jewels[i].Weight < jewels[j].Weight
 		}
-		return jewels[i].Price < jewels[j].Price
+		return jewels[i].Price > jewels[j].Price
 	})
 
 	bag := make([]int, 0, B)
@@ -77,4 +78,20 @@ func main() {
 		return bag[i] < bag[j]
 	})
 
+	answer := 0
+	jewelsIdx := 0
+
+	for _, b := range bag {
+		curWeight := b
+		for i := jewelsIdx; i < len(jewels); i++ {
+			if curWeight > 0 && jewels[i].Weight <= curWeight {
+				curWeight -= jewels[i].Weight
+				answer += jewels[i].Price
+				jewelsIdx = i + 1
+				break
+			}
+		}
+	}
+
+	fmt.Println(answer)
 }
