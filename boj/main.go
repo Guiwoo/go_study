@@ -8,62 +8,73 @@ import (
 )
 
 /**
-한 개의 회의실이 있는데 이를 사용하고자 하는 N개의 회의에 대하여 회의실 사용표를 만들려고 한다.
-각 회의 I에 대해 시작시간과 끝나는 시간이 주어져 있고, 각 회의가 겹치지 않게 하면서 회의실을 사용할 수 있는 회의의 최대 개수를 찾아보자.
-단, 회의는 한번 시작하면 중간에 중단될 수 없으며 한 회의가 끝나는 것과 동시에 다음 회의가 시작될 수 있다.
-회의의 시작시간과 끝나는 시간이 같을 수도 있다.
-이 경우에는 시작하자마자 끝나는 것으로 생각하면 된다.
+세계적인 도둑 상덕이는 보석점을 털기로 결심했다.
+상덕이가 털 보석점에는 보석이 총 N개 있다.
+각 보석은 무게 Mi와 가격 Vi를 가지고 있다.
+상덕이는 가방을 K개 가지고 있고, 각 가방에 담을 수 있는 최대 무게는 Ci이다.
+가방에는 최대 한 개의 보석만 넣을 수 있다.
+상덕이가 훔칠 수 있는 보석의 최대 가격을 구하는 프로그램을 작성하시오.
 
-첫째 줄에 회의의 수 N(1 ≤ N ≤ 100,000)이 주어진다.
-둘째 줄부터 N+1 줄까지 각 회의의 정보가 주어지는데 이것은 공백을 사이에 두고 회의의 시작시간과 끝나는 시간이 주어진다.
-시작 시간과 끝나는 시간은 231-1보다 작거나 같은 자연수 또는 0이다.
+첫째 줄에 N과 K가 주어진다. (1 ≤ N, K ≤ 300,000)
+다음 N개 줄에는 각 보석의 정보 Mi와 Vi가 주어진다. (0 ≤ Mi, Vi ≤ 1,000,000)
+다음 K개 줄에는 가방에 담을 수 있는 최대 무게 Ci가 주어진다. (1 ≤ Ci ≤ 100,000,000)
+모든 숫자는 양의 정수이다.
 
-첫째 줄에 최대 사용할 수 있는 회의의 최대 개수를 출력한다.
+첫째 줄에 상덕이가 훔칠 수 있는 보석 가격의 합의 최댓값을 출력한다.
 
+2 1
+5 10
+100 100
 11
-1 4
-3 5
-5 7
-12 14
-0 6
-2 13
-3 8
-5 9
-6 10
-8 11
-8 12
+답 : 10
 
-4
+3 2
+1 65
+5 23
+2 99
+10
+2
+
+답 :164
 */
 
-type Meeting struct {
-	start, end int
+type jewel struct {
+	Weight int
+	Price  int
 }
 
 func main() {
 	var (
 		reader = bufio.NewReader(os.Stdin)
 		writer = bufio.NewWriter(os.Stdout)
-		N      int
+		J, B   int
 	)
 
 	defer writer.Flush()
 
-	fmt.Fscanln(reader, &N)
-	arr := make([]Meeting, 0, N)
-	for i := 0; i < N; i++ {
+	jewels := make([]jewel, 0, J)
+	for i := 0; i < J; i++ {
 		var x, y int
 		fmt.Fscanln(reader, &x, &y)
-		arr = append(arr, Meeting{x, y})
+		jewels = append(jewels, jewel{x, y})
 	}
 
-	sort.Slice(arr, func(i, j int) bool {
-		dis1, dis2 := arr[i].end-arr[i].start, arr[j].end-arr[j].start
-		if arr[i].end < arr[j].end {
-			return dis1 < dis2
+	sort.Slice(jewels, func(i, j int) bool {
+		if jewels[i].Price == jewels[j].Price {
+			return jewels[i].Weight < jewels[j].Weight
 		}
-		return arr[i].end < arr[j].end
+		return jewels[i].Price < jewels[j].Price
 	})
 
-	fmt.Printf("%+v", arr)
+	bag := make([]int, 0, B)
+	for i := 0; i < B; i++ {
+		var x int
+		fmt.Fscanln(reader, &x)
+		bag = append(bag, x)
+	}
+
+	sort.Slice(bag, func(i, j int) bool {
+		return bag[i] < bag[j]
+	})
+
 }
