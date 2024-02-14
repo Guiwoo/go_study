@@ -88,8 +88,8 @@ func CreateImage() {
 	fmt.Println(string(body))
 }
 
-func CreateImageWssConnect() <-chan bool {
-	c := make(chan bool)
+func CreateImageWssConnect() <-chan string {
+	c := make(chan string)
 	CreateImage()
 	go socket.Connect(c)
 	return c

@@ -24,13 +24,17 @@ type PapagoResult struct {
 }
 
 type ComfySocketResp struct {
-	Type string `json:"type"`
-	//Data ComfySocketData `json:"data"`
+	Type string          `json:"type"`
+	Data ComfySocketData `json:"data"`
 }
 type ComfySocketData struct {
-	Node   string             `json:"node"`
+	Node   string      `json:"node"`
+	Output ComfyOutput `json:"output"`
+}
+type ComfyOutput struct {
 	Images []ComfySocketImage `json:"images"`
 }
+
 type ComfySocketImage struct {
 	FileName string `json:"filename"`
 	Type     string `json:"type"`

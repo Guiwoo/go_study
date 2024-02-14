@@ -98,8 +98,8 @@ func QueuePrompt(w http.ResponseWriter, r *http.Request) {
 		select {
 		case <-time.After(1 * time.Second):
 			c.WriteMessage(sc.TextMessage, []byte("progress"))
-		case <-getImage:
-			c.WriteMessage(sc.TextMessage, []byte("done"))
+		case filename := <-getImage:
+			c.WriteMessage(sc.TextMessage, []byte(filename))
 			return
 		}
 	}

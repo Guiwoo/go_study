@@ -28,7 +28,7 @@ func readClientMsg(ws *websocket.Conn, done chan bool) <-chan types.ComfySocketR
 	return stream
 }
 
-func Connect(sign chan bool) {
+func Connect(sign chan string) {
 	ws, err := websocket.Dial(
 		"ws://127.0.0.1:8188/ws?clientId=87655da4394a4f1f96301f9f8933b114",
 		"",
@@ -43,7 +43,7 @@ func Connect(sign chan bool) {
 	defer func() {
 		close(done)
 		ws.Close()
-		sign <- true
+		sign <- ""
 	}()
 	for {
 		select {
@@ -54,6 +54,7 @@ func Connect(sign chan bool) {
 			if msg.Type == "executed" {
 				done <- true
 				fmt.Println("[info] socket connections break created Images")
+				sign <- msg.Data.Output.Images[0].FileName
 				return
 			}
 		}

@@ -14,7 +14,7 @@
         <div class="m-4 flex border py-2 px-2">
             <form id="myForm" method="post" action="">
                 <input class="text-x3l font-bold w-96 border-b-2" type="text" name="prompt" placeholder="프롬프트 한글 입력 해주세요."/>
-                <input class="translate hover:bg-sky-500 bg-sky-300 text-white px-2 rounded-lg" type="submit" value="영어 번역 획득"/>
+                <input class=" cursor-pointer translate hover:bg-sky-500 bg-sky-300 text-white px-2 rounded-lg" type="submit" value="영어 번역 획득"/>
             </form>
             <div class="ml-2 flex">
                 <div class="ml-4 mr-4">결과</div>
@@ -31,13 +31,50 @@
                 <text class="translated px-1 py-1"></text>
             </div>
             <div class="mt-2 flex flex-row-reverse">
-                <button class="bg-sky-500 px-2 rounded-lg text-white dalle">이미지 생성</button>
+                <button class="translate hover:bg-sky-500 cursor-pointer bg-sky-300 px-2 rounded-lg text-white dalle">이미지 생성</button>
             </div>
             <img class="dalleImg" src="" width="512" height="512"/>
         </div>
         <br/>
         <h1>3. 달리이미지 + compfyUI 로 이미지 생성하기 옵션넣어서</h1>
-        <button class="comfyUIbtn bg-sky-500 px-2 rounded-lg text-white">comfyUI 이미지 생성</button>
+        <form class="flex flex-col border px-2 py-2">
+            <div class="border py-2 my-2">
+                <label for="negative">네거티브 프롬프트 : </label>
+                <input id="negative" type="text" class="border-b-2"/>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="sampler">Sampler : </label>
+                <input id="sampler" type="text" class="border-b-2"/>
+            </div>
+            <div class="border py-2 my-2">
+                <label id="steps">Steps : </label>
+                <input id="steps" type="text" class="border-b-2"/>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="cfg">CFG Scale : </label>
+                <input id="cfg" type="text" class="border-b-2"/>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="width">Width : </label>
+                <input id="width" type="text" class="border-b-2"/>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="height">height : </label>
+                <input id="height" type="text" class="border-b-2"/>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="seed">Seed : </label>
+                <input id="seed" type="text" class="border-b-2"/>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="batchSize">Batch Size : </label>
+                <input id="batchSize" type="text" class="border-b-2"/>
+            </div>
+            <div class="py-2 flex justify-center">
+                <input class="translate hover:bg-sky-500 bg-sky-300 cursor-pointer comfyUIbtn  p-4 rounded-lg text-white" type="submit" value="ComfyUI 이미지 생성">
+            </div>
+        </form>
+{{/*        <button class="comfyUIbtn bg-sky-500 px-2 rounded-lg text-white">comfyUI 이미지 생성</button>*/}}
         <div>
             <text class="progress"></text>
             <img src="" class="comfyui" width="512" height="512"/>
@@ -147,9 +184,9 @@
 
             socket.addEventListener("message", (event) => {
                 console.log("Message from server ", event.data);
-                if (event.data === "done") {
+                if (event.data !== "progress") {
                     var img = document.querySelector(".comfyui")
-                    img.src = "output/guiwoo_00001_.png"
+                    img.src = "output/"+ event.data
                 }else {
                    var pr = document.querySelector(".progress")
                     pr.innerText = "progress"
