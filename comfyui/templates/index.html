@@ -6,15 +6,44 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <div>
-        <form id="myForm" method="post" action="">
-            <input type="text" name="prompt" placeholder="프롬프트 한글 입력 해주세요."/>
-            <input class="translate" type="submit" value="영어 번역 획득"/>
-        </form>
-    </div>
-    <div class="eng_positive_prompt"></div>
+    <main class="m-4 border py-2 px-2">
+        <h1>1. 프롬프트 영어로 변경하기</h1>
+        <div class="m-4 flex border py-2 px-2">
+            <form id="myForm" method="post" action="">
+                <input class="text-x3l font-bold w-96 border-b-2" type="text" name="prompt" placeholder="프롬프트 한글 입력 해주세요."/>
+                <input class="translate hover:bg-sky-500 bg-sky-300 text-white px-2 rounded-lg" type="submit" value="영어 번역 획득"/>
+            </form>
+            <div class="ml-2 flex">
+                <div class="ml-4 mr-4">결과</div>
+                <div class="border-b translated text-red-500">
+                    <text class="translated px-1 py-1"></text>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <h1>2. 선정된 프롬프트로 달리 이미지 받아오기</h1>
+        <div class="m-4 border py-2 px-2">
+            <text>프롬프트</text>
+            <div class="border-b-2 translated text-red-500">
+                <text class="translated px-1 py-1"></text>
+            </div>
+            <div class="mt-2 flex flex-row-reverse">
+                <button class="bg-sky-500 px-2 rounded-lg text-white dalle">이미지 생성</button>
+            </div>
+            <img class="dalleImg" src="" width="512" height="512"/>
+        </div>
+        <br/>
+        <h1>3. 달리이미지 + compfyUI 로 이미지 생성하기 옵션넣어서</h1>
+        <button class="comfyUIbtn bg-sky-500 px-2 rounded-lg text-white">comfyUI 이미지 생성</button>
+        <div>
+            <text class="progress"></text>
+            <img src="" class="comfyui" width="512" height="512"/>
+        </div>
+    </main>
+
     <script>
         const postData = async (url = "", data = {}) => {
             // 옵션 기본 값은 *로 강조
@@ -34,12 +63,46 @@
             return response.json(); // JSON 응답을 네이티브 JavaScript 객체로 파싱
         };
 
+        const getData = async (url = "") => {
+            // GET 요청을 보냅니다.
+            const response = await fetch(url, {
+                method: "GET", // GET 요청
+                mode: "cors", // no-cors, *cors, same-origin
+                cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: "same-origin", // include, *same-origin, omit
+                headers: {
+                    "Content-Type": "application/json"
+                    // GET 요청에서는 주로 Content-Type 헤더를 설정하지 않습니다.
+                },
+                redirect: "follow", // manual, *follow, error
+                referrerPolicy: "no-referrer" // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            });
+            return response.json(); // JSON 응답을 네이티브 JavaScript 객체로 파싱
+        };
 
         const translate =  (data) => {
             const resp = postData("http://localhost:9000/translate",data)
-            resp.then((real)=>{
-                console.log(real)
+            resp.then((resp)=>{
+                translated = resp["translate"]
+                var divs = document.querySelectorAll(".translated");
+                divs.forEach(function(div) {
+                    div.innerText = translated;
+                });
             })
+       }
+
+       const generateDalle = (data) => {
+            const resp = postData("http://localhost:9000/dalle",data)
+           resp.then((resp)=>{
+               msg = resp["msg"]
+               console.log(msg)
+               if (msg === "ok") {
+                   img = document.querySelector(".dalleImg")
+                   console.log(img)
+                   img.src = "assets/example2.png"
+                   console.log(img)
+               }
+           })
        }
 
         document.getElementById("myForm").addEventListener("submit", function(event) {
@@ -53,6 +116,45 @@
             });
 
             translate(jsonData)
+
+            return false;
+        });
+
+        document.querySelector(".dalle").addEventListener("click",function (event){
+            event.preventDefault(); // 기본 제출 동작을 막음
+
+            text = document.querySelector(".translated").innerText
+
+            jsonData = {
+                "prompt" : text
+            }
+
+            generateDalle(jsonData)
+
+            return false;
+        })
+
+        document.querySelector(".comfyUIbtn").addEventListener("click", function(event) {
+            event.preventDefault(); // 기본 제출 동작을 막음
+
+            const text = document.querySelector(".translated").innerText;
+
+            const jsonData = {
+                "prompt": text
+            };
+
+            const socket = new WebSocket("ws://localhost:9000/generate");
+
+            socket.addEventListener("message", (event) => {
+                console.log("Message from server ", event.data);
+                if (event.data === "done") {
+                    var img = document.querySelector(".comfyui")
+                    img.src = "output/guiwoo_00001_.png"
+                }else {
+                   var pr = document.querySelector(".progress")
+                    pr.innerText = "progress"
+                }
+            });
 
             return false;
         });

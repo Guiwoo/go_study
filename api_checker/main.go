@@ -2,10 +2,13 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/sashabaranov/go-openai"
+	"image/png"
 	"io"
 	"log"
 	"mime/multipart"
@@ -32,8 +35,8 @@ func papagoTest() {
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-	req.Header.Set("X-Naver-Client-Id", "Nr6PZ2Nj7H2n2pKur5vJ")
-	req.Header.Set("X-Naver-Client-Secret", "8kny84_ER9")
+	req.Header.Set("X-Naver-Client-Id", getEnv("papagoId"))
+	req.Header.Set("X-Naver-Client-Secret", getEnv("papagoSecret"))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -240,6 +243,54 @@ func ocrSendFile() {
 	fmt.Println(string(body))
 }
 
+func dalleTest() {
+	APIKEY := getEnv("dalle")
+	c := openai.NewClient(APIKEY)
+	ctx := context.Background()
+
+	// Example image as base64
+	reqBase64 := openai.ImageRequest{
+		Prompt:         "Portrait of a humanoid dog in a classic costume, high detail, realistic light, unreal engine",
+		Size:           openai.CreateImageSize1024x1024,
+		ResponseFormat: openai.CreateImageResponseFormatB64JSON,
+		Model:          openai.CreateImageModelDallE2,
+		N:              1,
+	}
+
+	respBase64, err := c.CreateImage(ctx, reqBase64)
+	if err != nil {
+		fmt.Printf("Image creation error: %v\n", err)
+		return
+	}
+
+	imgBytes, err := base64.StdEncoding.DecodeString(respBase64.Data[0].B64JSON)
+	if err != nil {
+		fmt.Printf("Base64 decode error: %v\n", err)
+		return
+	}
+
+	r := bytes.NewReader(imgBytes)
+	imgData, err := png.Decode(r)
+	if err != nil {
+		fmt.Printf("PNG decode error: %v\n", err)
+		return
+	}
+
+	file, err := os.Create("/Users/guiwoopark/Desktop/personal/study/api_checker/example2.png")
+	if err != nil {
+		fmt.Printf("File creation error: %v\n", err)
+		return
+	}
+	defer file.Close()
+
+	if err := png.Encode(file, imgData); err != nil {
+		fmt.Printf("PNG encode error: %v\n", err)
+		return
+	}
+
+	fmt.Println("The image was saved as example.png")
+}
+
 func main() {
-	ocrSendFile()
+	dalleTest()
 }

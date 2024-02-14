@@ -2,9 +2,9 @@ package main
 
 import (
 	"bufio"
+	"container/heap"
 	"fmt"
 	"os"
-	"sort"
 )
 
 /**
@@ -43,6 +43,37 @@ type jewel struct {
 	Price  int
 }
 
+type jewels []*jewel
+
+func (arr jewels) Less(i, j int) bool {
+	if arr[i].Price == arr[j].Price {
+		return arr[i].Weight < arr[j].Weight
+	}
+	return arr[i].Price > arr[j].Price
+}
+
+func (arr jewels) Len() int {
+	return len(arr)
+}
+
+func (arr jewels) Swap(i, j int) {
+	arr[i], arr[j] = arr[j], arr[i]
+}
+
+func (arr *jewels) Push(x any) {
+	item := x.(*jewel)
+	*arr = append(*arr, item)
+}
+
+func (arr *jewels) Pop() any {
+	old := *arr
+	n := len(old)
+	item := old[n-1]
+	old[n-1] = nil
+	*arr = old[0 : n-1]
+	return item
+}
+
 func main() {
 	var (
 		reader = bufio.NewReader(os.Stdin)
@@ -53,45 +84,28 @@ func main() {
 	defer writer.Flush()
 	fmt.Fscanln(reader, &J, &B)
 
-	jewels := make([]jewel, 0, J)
+	pq := make(jewels, 0)
+	heap.Init(&pq)
+
 	for i := 0; i < J; i++ {
 		var x, y int
 		fmt.Fscanln(reader, &x, &y)
-		jewels = append(jewels, jewel{x, y})
+		heap.Push(&pq, &jewel{x, y})
 	}
 
-	sort.Slice(jewels, func(i, j int) bool {
-		if jewels[i].Price == jewels[j].Price {
-			return jewels[i].Weight < jewels[j].Weight
-		}
-		return jewels[i].Price > jewels[j].Price
-	})
-
-	bag := make([]int, 0, B)
+	bags := make([]int, 0, B)
 	for i := 0; i < B; i++ {
 		var x int
 		fmt.Fscanln(reader, &x)
-		bag = append(bag, x)
+		bags = append(bags, x)
 	}
 
-	sort.Slice(bag, func(i, j int) bool {
-		return bag[i] < bag[j]
-	})
-
-	answer := 0
-	jewelsIdx := 0
-
-	for _, b := range bag {
-		curWeight := b
-		for i := jewelsIdx; i < len(jewels); i++ {
-			if curWeight > 0 && jewels[i].Weight <= curWeight {
-				curWeight -= jewels[i].Weight
-				answer += jewels[i].Price
-				jewelsIdx = i + 1
-				break
-			}
-		}
+	for pq.Len() > 0 {
+		item := heap.Pop(&pq)
+		fmt.Printf("%+v\n", item)
 	}
 
-	fmt.Println(answer)
+	// 보석을 정렬 가격순으로 무게는 부차적인거
+	// 가방은 가벼운 순으로 정렬
+	fmt.Printf("%+v\n", bags)
 }

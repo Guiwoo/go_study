@@ -1,14 +1,14 @@
 {
-  "client_id": "644ee42f1afd424ebe0da5b9da487df1",
+  "client_id": "87655da4394a4f1f96301f9f8933b114",
   "prompt": {
     "3": {
       "inputs": {
-        "seed": 329669721832424,
+        "seed": 1021004397333543,
         "steps": 20,
         "cfg": 8,
         "sampler_name": "dpmpp_2m",
         "scheduler": "normal",
-        "denoise": 0.87,
+        "denoise": 0.86,
         "model": [
           "4",
           0
@@ -22,7 +22,7 @@
           0
         ],
         "latent_image": [
-          "5",
+          "22",
           0
         ]
       },
@@ -33,14 +33,6 @@
         "ckpt_name": "sd-v1-4.ckpt"
       },
       "class_type": "CheckpointLoaderSimple"
-    },
-    "5": {
-      "inputs": {
-        "width": 512,
-        "height": 512,
-        "batch_size": 1
-      },
-      "class_type": "EmptyLatentImage"
     },
     "6": {
       "inputs": {
@@ -77,31 +69,102 @@
     },
     "9": {
       "inputs": {
-        "filename_prefix": "ComfyUI",
+        "filename_prefix": "clientID",
         "images": [
           "8",
           0
         ]
       },
       "class_type": "SaveImage"
+    },
+    "20": {
+      "inputs": {
+        "image": "guiwoo.png",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "21": {
+      "inputs": {
+        "pixels": [
+          "20",
+          0
+        ],
+        "vae": [
+          "4",
+          2
+        ]
+      },
+      "class_type": "VAEEncode"
+    },
+    "22": {
+      "inputs": {
+        "amount": 1,
+        "samples": [
+          "21",
+          0
+        ]
+      },
+      "class_type": "RepeatLatentBatch"
     }
   },
   "extra_data": {
     "extra_pnginfo": {
       "workflow": {
-        "last_node_id": 19,
-        "last_link_id": 25,
+        "last_node_id": 25,
+        "last_link_id": 41,
         "nodes": [
           {
-            "id": 8,
-            "type": "VAEDecode",
+            "id": 21,
+            "type": "VAEEncode",
             "pos": [
-              1277,
-              188
+              524,
+              787
             ],
             "size": {
               "0": 210,
               "1": 46
+            },
+            "flags": {},
+            "order": 4,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "pixels",
+                "type": "IMAGE",
+                "link": 26
+              },
+              {
+                "name": "vae",
+                "type": "VAE",
+                "link": 27
+              }
+            ],
+            "outputs": [
+              {
+                "name": "LATENT",
+                "type": "LATENT",
+                "links": [
+                  35
+                ],
+                "shape": 3,
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "VAEEncode"
+            }
+          },
+          {
+            "id": 22,
+            "type": "RepeatLatentBatch",
+            "pos": [
+              525,
+              891
+            ],
+            "size": {
+              "0": 315,
+              "1": 58
             },
             "flags": {},
             "order": 5,
@@ -110,27 +173,85 @@
               {
                 "name": "samples",
                 "type": "LATENT",
-                "link": 7
-              },
-              {
-                "name": "vae",
-                "type": "VAE",
-                "link": 8
+                "link": 35
               }
             ],
             "outputs": [
               {
-                "name": "IMAGE",
-                "type": "IMAGE",
+                "name": "LATENT",
+                "type": "LATENT",
                 "links": [
-                  9
+                  36
+                ],
+                "shape": 3,
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "RepeatLatentBatch"
+            },
+            "widgets_values": [
+              1
+            ]
+          },
+          {
+            "id": 3,
+            "type": "KSampler",
+            "pos": [
+              962,
+              358
+            ],
+            "size": {
+              "0": 315,
+              "1": 262
+            },
+            "flags": {},
+            "order": 6,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "model",
+                "type": "MODEL",
+                "link": 19
+              },
+              {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "link": 31
+              },
+              {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "link": 32
+              },
+              {
+                "name": "latent_image",
+                "type": "LATENT",
+                "link": 36
+              }
+            ],
+            "outputs": [
+              {
+                "name": "LATENT",
+                "type": "LATENT",
+                "links": [
+                  7
                 ],
                 "slot_index": 0
               }
             ],
             "properties": {
-              "Node name for S&R": "VAEDecode"
-            }
+              "Node name for S&R": "KSampler"
+            },
+            "widgets_values": [
+              1021004397333543,
+              "randomize",
+              20,
+              8,
+              "dpmpp_2m",
+              "normal",
+              0.86
+            ]
           },
           {
             "id": 7,
@@ -158,7 +279,7 @@
                 "name": "CONDITIONING",
                 "type": "CONDITIONING",
                 "links": [
-                  6
+                  32
                 ],
                 "slot_index": 0
               }
@@ -168,32 +289,6 @@
             },
             "widgets_values": [
               "text, watermark"
-            ]
-          },
-          {
-            "id": 9,
-            "type": "SaveImage",
-            "pos": [
-              1507,
-              485
-            ],
-            "size": {
-              "0": 210,
-              "1": 270
-            },
-            "flags": {},
-            "order": 6,
-            "mode": 0,
-            "inputs": [
-              {
-                "name": "images",
-                "type": "IMAGE",
-                "link": 9
-              }
-            ],
-            "properties": {},
-            "widgets_values": [
-              "ComfyUI"
             ]
           },
           {
@@ -222,7 +317,7 @@
                 "name": "CONDITIONING",
                 "type": "CONDITIONING",
                 "links": [
-                  4
+                  31
                 ],
                 "slot_index": 0
               }
@@ -235,70 +330,11 @@
             ]
           },
           {
-            "id": 3,
-            "type": "KSampler",
-            "pos": [
-              904,
-              293
-            ],
-            "size": {
-              "0": 315,
-              "1": 262
-            },
-            "flags": {},
-            "order": 4,
-            "mode": 0,
-            "inputs": [
-              {
-                "name": "model",
-                "type": "MODEL",
-                "link": 19
-              },
-              {
-                "name": "positive",
-                "type": "CONDITIONING",
-                "link": 4
-              },
-              {
-                "name": "negative",
-                "type": "CONDITIONING",
-                "link": 6
-              },
-              {
-                "name": "latent_image",
-                "type": "LATENT",
-                "link": 25
-              }
-            ],
-            "outputs": [
-              {
-                "name": "LATENT",
-                "type": "LATENT",
-                "links": [
-                  7
-                ],
-                "slot_index": 0
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "KSampler"
-            },
-            "widgets_values": [
-              329669721832424,
-              "randomize",
-              20,
-              8,
-              "dpmpp_2m",
-              "normal",
-              0.87
-            ]
-          },
-          {
             "id": 4,
             "type": "CheckpointLoaderSimple",
             "pos": [
-              -146,
-              360
+              -191,
+              327
             ],
             "size": {
               "0": 315,
@@ -329,7 +365,8 @@
                 "name": "VAE",
                 "type": "VAE",
                 "links": [
-                  8
+                  8,
+                  27
                 ],
                 "slot_index": 2
               }
@@ -342,56 +379,112 @@
             ]
           },
           {
-            "id": 5,
-            "type": "EmptyLatentImage",
+            "id": 9,
+            "type": "SaveImage",
             "pos": [
-              411,
-              709
+              1557,
+              655
+            ],
+            "size": {
+              "0": 210,
+              "1": 270
+            },
+            "flags": {},
+            "order": 8,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "images",
+                "type": "IMAGE",
+                "link": 41
+              }
+            ],
+            "properties": {},
+            "widgets_values": [
+              "ComfyUI"
+            ]
+          },
+          {
+            "id": 8,
+            "type": "VAEDecode",
+            "pos": [
+              1323,
+              212
+            ],
+            "size": {
+              "0": 210,
+              "1": 46
+            },
+            "flags": {},
+            "order": 7,
+            "mode": 0,
+            "inputs": [
+              {
+                "name": "samples",
+                "type": "LATENT",
+                "link": 7
+              },
+              {
+                "name": "vae",
+                "type": "VAE",
+                "link": 8
+              }
+            ],
+            "outputs": [
+              {
+                "name": "IMAGE",
+                "type": "IMAGE",
+                "links": [
+                  41
+                ],
+                "slot_index": 0
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "VAEDecode"
+            }
+          },
+          {
+            "id": 20,
+            "type": "LoadImage",
+            "pos": [
+              52,
+              611
             ],
             "size": {
               "0": 315,
-              "1": 106
+              "1": 314
             },
             "flags": {},
             "order": 1,
             "mode": 0,
             "outputs": [
               {
-                "name": "LATENT",
-                "type": "LATENT",
+                "name": "IMAGE",
+                "type": "IMAGE",
                 "links": [
-                  25
+                  26
                 ],
+                "shape": 3,
                 "slot_index": 0
+              },
+              {
+                "name": "MASK",
+                "type": "MASK",
+                "links": null,
+                "shape": 3
               }
             ],
             "properties": {
-              "Node name for S&R": "EmptyLatentImage"
+              "Node name for S&R": "LoadImage"
             },
             "widgets_values": [
-              512,
-              512,
-              1
+              "example2.png",
+              "image"
             ]
           }
         ],
         "links": [
-          [
-            4,
-            6,
-            0,
-            3,
-            1,
-            "CONDITIONING"
-          ],
-          [
-            6,
-            7,
-            0,
-            3,
-            2,
-            "CONDITIONING"
-          ],
           [
             7,
             3,
@@ -407,14 +500,6 @@
             8,
             1,
             "VAE"
-          ],
-          [
-            9,
-            8,
-            0,
-            9,
-            0,
-            "IMAGE"
           ],
           [
             19,
@@ -441,12 +526,60 @@
             "CLIP"
           ],
           [
-            25,
-            5,
+            26,
+            20,
+            0,
+            21,
+            0,
+            "IMAGE"
+          ],
+          [
+            27,
+            4,
+            2,
+            21,
+            1,
+            "VAE"
+          ],
+          [
+            31,
+            6,
+            0,
+            3,
+            1,
+            "CONDITIONING"
+          ],
+          [
+            32,
+            7,
+            0,
+            3,
+            2,
+            "CONDITIONING"
+          ],
+          [
+            35,
+            21,
+            0,
+            22,
+            0,
+            "LATENT"
+          ],
+          [
+            36,
+            22,
             0,
             3,
             3,
             "LATENT"
+          ],
+          [
+            41,
+            8,
+            0,
+            9,
+            0,
+            "IMAGE"
           ]
         ],
         "groups": [],
