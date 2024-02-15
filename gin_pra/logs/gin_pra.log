@@ -1,0 +1,3 @@
+{"level":"info","ts":1707188287.2104452,"msg":"something work?"}
+{"level":"info","ts":1707188345.617944,"msg":"something work?"}
+{"level":"info","ts":1707188442.4548259,"caller":"gin_log/log.go:34","msg":"something work?"}

@@ -114,7 +114,7 @@ func mainTestRoutine() {
 
 func systemCall() {
 	fmt.Println("system call ")
-	file, _ := syscall.Open("./atask_user.log", syscall.O_RDONLY, uint32(0666))
+	file, _ := syscall.Open("./atask_user.gin_log", syscall.O_RDONLY, uint32(0666))
 
 	defer syscall.Close(file) // 파일 닫기 (defer를 사용하여 함수 종료 시 닫히도록 함)
 
