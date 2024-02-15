@@ -36,14 +36,22 @@ func Translate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	translated, err := api.CallPapagoAPI(body.Msg)
+	pTranslated, err := api.CallPapagoAPI(body.Positive)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "fail to call naver api", 400)
 		return
 	}
 
-	body.Translate = translated
+	nTranslated, err := api.CallPapagoAPI(body.Negative)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "fail to call naver api", 400)
+		return
+	}
+
+	body.PTranslate = pTranslated
+	body.NTranslate = nTranslated
 	jsonResp, err := json.Marshal(body)
 	if err != nil {
 		http.Error(w, "fail to marshaling", 400)
@@ -67,7 +75,7 @@ func CallDalle(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "fail to unmarshal data", 400)
 		return
 	}
-	if err := api.CallDalle(body.Msg); err != nil {
+	if err := api.CallDalle(body.Positive); err != nil {
 		fmt.Println(err)
 		http.Error(w, "fail to call dalle", 400)
 		return
@@ -93,7 +101,14 @@ func QueuePrompt(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer c.Close()
-	getImage := api.CreateImageWssConnect()
+
+	var msg types.QueueRequest
+	if err := c.ReadJSON(&msg); err != nil {
+		fmt.Println("json parse error", err)
+	}
+
+	getImage := api.CreateImageWssConnect(msg)
+
 	for {
 		select {
 		case <-time.After(1 * time.Second):

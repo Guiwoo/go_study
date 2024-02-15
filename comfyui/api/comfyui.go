@@ -3,12 +3,15 @@ package api
 import (
 	"bytes"
 	"comfyui/socket"
+	"comfyui/types"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -54,7 +57,38 @@ func UploadImage(url string) error {
 	return nil
 }
 
-func CreateImage() {
+func configJson(data []byte, req types.QueueRequest) ([]byte, error) {
+	m := make(map[string]interface{})
+	if err := json.Unmarshal(data, &m); err != nil {
+		return nil, err
+	}
+	//Model
+	SetStringJson(model, modelKey, "sdkv123", m)
+	//Positive
+	SetStringJson(positive, positiveKey, req.Positive, m)
+	//Negative
+	SetStringJson(negative, negativeKey, req.Negative, m)
+	//Seed
+	SetBigInt(ksampler, ksamplerSeed, req.Seed, m)
+	//CFG
+	SetIntJson(ksampler, ksamplerCfg, req.Cfg, m)
+	//Setps
+	SetIntJson(ksampler, ksamplerSteps, req.Steps, m)
+	//Width
+	SetIntJson(image, imageWidth, req.Width, m)
+	//Height
+	SetIntJson(image, imageHeight, req.Height, m)
+	//BatchSize
+	SetIntJson(image, imageBatchSize, req.BatchSize, m)
+
+	jsonData, err := json.Marshal(&m)
+	if err != nil {
+		return nil, err
+	}
+	return jsonData, nil
+}
+
+func CreateImage(qReq types.QueueRequest) error {
 	host := "http://127.0.0.1:8188/prompt"
 
 	// todo client id로 변경하기 imageURL 확인해서 보내기 , s3 연동해보기
@@ -64,34 +98,45 @@ func CreateImage() {
 
 	fmt.Println("upload image done")
 
-	// todo json 파일 변경해보기
 	data, err := os.ReadFile("/Users/guiwoopark/Desktop/personal/study/comfyui/etc.json")
 	if err != nil {
 		panic(err)
 	}
-	buf := bytes.NewBuffer(data)
+	jsonData, err := configJson(data, qReq)
+	if err != nil {
+		panic(err)
+	}
+	buf := bytes.NewBuffer(jsonData)
 
 	req, _ := http.NewRequest("POST", host, buf)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Error sending request:", err)
-		return
+		return err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Error reading response:", err)
-		return
+		return err
 	}
 	//todo history 호출해보기 완료된건지 확인해야하는데... 응답값 돌려주고 해당 응답값들고 넘겨버려 c에다가 데이터 넣어주기
 	fmt.Println(string(body))
+	if strings.Contains(string(body), "error") {
+		return fmt.Errorf("fail to request %+v", string(body))
+	}
+	return nil
 }
 
-func CreateImageWssConnect() <-chan string {
+func CreateImageWssConnect(data types.QueueRequest) <-chan string {
 	c := make(chan string)
-	CreateImage()
+	if err := CreateImage(data); err != nil {
+		close(c)
+	}
+
 	go socket.Connect(c)
+
 	return c
 }

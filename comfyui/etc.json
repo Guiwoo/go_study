@@ -3,7 +3,7 @@
   "prompt": {
     "3": {
       "inputs": {
-        "seed": 1021004397333543,
+        "seed": 400597484425742,
         "steps": 20,
         "cfg": 8,
         "sampler_name": "dpmpp_2m",
@@ -22,7 +22,7 @@
           0
         ],
         "latent_image": [
-          "22",
+          "32",
           0
         ]
       },
@@ -36,7 +36,7 @@
     },
     "6": {
       "inputs": {
-        "text": "create a cute kitty with blue sunglass, standing in front of the mountain, the cat eyes should be normal and using the image background as a image background",
+        "text": "A Labrador retriever is sleeping on the couch",
         "clip": [
           "4",
           1
@@ -46,7 +46,7 @@
     },
     "7": {
       "inputs": {
-        "text": "text, watermark",
+        "text": "text, watermark, multiple head",
         "clip": [
           "4",
           1
@@ -69,7 +69,7 @@
     },
     "9": {
       "inputs": {
-        "filename_prefix": "clientID",
+        "filename_prefix": "ComfyUI",
         "images": [
           "8",
           0
@@ -97,15 +97,26 @@
       },
       "class_type": "VAEEncode"
     },
-    "22": {
+    "32": {
       "inputs": {
-        "amount": 1,
-        "samples": [
+        "samples1": [
           "21",
+          0
+        ],
+        "samples2": [
+          "33",
           0
         ]
       },
-      "class_type": "RepeatLatentBatch"
+      "class_type": "LatentAdd"
+    },
+    "33": {
+      "inputs": {
+        "width": 512,
+        "height": 512,
+        "batch_size": 1
+      },
+      "class_type": "EmptyLatentImage"
     }
   }
 }

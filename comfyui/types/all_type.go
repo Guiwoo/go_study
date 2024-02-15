@@ -1,8 +1,10 @@
 package types
 
 type Prompt struct {
-	Msg       string `json:"prompt"`
-	Translate string `json:"translate"`
+	Positive   string `json:"positive"`
+	Negative   string `json:"negative"`
+	PTranslate string `json:"p_translate"`
+	NTranslate string `json:"n_translate"`
 }
 
 type PapagoResp struct {
@@ -38,4 +40,16 @@ type ComfyOutput struct {
 type ComfySocketImage struct {
 	FileName string `json:"filename"`
 	Type     string `json:"type"`
+}
+
+type QueueRequest struct {
+	Model     string `json:"model"`
+	Positive  string `json:"positive"`
+	Negative  string `json:"negative"`
+	Seed      string `json:"seed"`
+	Cfg       string `json:"cfg"`
+	Steps     string `json:"steps"`
+	Width     string `json:"width"`
+	Height    string `json:"height"`
+	BatchSize string `json:"batchSize"`
 }

@@ -11,15 +11,20 @@
 <body>
     <main class="m-4 border py-2 px-2">
         <h1>1. 프롬프트 영어로 변경하기</h1>
-        <div class="m-4 flex border py-2 px-2">
+        <div class="m-4 flex border py-2 px-2 flex-col">
             <form id="myForm" method="post" action="">
-                <input class="text-x3l font-bold w-96 border-b-2" type="text" name="prompt" placeholder="프롬프트 한글 입력 해주세요."/>
+                <input class="text-x3l font-bold w-96 border-b-2" type="text" name="positive" placeholder="긍정 프롬프트 한글 입력 해주세요."/>
+                <input class="text-x3l font-bold w-96 border-b-2" type="text" name="negative" placeholder="부정 프롬프트 한글 입력 해주세요."/>
                 <input class=" cursor-pointer translate hover:bg-sky-500 bg-sky-300 text-white px-2 rounded-lg" type="submit" value="영어 번역 획득"/>
             </form>
-            <div class="ml-2 flex">
-                <div class="ml-4 mr-4">결과</div>
-                <div class="border-b translated text-red-500">
-                    <text class="translated px-1 py-1"></text>
+            <div class="">
+                <div class="text-green-500">
+                    <text>긍정 : </text>
+                    <text class="border positive"></text>
+                </div>
+                <div class="text-red-500">
+                    <text>부정 : </text>
+                    <text class="border  negative"></text>
                 </div>
             </div>
         </div>
@@ -27,48 +32,60 @@
         <h1>2. 선정된 프롬프트로 달리 이미지 받아오기</h1>
         <div class="m-4 border py-2 px-2">
             <text>프롬프트</text>
-            <div class="border-b-2 translated text-red-500">
-                <text class="translated px-1 py-1"></text>
+            <div class="border-b-2 text-green-500">
+                <text class="positive px-1 py-1"></text>
             </div>
             <div class="mt-2 flex flex-row-reverse">
-                <button class="translate hover:bg-sky-500 cursor-pointer bg-sky-300 px-2 rounded-lg text-white dalle">이미지 생성</button>
+                <button class="hover:bg-sky-500 cursor-pointer bg-sky-300 px-2 rounded-lg text-white dalle">이미지 생성</button>
             </div>
             <img class="dalleImg" src="" width="512" height="512"/>
         </div>
         <br/>
         <h1>3. 달리이미지 + compfyUI 로 이미지 생성하기 옵션넣어서</h1>
-        <form class="flex flex-col border px-2 py-2">
+        <form id="comfyUiForm" method="post" action="" class="flex flex-col border px-2 py-2">
+            <div class="border py-2 my-2">
+                <label for="model">모델 : </label>
+                <select id="model" name="model">
+                    <option value="sd-v1-4.ckpt">스테이블 디퓨전 v1.4</option>
+                    <option value="chilloutmix_NiPrunedFp32Fix.safetensors">애니화</option>
+                    <option value="realisticVisionV60B1_v20Novae.safetensors">실사화</option>
+                </select>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="positive">긍정 프롬프트 : </label>
+                <input name="positive" id="positive" type="text" class="border-b-2 positive text-green-500" value=""/>
+            </div>
             <div class="border py-2 my-2">
                 <label for="negative">네거티브 프롬프트 : </label>
-                <input id="negative" type="text" class="border-b-2"/>
+                <input name="negative" id="negative" type="text" class="border-b-2 negative text-red-500"/>
             </div>
             <div class="border py-2 my-2">
                 <label for="sampler">Sampler : </label>
-                <input id="sampler" type="text" class="border-b-2"/>
+                <input name="sampler" id="sampler" type="text" class="border-b-2" value="dpmpp_2m" disabled/>
             </div>
             <div class="border py-2 my-2">
                 <label id="steps">Steps : </label>
-                <input id="steps" type="text" class="border-b-2"/>
+                <input name="steps" id="steps" type="text" class="border-b-2" value="20"/>
             </div>
             <div class="border py-2 my-2">
                 <label for="cfg">CFG Scale : </label>
-                <input id="cfg" type="text" class="border-b-2"/>
+                <input name="cfg" id="cfg" type="text" class="border-b-2" value="8"/>
             </div>
             <div class="border py-2 my-2">
                 <label for="width">Width : </label>
-                <input id="width" type="text" class="border-b-2"/>
+                <input name="width" id="width" type="text" class="border-b-2" value="512"/>
             </div>
             <div class="border py-2 my-2">
                 <label for="height">height : </label>
-                <input id="height" type="text" class="border-b-2"/>
+                <input name="height" id="height" type="text" class="border-b-2" value="512" />
             </div>
             <div class="border py-2 my-2">
                 <label for="seed">Seed : </label>
-                <input id="seed" type="text" class="border-b-2"/>
+                <input name="seed" id="seed" type="text" class="border-b-2" value="1021004397333543"/>
             </div>
             <div class="border py-2 my-2">
                 <label for="batchSize">Batch Size : </label>
-                <input id="batchSize" type="text" class="border-b-2"/>
+                <input name="batchSize" id="batchSize" type="text" class="border-b-2" value="1"/>
             </div>
             <div class="py-2 flex justify-center">
                 <input class="translate hover:bg-sky-500 bg-sky-300 cursor-pointer comfyUIbtn  p-4 rounded-lg text-white" type="submit" value="ComfyUI 이미지 생성">
@@ -120,11 +137,24 @@
         const translate =  (data) => {
             const resp = postData("http://localhost:9000/translate",data)
             resp.then((resp)=>{
-                translated = resp["translate"]
-                var divs = document.querySelectorAll(".translated");
-                divs.forEach(function(div) {
-                    div.innerText = translated;
+                positivie = resp["p_translate"]
+                negative = resp["n_translate"]
+
+                var pos = document.querySelectorAll(".positive");
+                pos.forEach(function(div) {
+                    div.innerText = positivie;
                 });
+
+                var nev = document.querySelectorAll(".negative");
+                nev.forEach(function (div){
+                    div.innerText = negative
+                })
+
+                var po = document.querySelector("#positive")
+                po.value = positivie
+
+                var ne = document.querySelector("#negative")
+                ne.value = negative
             })
        }
 
@@ -160,10 +190,10 @@
         document.querySelector(".dalle").addEventListener("click",function (event){
             event.preventDefault(); // 기본 제출 동작을 막음
 
-            text = document.querySelector(".translated").innerText
+            text = document.querySelector(".positive").innerText
 
             jsonData = {
-                "prompt" : text
+                "positive" : text
             }
 
             generateDalle(jsonData)
@@ -171,16 +201,49 @@
             return false;
         })
 
-        document.querySelector(".comfyUIbtn").addEventListener("click", function(event) {
-            event.preventDefault(); // 기본 제출 동작을 막음
+        // document.querySelector(".comfyUIbtn").addEventListener("click", function(event) {
+        //     event.preventDefault(); // 기본 제출 동작을 막음
+        //
+        //     const text = document.querySelector(".translated").innerText;
+        //
+        //     const jsonData = {
+        //         "prompt": text
+        //     };
+        //
+        //     const socket = new WebSocket("ws://localhost:9000/generate");
+        //
+        //     socket.addEventListener("message", (event) => {
+        //         console.log("Message from server ", event.data);
+        //         if (event.data !== "progress") {
+        //             var img = document.querySelector(".comfyui")
+        //             img.src = "output/"+ event.data
+        //         }else {
+        //            var pr = document.querySelector(".progress")
+        //             pr.innerText = "progress"
+        //         }
+        //     });
+        //
+        //     return false;
+        // });
 
-            const text = document.querySelector(".translated").innerText;
+        document.getElementById("comfyUiForm").addEventListener("submit",function (event){
+            event.preventDefault()
 
-            const jsonData = {
-                "prompt": text
-            };
+            var formData = new FormData(this)
+
+            var jsonData = {}
+            formData.forEach(function (value,key){
+                jsonData[key] = value;
+            })
+
+            data = JSON.stringify(jsonData)
+
 
             const socket = new WebSocket("ws://localhost:9000/generate");
+
+            socket.addEventListener("open",(event)=>{
+                socket.send(data)
+            })
 
             socket.addEventListener("message", (event) => {
                 console.log("Message from server ", event.data);
@@ -194,7 +257,7 @@
             });
 
             return false;
-        });
+        })
     </script>
 </body>
 </html>
