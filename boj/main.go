@@ -114,4 +114,5 @@ func main() {
 	fmt.Printf("%+v\n", bags)
 
 	// 가방 하나 잡고 들어갈수 있을만큼 loop 돌려서 끝내고 넘어가고 answer 추가해주고
+	// git test
 }
