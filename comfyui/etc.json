@@ -1,0 +1,111 @@
+{
+  "client_id": "87655da4394a4f1f96301f9f8933b114",
+  "prompt": {
+    "3": {
+      "inputs": {
+        "seed": 1021004397333543,
+        "steps": 20,
+        "cfg": 8,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "normal",
+        "denoise": 0.86,
+        "model": [
+          "4",
+          0
+        ],
+        "positive": [
+          "6",
+          0
+        ],
+        "negative": [
+          "7",
+          0
+        ],
+        "latent_image": [
+          "22",
+          0
+        ]
+      },
+      "class_type": "KSampler"
+    },
+    "4": {
+      "inputs": {
+        "ckpt_name": "sd-v1-4.ckpt"
+      },
+      "class_type": "CheckpointLoaderSimple"
+    },
+    "6": {
+      "inputs": {
+        "text": "create a cute kitty with blue sunglass, standing in front of the mountain, the cat eyes should be normal and using the image background as a image background",
+        "clip": [
+          "4",
+          1
+        ]
+      },
+      "class_type": "CLIPTextEncode"
+    },
+    "7": {
+      "inputs": {
+        "text": "text, watermark",
+        "clip": [
+          "4",
+          1
+        ]
+      },
+      "class_type": "CLIPTextEncode"
+    },
+    "8": {
+      "inputs": {
+        "samples": [
+          "3",
+          0
+        ],
+        "vae": [
+          "4",
+          2
+        ]
+      },
+      "class_type": "VAEDecode"
+    },
+    "9": {
+      "inputs": {
+        "filename_prefix": "clientID",
+        "images": [
+          "8",
+          0
+        ]
+      },
+      "class_type": "SaveImage"
+    },
+    "20": {
+      "inputs": {
+        "image": "guiwoo.png",
+        "upload": "image"
+      },
+      "class_type": "LoadImage"
+    },
+    "21": {
+      "inputs": {
+        "pixels": [
+          "20",
+          0
+        ],
+        "vae": [
+          "4",
+          2
+        ]
+      },
+      "class_type": "VAEEncode"
+    },
+    "22": {
+      "inputs": {
+        "amount": 1,
+        "samples": [
+          "21",
+          0
+        ]
+      },
+      "class_type": "RepeatLatentBatch"
+    }
+  }
+}

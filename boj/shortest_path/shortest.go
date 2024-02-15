@@ -210,3 +210,268 @@ func dijkstra9370(graph []map[int]int, start int, vertexes int) []int {
 
 	return dp
 }
+
+func boj11675() {
+	var (
+		reader          = bufio.NewReader(os.Stdin)
+		writer          = bufio.NewWriter(os.Stdout)
+		edges, vertexes int
+	)
+
+	defer writer.Flush()
+	fmt.Fscanln(reader, &edges, &vertexes)
+
+	graph := make([][]int, 0, vertexes)
+	for i := 0; i < vertexes; i++ {
+		var (
+			from, to, value int
+		)
+		fmt.Fscanln(reader, &from, &to, &value)
+
+		graph = append(graph, []int{from, to, value})
+	}
+
+	dist, ok := bellmanFord(edges, 1, graph)
+	if ok {
+		fmt.Println(-1)
+	} else {
+		for i := 2; i < len(dist); i++ {
+			if dist[i] == 1e8 {
+				fmt.Println(-1)
+			} else {
+				fmt.Println(dist[i])
+			}
+		}
+	}
+}
+
+func bellmanFord(edges, start int, graph [][]int) ([]int, bool) {
+	dp := make([]int, edges+1)
+	for i := range dp {
+		dp[i] = 1e8
+	}
+	dp[start] = 0
+
+	for i := 0; i < edges; i++ {
+		for _, t := range graph {
+			from, to, val := t[0], t[1], t[2]
+
+			if dp[from] != 1e8 && dp[to] > dp[from]+val {
+				dp[to] = dp[from] + val
+
+				if i == edges-1 {
+					return dp, true
+				}
+			}
+		}
+	}
+	return dp, false
+}
+
+func boj1865() {
+	var (
+		reader = bufio.NewReader(os.Stdin)
+		writer = bufio.NewWriter(os.Stdout)
+		tcs    int
+	)
+
+	defer writer.Flush()
+	fmt.Fscanln(reader, &tcs)
+
+	for i := 0; i < tcs; i++ {
+		isBlackHole(reader)
+	}
+}
+
+func isBlackHole(reader *bufio.Reader) {
+	var (
+		edges, vertexes, wormhole int
+	)
+
+	fmt.Fscanln(reader, &edges, &vertexes, &wormhole)
+
+	graph := make([]map[int][]int, edges+1)
+	for i := range graph {
+		graph[i] = make(map[int][]int)
+	}
+
+	for i := 0; i < vertexes; i++ {
+		var (
+			from, to, value int
+		)
+		fmt.Fscanln(reader, &from, &to, &value)
+		graph[from][to] = append(graph[from][to], value)
+		graph[to][from] = append(graph[to][from], value)
+	}
+
+	for i := 0; i < wormhole; i++ {
+		var (
+			from, to, value int
+		)
+		fmt.Fscanln(reader, &from, &to, &value)
+		graph[from][to] = append(graph[from][to], -value)
+	}
+
+	dp := make([]int, edges+1)
+	for i := range dp {
+		dp[i] = 1e8
+	}
+
+	for i := 1; i < edges; i++ {
+		if !relaxd(dp, graph, edges) {
+			fmt.Println("NO")
+			return
+		}
+	}
+	if !relaxd(dp, graph, edges) {
+		fmt.Println("NO")
+		return
+	}
+	fmt.Println("YES")
+	return
+}
+
+func relaxd(dp []int, graph []map[int][]int, edges int) bool {
+	relaxed := false
+	for from := 1; from <= edges; from++ {
+		for to, values := range graph[from] {
+			for _, value := range values {
+				if dp[to] > dp[from]+value {
+					dp[to] = dp[from] + value
+					relaxed = true
+				}
+			}
+		}
+	}
+	return relaxed
+}
+
+func boj11404() {
+	var (
+		reader      = bufio.NewReader(os.Stdin)
+		writer      = bufio.NewWriter(os.Stdout)
+		cities, bus int
+	)
+
+	defer writer.Flush()
+
+	fmt.Fscanln(reader, &cities)
+	fmt.Fscanln(reader, &bus)
+
+	graph := make([]map[int][]int, cities+1)
+	for i := range graph {
+		graph[i] = make(map[int][]int)
+	}
+	dp := make([][]int, cities+1)
+	for i := range dp {
+		sub := make([]int, cities+1)
+		for j := range sub {
+			sub[j] = 1e8
+			if i == j {
+				sub[j] = 0
+			}
+		}
+		dp[i] = sub
+
+	}
+
+	for i := 0; i < bus; i++ {
+		var from, to, value int
+		fmt.Fscanln(reader, &from, &to, &value)
+		graph[from][to] = append(graph[from][to], value)
+		if dp[from][to] != 0 {
+			dp[from][to] = min(dp[from][to], value)
+		} else {
+			dp[from][to] = value
+		}
+	}
+
+	other := floyed(cities, dp)
+
+	fmt.Fprintln(writer, other)
+}
+func floyed(cities int, dp [][]int) string {
+	for k := 1; k <= cities; k++ {
+		for i := 1; i <= cities; i++ {
+			for j := 1; j <= cities; j++ {
+				if i == j {
+					dp[i][j] = 0
+					continue
+				}
+				dp[i][j] = min(dp[i][j], dp[i][k]+dp[k][j])
+			}
+		}
+	}
+
+	answer := ""
+	for i, row := range dp {
+		if i == 0 {
+			continue
+		}
+		sub := ""
+		for j, val := range row {
+			if j == 0 {
+				continue
+			}
+			if val == 1e8 {
+				sub += fmt.Sprintf("%d ", 0)
+			} else {
+				sub += fmt.Sprintf("%d ", val)
+			}
+		}
+		answer += sub + "\n"
+	}
+	return answer
+}
+func boj1956() {
+	var (
+		reader = bufio.NewReader(os.Stdin)
+		writer = bufio.NewWriter(os.Stdout)
+		N, V   int
+		answer int = 1e8
+	)
+	defer writer.Flush()
+
+	fmt.Fscanln(reader, &N, &V)
+
+	graph := make([][]int, N+1)
+	for i := range graph {
+		sub := make([]int, N+1)
+		for j := range sub {
+			//if i == j {
+			//	continue
+			//}
+			sub[j] = 1e8
+		}
+		graph[i] = sub
+	}
+
+	for i := 0; i < V; i++ {
+		var (
+			from, to, value int
+		)
+		fmt.Fscanln(reader, &from, &to, &value)
+
+		graph[from][to] = value
+	}
+
+	for k := 1; k <= N; k++ {
+		for i := 1; i <= N; i++ {
+			for j := 1; j <= N; j++ {
+				if graph[i][j] > graph[i][k]+graph[k][j] {
+					graph[i][j] = graph[i][k] + graph[k][j]
+				}
+			}
+		}
+	}
+
+	for i := 1; i <= N; i++ {
+		answer = min(answer, graph[i][i])
+	}
+
+	if answer == 1e8 {
+		answer = -1
+	}
+
+	fmt.Fprintln(writer, answer)
+}
