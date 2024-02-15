@@ -5,6 +5,7 @@ import (
 	"container/heap"
 	"fmt"
 	"os"
+	"sort"
 )
 
 /**
@@ -99,6 +100,9 @@ func main() {
 		fmt.Fscanln(reader, &x)
 		bags = append(bags, x)
 	}
+	sort.Slice(bags, func(i, j int) bool {
+		return bags[i] < bags[j]
+	})
 
 	for pq.Len() > 0 {
 		item := heap.Pop(&pq)
@@ -108,4 +112,6 @@ func main() {
 	// 보석을 정렬 가격순으로 무게는 부차적인거
 	// 가방은 가벼운 순으로 정렬
 	fmt.Printf("%+v\n", bags)
+
+	// 가방 하나 잡고 들어갈수 있을만큼 loop 돌려서 끝내고 넘어가고 answer 추가해주고
 }

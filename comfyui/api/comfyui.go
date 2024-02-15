@@ -21,6 +21,7 @@ func UploadImage(url string) error {
 	}
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
+	//todo cliendId + .png 로 변경
 	fw, err := writer.CreateFormFile("image", "guiwoo.png")
 	if err != nil {
 		return err
@@ -56,14 +57,14 @@ func UploadImage(url string) error {
 func CreateImage() {
 	host := "http://127.0.0.1:8188/prompt"
 
-	//하드코딩 변경 필요
+	// todo client id로 변경하기 imageURL 확인해서 보내기 , s3 연동해보기
 	if err := UploadImage("/Users/guiwoopark/Desktop/personal/study/comfyui/assets/example2.png"); err != nil {
 		panic(err)
 	}
 
 	fmt.Println("upload image done")
 
-	// 하드코딩 변경 필요
+	// todo json 파일 변경해보기
 	data, err := os.ReadFile("/Users/guiwoopark/Desktop/personal/study/comfyui/etc.json")
 	if err != nil {
 		panic(err)
@@ -84,7 +85,7 @@ func CreateImage() {
 		fmt.Println("Error reading response:", err)
 		return
 	}
-
+	//todo history 호출해보기 완료된건지 확인해야하는데... 응답값 돌려주고 해당 응답값들고 넘겨버려 c에다가 데이터 넣어주기
 	fmt.Println(string(body))
 }
 

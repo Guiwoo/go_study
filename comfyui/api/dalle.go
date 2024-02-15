@@ -42,7 +42,7 @@ func CallDalle(prompt string) error {
 		fmt.Printf("PNG decode error: %v\n", err)
 		return err
 	}
-
+	// todo clientID 생성해서 .png로 생성하기
 	file, err := os.Create("/Users/guiwoopark/Desktop/personal/study/comfyui/assets/example2.png")
 	if err != nil {
 		fmt.Printf("File creation error: %v\n", err)
