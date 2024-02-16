@@ -44,35 +44,20 @@ type jewel struct {
 	Price  int
 }
 
-type jewels []*jewel
+type intHeap []int
 
-func (arr jewels) Less(i, j int) bool {
-	if arr[i].Price == arr[j].Price {
-		return arr[i].Weight < arr[j].Weight
-	}
-	return arr[i].Price > arr[j].Price
+func (h intHeap) Len() int           { return len(h) }
+func (h intHeap) Less(i, j int) bool { return h[i] > h[j] }
+func (h intHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *intHeap) Push(x any) {
+	*h = append(*h, x.(int))
 }
-
-func (arr jewels) Len() int {
-	return len(arr)
-}
-
-func (arr jewels) Swap(i, j int) {
-	arr[i], arr[j] = arr[j], arr[i]
-}
-
-func (arr *jewels) Push(x any) {
-	item := x.(*jewel)
-	*arr = append(*arr, item)
-}
-
-func (arr *jewels) Pop() any {
-	old := *arr
+func (h *intHeap) Pop() any {
+	old := *h
 	n := len(old)
-	item := old[n-1]
-	old[n-1] = nil
-	*arr = old[0 : n-1]
-	return item
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
 }
 
 func main() {
@@ -85,13 +70,12 @@ func main() {
 	defer writer.Flush()
 	fmt.Fscanln(reader, &J, &B)
 
-	pq := make(jewels, 0)
-	heap.Init(&pq)
+	jewels := make([]jewel, 0, J)
 
 	for i := 0; i < J; i++ {
 		var x, y int
 		fmt.Fscanln(reader, &x, &y)
-		heap.Push(&pq, &jewel{x, y})
+		jewels = append(jewels, jewel{x, y})
 	}
 
 	bags := make([]int, 0, B)
@@ -100,19 +84,31 @@ func main() {
 		fmt.Fscanln(reader, &x)
 		bags = append(bags, x)
 	}
+	// 가방은 가벼운 순으로 정렬
 	sort.Slice(bags, func(i, j int) bool {
 		return bags[i] < bags[j]
 	})
+	sort.Slice(jewels, func(i, j int) bool {
+		return jewels[i].Weight < jewels[j].Weight
+	})
 
-	for pq.Len() > 0 {
-		item := heap.Pop(&pq)
-		fmt.Printf("%+v\n", item)
+	h := &intHeap{}
+	heap.Init(h)
+	var (
+		jIdx   int
+		answer int64
+	)
+
+	for i := 0; i < len(bags); i++ {
+		for jIdx < J && bags[i] >= jewels[jIdx].Weight {
+			heap.Push(h, jewels[jIdx].Price)
+			jIdx++
+		}
+		if h.Len() > 0 {
+			x := heap.Pop(h).(int)
+			answer += int64(x)
+		}
 	}
 
-	// 보석을 정렬 가격순으로 무게는 부차적인거
-	// 가방은 가벼운 순으로 정렬
-	fmt.Printf("%+v\n", bags)
-
-	// 가방 하나 잡고 들어갈수 있을만큼 loop 돌려서 끝내고 넘어가고 answer 추가해주고
-	// git test
+	fmt.Fprintln(writer, answer)
 }

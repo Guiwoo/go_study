@@ -11,7 +11,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 )
 
@@ -63,7 +62,7 @@ func configJson(data []byte, req types.QueueRequest) ([]byte, error) {
 		return nil, err
 	}
 	//Model
-	SetStringJson(model, modelKey, "sdkv123", m)
+	SetStringJson(model, modelKey, req.Model, m)
 	//Positive
 	SetStringJson(positive, positiveKey, req.Positive, m)
 	//Negative
@@ -124,16 +123,16 @@ func CreateImage(qReq types.QueueRequest) error {
 	}
 	//todo history 호출해보기 완료된건지 확인해야하는데... 응답값 돌려주고 해당 응답값들고 넘겨버려 c에다가 데이터 넣어주기
 	fmt.Println(string(body))
-	if strings.Contains(string(body), "error") {
-		return fmt.Errorf("fail to request %+v", string(body))
-	}
+	//if strings.Contains(string(body), "error") {
+	//	return fmt.Errorf("fail to request %+v", string(body))
+	//}
 	return nil
 }
 
 func CreateImageWssConnect(data types.QueueRequest) <-chan string {
 	c := make(chan string)
 	if err := CreateImage(data); err != nil {
-		close(c)
+		log.Fatalf("err %+v\n", err)
 	}
 
 	go socket.Connect(c)
