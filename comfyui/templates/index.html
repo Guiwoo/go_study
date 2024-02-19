@@ -10,6 +10,20 @@
 </head>
 <body>
     <main class="m-4 border py-2 px-2">
+        <div class="flex my-2">
+            <h1>CLIENT ID : </h1>
+            <h1 class="clientID text-red-300 border mx-2 px-2"></h1>
+        </div>
+        <h1>GPT 문구추천</h1>
+        <div class="m-4 flex border py-2 px-2 flex-col">
+            <form id="gpt" method="post" action="">
+                <input class="text-x3l font-bold w-96 border-b-2" type="text" name="input" placeholder="프롬프트 텍스트를 입력 해주세요."/>
+                <input class=" cursor-pointer translate hover:bg-sky-500 bg-sky-300 text-white px-2 rounded-lg" type="submit" value="추천 문구 획득"/>
+            </form>
+            <div class="result">
+               <text>결과</text>
+            </div>
+        </div>
         <h1>1. 프롬프트 영어로 변경하기</h1>
         <div class="m-4 flex border py-2 px-2 flex-col">
             <form id="myForm" method="post" action="">
@@ -17,7 +31,7 @@
                 <input class="text-x3l font-bold w-96 border-b-2" type="text" name="negative" placeholder="부정 프롬프트 한글 입력 해주세요."/>
                 <input class=" cursor-pointer translate hover:bg-sky-500 bg-sky-300 text-white px-2 rounded-lg" type="submit" value="영어 번역 획득"/>
             </form>
-            <div class="">
+            <div class="flex flex-col">
                 <div class="text-green-500">
                     <text>긍정 : </text>
                     <text class="border positive"></text>
@@ -94,11 +108,15 @@
 {{/*        <button class="comfyUIbtn bg-sky-500 px-2 rounded-lg text-white">comfyUI 이미지 생성</button>*/}}
         <div>
             <text class="progress"></text>
-            <img src="" class="comfyui" width="512" height="512"/>
+            <img src="https://guiwoo-test.s3.amazonaws.com/bb104b31-fe49-442e-b5e6-0e52396794fb_00001_.png" class="comfyui" width="512" height="512"/>
         </div>
     </main>
 
     <script>
+        let clientID = crypto.randomUUID()
+        clientID.replace("-","a")
+        document.querySelector(".clientID").innerText = clientID
+
         const postData = async (url = "", data = {}) => {
             // 옵션 기본 값은 *로 강조
             const response = await fetch(url, {
@@ -166,9 +184,21 @@
                if (msg === "ok") {
                    img = document.querySelector(".dalleImg")
                    console.log(img)
-                   img.src = "assets/example2.png"
+                   img.src = resp["url"]
                    console.log(img)
                }
+           })
+       }
+
+       const gpt = (data) => {
+            const resp = postData("http://localhost:9000/gpt",data)
+           resp.then((resp)=>{
+               rs = document.querySelector(".result")
+               resp.forEach(function (data){
+                   n = document.createElement("div")
+                   n.innerText = data
+                   rs.appendChild(n)
+               })
            })
        }
 
@@ -187,13 +217,28 @@
             return false;
         });
 
+        document.getElementById("gpt").addEventListener("submit",function (event){
+            event.preventDefault()
+            var formData = new FormData(this)
+
+            var jsonData = {};
+            formData.forEach((value,key)=>{
+                jsonData[key] = value;
+            })
+
+            gpt(jsonData)
+
+            return false
+        })
+
         document.querySelector(".dalle").addEventListener("click",function (event){
             event.preventDefault(); // 기본 제출 동작을 막음
 
             text = document.querySelector(".positive").innerText
 
             jsonData = {
-                "positive" : text
+                "positive" : text,
+                "client_id" : clientID
             }
 
             generateDalle(jsonData)
@@ -235,6 +280,8 @@
             formData.forEach(function (value,key){
                 jsonData[key] = value;
             })
+            jsonData["client_id"] = clientID
+            console.log(clientID)
 
             data = JSON.stringify(jsonData)
 
@@ -247,11 +294,12 @@
 
             socket.addEventListener("message", (event) => {
                 console.log("Message from server ", event.data);
+                img = document.querySelector(".comfyui")
+                pr = document.querySelector(".progress")
                 if (event.data !== "progress") {
-                    var img = document.querySelector(".comfyui")
-                    img.src = "output/"+ event.data
+                    img.src = event.data
+                    pr.innerText = "done"
                 }else {
-                   var pr = document.querySelector(".progress")
                     pr.innerText = "progress"
                 }
             });

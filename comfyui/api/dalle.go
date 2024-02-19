@@ -6,11 +6,9 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/sashabaranov/go-openai"
-	"image/png"
-	"os"
 )
 
-func CallDalle(prompt string) error {
+func CallDalle(prompt, clientID string) (string, error) {
 	APIKEY := getEnv("dalle")
 	c := openai.NewClient(APIKEY)
 	ctx := context.Background()
@@ -27,33 +25,21 @@ func CallDalle(prompt string) error {
 	respBase64, err := c.CreateImage(ctx, reqBase64)
 	if err != nil {
 		fmt.Printf("Image creation error: %v\n", err)
-		return err
+		return "", err
 	}
 
 	imgBytes, err := base64.StdEncoding.DecodeString(respBase64.Data[0].B64JSON)
 	if err != nil {
 		fmt.Printf("Base64 decode error: %v\n", err)
-		return err
+		return "", err
 	}
 
-	r := bytes.NewReader(imgBytes)
-	imgData, err := png.Decode(r)
+	fileName := "upload/" + clientID + ".png"
+	reader := bytes.NewReader(imgBytes)
+
+	path, err := UploadAWS_S3(fileName, reader)
 	if err != nil {
-		fmt.Printf("PNG decode error: %v\n", err)
-		return err
+		return "", err
 	}
-	// todo clientID 생성해서 .png로 생성하기
-	file, err := os.Create("/Users/guiwoopark/Desktop/personal/study/comfyui/assets/example2.png")
-	if err != nil {
-		fmt.Printf("File creation error: %v\n", err)
-		return err
-	}
-	defer file.Close()
-
-	if err := png.Encode(file, imgData); err != nil {
-		fmt.Printf("PNG encode error: %v\n", err)
-		return err
-	}
-
-	return nil
+	return path, nil
 }

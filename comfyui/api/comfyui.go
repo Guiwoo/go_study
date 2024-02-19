@@ -61,6 +61,8 @@ func configJson(data []byte, req types.QueueRequest) ([]byte, error) {
 	if err := json.Unmarshal(data, &m); err != nil {
 		return nil, err
 	}
+	//ClientID
+	SetClientID(req.ClientID, m)
 	//Model
 	SetStringJson(model, modelKey, req.Model, m)
 	//Positive
@@ -79,6 +81,8 @@ func configJson(data []byte, req types.QueueRequest) ([]byte, error) {
 	SetIntJson(image, imageHeight, req.Height, m)
 	//BatchSize
 	SetIntJson(image, imageBatchSize, req.BatchSize, m)
+	//SetOutput
+	SetStringJson(output, fileNamePrefix, req.ClientID, m)
 
 	jsonData, err := json.Marshal(&m)
 	if err != nil {
@@ -135,7 +139,7 @@ func CreateImageWssConnect(data types.QueueRequest) <-chan string {
 		log.Fatalf("err %+v\n", err)
 	}
 
-	go socket.Connect(c)
+	go socket.Connect(c, data.ClientID)
 
 	return c
 }

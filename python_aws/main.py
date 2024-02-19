@@ -1,4 +1,6 @@
 import boto3
+import yaml
+import os
 
 # AWS 자격 증명을 로드하고 세션을 생성합니다.
 session = boto3.Session(
@@ -25,6 +27,16 @@ def getImage():
 
 
 def uploadImage():
+    session = boto3.Session(
+        aws_access_key_id='',
+        aws_secret_access_key='',
+        region_name='ap-northeast-2'
+    )
+
+    # 세션을 사용하여 S3 클라이언트를 초기화합니다.
+    s3 = session.client('s3')
+    bucket_name = 'test-guiwoo'
+
     local_image_path = '/Users/guiwoopark/Desktop/personal/study/comfyui/assets/example2.png'
 
     try:
@@ -37,4 +49,14 @@ def uploadImage():
         print("Error : ",e)
 
 
-uploadImage()
+path = os.path.abspath(os.path.dirname(__file__))
+real = os.path.join(path,"extra_config.yaml")
+
+with open(real,'r') as file:
+    try:
+        data = yaml.safe_load(file)
+        print(data['aws']['access_key'])
+    except yaml.YAMLError as e:
+        print("Error reading YAML file:",e)
+
+

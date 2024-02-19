@@ -28,9 +28,10 @@ func readClientMsg(ws *websocket.Conn, done chan bool) <-chan types.ComfySocketR
 	return stream
 }
 
-func Connect(sign chan string) {
+func Connect(sign chan string, id string) {
+	url := fmt.Sprintf("ws://127.0.0.1:8188/ws?clientId=%s", id)
 	ws, err := websocket.Dial(
-		"ws://127.0.0.1:8188/ws?clientId=87655da4394a4f1f96301f9f8933b114",
+		url,
 		"",
 		"http://127.0.0.1:8188")
 	if err != nil {

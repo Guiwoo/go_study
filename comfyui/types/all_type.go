@@ -5,6 +5,7 @@ type Prompt struct {
 	Negative   string `json:"negative"`
 	PTranslate string `json:"p_translate"`
 	NTranslate string `json:"n_translate"`
+	ClientID   string `json:"client_id"`
 }
 
 type PapagoResp struct {
@@ -43,6 +44,7 @@ type ComfySocketImage struct {
 }
 
 type QueueRequest struct {
+	ClientID  string `json:"client_id"`
 	Model     string `json:"model"`
 	Positive  string `json:"positive"`
 	Negative  string `json:"negative"`
@@ -52,4 +54,30 @@ type QueueRequest struct {
 	Width     string `json:"width"`
 	Height    string `json:"height"`
 	BatchSize string `json:"batchSize"`
+}
+
+type GPTRequest struct {
+	Input string `json:"input"`
+}
+
+type GPTResponse struct {
+	ID      string `json:"id"`
+	Object  string `json:"object"`
+	Created int    `json:"created"`
+	Model   string `json:"model"`
+	Choices []struct {
+		Index   int `json:"index"`
+		Message struct {
+			Role    string `json:"role"`
+			Content string `json:"content"`
+		} `json:"message"`
+		Logprobs     interface{} `json:"logprobs"`
+		FinishReason string      `json:"finish_reason"`
+	} `json:"choices"`
+	Usage struct {
+		PromptTokens     int `json:"prompt_tokens"`
+		CompletionTokens int `json:"completion_tokens"`
+		TotalTokens      int `json:"total_tokens"`
+	} `json:"usage"`
+	SystemFingerprint interface{} `json:"system_fingerprint"`
 }

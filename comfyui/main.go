@@ -75,7 +75,8 @@ func CallDalle(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "fail to unmarshal data", 400)
 		return
 	}
-	if err := api.CallDalle(body.Positive); err != nil {
+	path, err := api.CallDalle(body.Positive, body.ClientID)
+	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "fail to call dalle", 400)
 		return
@@ -84,6 +85,7 @@ func CallDalle(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	data := map[string]interface{}{
 		"msg": "ok",
+		"url": path,
 	}
 	value, err := json.Marshal(data)
 	if err != nil {
@@ -114,10 +116,38 @@ func QueuePrompt(w http.ResponseWriter, r *http.Request) {
 		case <-time.After(1 * time.Second):
 			c.WriteMessage(sc.TextMessage, []byte("progress"))
 		case filename := <-getImage:
-			c.WriteMessage(sc.TextMessage, []byte(filename))
+			bucketName := "test-guiwoo"
+			awsFullPath := fmt.Sprintf("https://%s.s3.amazonaws.com/%s", bucketName, filename)
+			c.WriteMessage(sc.TextMessage, []byte(awsFullPath))
 			return
 		}
 	}
+}
+
+func Gpt(w http.ResponseWriter, r *http.Request) {
+	resp, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "wrong data", 400)
+		return
+	}
+	var body types.GPTRequest
+	if err := json.Unmarshal(resp, &body); err != nil {
+		fmt.Println(err)
+		http.Error(w, "fail to unmarshal json", 400)
+		return
+	}
+
+	data, err := api.CallGPT(body.Input)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "fail to call api gpt", 400)
+		return
+	}
+
+	rsp, _ := json.Marshal(&data)
+
+	w.WriteHeader(200)
+	w.Write(rsp)
 }
 
 func Render() {
@@ -134,6 +164,7 @@ func Render() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handler)
+	mux.HandleFunc("/gpt", Gpt)
 	mux.HandleFunc("/translate", Translate)
 	mux.HandleFunc("/dalle", CallDalle)
 	mux.HandleFunc("/generate", QueuePrompt)
