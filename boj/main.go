@@ -2,113 +2,31 @@ package main
 
 import (
 	"bufio"
-	"container/heap"
 	"fmt"
 	"os"
 	"sort"
 )
+func main(){
+	fmt.Fscanln(reader, &N)
 
-/**
-세계적인 도둑 상덕이는 보석점을 털기로 결심했다.
-상덕이가 털 보석점에는 보석이 총 N개 있다.
-각 보석은 무게 Mi와 가격 Vi를 가지고 있다.
-상덕이는 가방을 K개 가지고 있고, 각 가방에 담을 수 있는 최대 무게는 Ci이다.
-가방에는 최대 한 개의 보석만 넣을 수 있다.
-상덕이가 훔칠 수 있는 보석의 최대 가격을 구하는 프로그램을 작성하시오.
+	arr := make([]int, N)
 
-첫째 줄에 N과 K가 주어진다. (1 ≤ N, K ≤ 300,000)
-다음 N개 줄에는 각 보석의 정보 Mi와 Vi가 주어진다. (0 ≤ Mi, Vi ≤ 1,000,000)
-다음 K개 줄에는 가방에 담을 수 있는 최대 무게 Ci가 주어진다. (1 ≤ Ci ≤ 100,000,000)
-모든 숫자는 양의 정수이다.
-
-첫째 줄에 상덕이가 훔칠 수 있는 보석 가격의 합의 최댓값을 출력한다.
-
-2 1
-5 10
-100 100
-11
-답 : 10
-
-3 2
-1 65
-5 23
-2 99
-10
-2
-
-답 :164
-*/
-
-type jewel struct {
-	Weight int
-	Price  int
-}
-
-type intHeap []int
-
-func (h intHeap) Len() int           { return len(h) }
-func (h intHeap) Less(i, j int) bool { return h[i] > h[j] }
-func (h intHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
-func (h *intHeap) Push(x any) {
-	*h = append(*h, x.(int))
-}
-func (h *intHeap) Pop() any {
-	old := *h
-	n := len(old)
-	x := old[n-1]
-	*h = old[0 : n-1]
-	return x
-}
-
-func main() {
-	var (
-		reader = bufio.NewReader(os.Stdin)
-		writer = bufio.NewWriter(os.Stdout)
-		J, B   int
-	)
-
-	defer writer.Flush()
-	fmt.Fscanln(reader, &J, &B)
-
-	jewels := make([]jewel, 0, J)
-
-	for i := 0; i < J; i++ {
-		var x, y int
-		fmt.Fscanln(reader, &x, &y)
-		jewels = append(jewels, jewel{x, y})
-	}
-
-	bags := make([]int, 0, B)
-	for i := 0; i < B; i++ {
+	for i := 0; i < N; i++ {
 		var x int
-		fmt.Fscanln(reader, &x)
-		bags = append(bags, x)
-	}
-	// 가방은 가벼운 순으로 정렬
-	sort.Slice(bags, func(i, j int) bool {
-		return bags[i] < bags[j]
-	})
-	sort.Slice(jewels, func(i, j int) bool {
-		return jewels[i].Weight < jewels[j].Weight
-	})
-
-	h := &intHeap{}
-	heap.Init(h)
-	var (
-		jIdx   int
-		answer int64
-	)
-
-	for i := 0; i < len(bags); i++ {
-		for jIdx < J && bags[i] >= jewels[jIdx].Weight {
-			heap.Push(h, jewels[jIdx].Price)
-			jIdx++
-		}
-		if h.Len() > 0 {
-			x := heap.Pop(h).(int)
-			answer += int64(x)
-		}
+		fmt.Fscan(reader, &x)
+		arr[i] = x
 	}
 
-	fmt.Fprintln(writer, answer)
+	sort.Ints(arr)
+
+	dp, sum := make([]int, N), arr[0]
+	dp[0] = arr[0]
+
+	for i := 1; i < N; i++ {
+		dp[i] = arr[i] + dp[i-1]
+		sum += dp[i]
+
+	}
+
+	fmt.Fprintln(writer, sum)
 }

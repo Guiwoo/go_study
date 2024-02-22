@@ -1561,3 +1561,116 @@ func boj14442() {
 	}
 	fmt.Fprintln(writer, -1)
 }
+
+func boj16933() {
+	var (
+		reader          = bufio.NewReader(os.Stdin)
+		writer          = bufio.NewWriter(os.Stdout)
+		row, col, booms int
+		dirs            = []int{0, 1, 0, -1, 0}
+		visit           [1001][1001][11]bool
+	)
+	type mover struct {
+		x, y, steps, booms int
+		isDay              bool
+	}
+	defer writer.Flush()
+
+	fmt.Fscanln(reader, &row, &col, &booms)
+
+	arr := make([][]int, row)
+	for i := range arr {
+		sub := make([]int, col)
+		str, _ := reader.ReadString('\n')
+		for j := range strings.TrimSpace(str) {
+			sub[j], _ = strconv.Atoi(string(str[j]))
+		}
+		arr[i] = sub
+	}
+
+	q := list.New()
+	q.PushBack(mover{0, 0, 1, booms, true})
+	visit[0][0][booms] = true
+
+	for q.Len() > 0 {
+		current := q.Front()
+		q.Remove(current)
+		cur := current.Value.(mover)
+		if cur.x == row-1 && cur.y == col-1 {
+			fmt.Fprintln(writer, cur.steps)
+			return
+		}
+		for i := 1; i < len(dirs); i++ {
+			nRow := cur.x + dirs[i-1]
+			nCol := cur.y + dirs[i]
+
+			if nRow < 0 || nCol < 0 || nRow >= row || nCol >= col {
+				continue
+			}
+
+			if nRow == row-1 && nCol == col-1 {
+				fmt.Fprintln(writer, cur.steps+1)
+				return
+			}
+
+			if arr[nRow][nCol] == 1 && cur.booms > 0 && visit[nRow][nCol][cur.booms-1] == false {
+				if cur.isDay {
+					visit[nRow][nCol][cur.booms-1] = true
+					q.PushBack(mover{nRow, nCol, cur.steps + 1, cur.booms - 1, !cur.isDay})
+				} else {
+					q.PushBack(mover{cur.x, cur.y, cur.steps + 1, cur.booms, !cur.isDay})
+				}
+			}
+
+			if arr[nRow][nCol] == 0 && visit[nRow][nCol][cur.booms] == false {
+				visit[nRow][nCol][cur.booms] = true
+				q.PushBack(mover{nRow, nCol, cur.steps + 1, cur.booms, !cur.isDay})
+			}
+		}
+	}
+
+	fmt.Fprintln(writer, -1)
+}
+
+func boj13549() {
+	var (
+		reader   = bufio.NewReader(os.Stdin)
+		writer   = bufio.NewWriter(os.Stdout)
+		from, to int
+	)
+	defer writer.Flush()
+
+	fmt.Fscan(reader, &from, &to)
+	visit := make([]int, 1000000)
+	for i := range visit {
+		visit[i] = math.MaxInt
+	}
+	visit[from] = 0
+
+	q := list.New()
+	q.PushBack(from)
+	for q.Len() > 0 {
+		current := q.Front()
+		q.Remove(current)
+		cur := current.Value.(int)
+		if cur == to {
+			fmt.Fprintln(writer, visit[to])
+			return
+		}
+
+		for _, v := range []int{1, -1, cur} {
+			sec := 1
+			if v == cur {
+				sec = 0
+			}
+			next := v + cur
+			if next < 0 || next > 100000 {
+				continue
+			}
+			if visit[next] > visit[cur]+sec {
+				visit[next] = visit[cur] + sec
+				q.PushBack(next)
+			}
+		}
+	}
+}
