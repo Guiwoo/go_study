@@ -20,6 +20,18 @@ func (f CarFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CarMutation", m)
 }
 
+// The CardFunc type is an adapter to allow the use of ordinary
+// function as Card mutator.
+type CardFunc func(context.Context, *ent.CardMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CardFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CardMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CardMutation", m)
+}
+
 // The GroupFunc type is an adapter to allow the use of ordinary
 // function as Group mutator.
 type GroupFunc func(context.Context, *ent.GroupMutation) (ent.Value, error)
@@ -30,6 +42,18 @@ func (f GroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupMutation", m)
+}
+
+// The PetFunc type is an adapter to allow the use of ordinary
+// function as Pet mutator.
+type PetFunc func(context.Context, *ent.PetMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PetMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PetMutation", m)
 }
 
 // The TesterFunc type is an adapter to allow the use of ordinary

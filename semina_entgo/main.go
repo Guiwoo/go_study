@@ -104,7 +104,7 @@ func QueryCars(ctx context.Context, client *ent.Client) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("%+v", car)
+	fmt.Printf("%+v", car)
 
 	return nil
 }
@@ -191,7 +191,7 @@ func CreateGraph(ctx context.Context, client *ent.Client) error {
 }
 
 func QueryKorea(ctx context.Context, client *ent.Client) error {
-	if cars, err := client.Group.Query().
+	if cars, err := client.Debug().Group.Query().
 		Where(group.Name("Korea")).
 		QueryUsers().QueryCars().All(ctx); err != nil {
 		return fmt.Errorf("fail to query group users cars %+v", err)
@@ -254,11 +254,27 @@ func TestInsertValidateReturnError(ctx context.Context, client *ent.Client) erro
 	return nil
 }
 
+func CreateCardAndUser(ctx context.Context, client *ent.Client) error {
+	guiwoo := client.User.Query().Where(user.ID(1)).OnlyX(ctx)
+
+	card, err := client.Card.Create().
+		SetNumber("1234-1234-1234-1234").
+		SetOwner(guiwoo).
+		SetExpiredAt(time.Now().AddDate(5, 0, 0)).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+	log.Printf("card created %+v\n", card)
+	return nil
+}
+
 func main() {
 	client, err := ent.Open("mysql", "guiwoo:guiwoo@tcp(localhost:3306)/guiwoo?parseTime=true")
 	if err != nil {
 		panic(err)
 	}
+
 	defer func(client *ent.Client) {
 		err := client.Close()
 		if err != nil {
@@ -268,10 +284,10 @@ func main() {
 
 	//auto migrate
 	if err := client.Schema.Create(context.TODO()); err != nil {
-		log.Fatalf("failed to create entity %v", err)
+		log.Fatalf("failed to create entity %+v", err)
 	}
 
-	if err := TestInsertValidateReturnError(context.Background(), client); err != nil {
-		log.Fatalf("fail to test insert data error %+v", err)
+	if err := CreateCardAndUser(context.Background(), client); err != nil {
+		log.Fatalf("failed to query korea %+v", err)
 	}
 }

@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"reflect"
 	"semina_entgo/ent/car"
+	"semina_entgo/ent/card"
 	"semina_entgo/ent/group"
+	"semina_entgo/ent/pet"
 	"semina_entgo/ent/tester"
 	"semina_entgo/ent/user"
 	"sync"
@@ -77,7 +79,9 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			car.Table:    car.ValidColumn,
+			card.Table:   card.ValidColumn,
 			group.Table:  group.ValidColumn,
+			pet.Table:    pet.ValidColumn,
 			tester.Table: tester.ValidColumn,
 			user.Table:   user.ValidColumn,
 		})

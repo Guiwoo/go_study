@@ -192,6 +192,29 @@ func HasCarsWith(preds ...predicate.Car) predicate.User {
 	})
 }
 
+// HasPets applies the HasEdge predicate on the "pets" edge.
+func HasPets() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PetsTable, PetsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPetsWith applies the HasEdge predicate on the "pets" edge with a given conditions (other predicates).
+func HasPetsWith(preds ...predicate.Pet) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newPetsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasGroups applies the HasEdge predicate on the "groups" edge.
 func HasGroups() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -207,6 +230,29 @@ func HasGroups() predicate.User {
 func HasGroupsWith(preds ...predicate.Group) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newGroupsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCard applies the HasEdge predicate on the "card" edge.
+func HasCard() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, CardTable, CardColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCardWith applies the HasEdge predicate on the "card" edge with a given conditions (other predicates).
+func HasCardWith(preds ...predicate.Card) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newCardStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
