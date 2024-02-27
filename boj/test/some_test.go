@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -96,4 +97,29 @@ func TestBoj(t *testing.T) {
 	arr2 := aFunc(arr)
 	fmt.Println(arr, arr2)
 	fmt.Printf("%p,%p", arr, arr2)
+}
+
+func TestEqual(t *testing.T) {
+	type tester struct {
+		a int
+		b string
+		c bool
+	}
+	a := tester{5, "a", true}
+	b := tester{5, "a", true}
+	fmt.Println("ab")
+	if a == b {
+		fmt.Println("true")
+	} else {
+		fmt.Println("false")
+	}
+	fmt.Println("cd")
+
+	c := []int{1, 2, 3}
+	d := []int{1, 2, 3}
+	if reflect.DeepEqual(c, d) {
+		fmt.Println("true")
+	} else {
+		fmt.Println("false")
+	}
 }
