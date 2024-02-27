@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <main class="m-4 border py-2 px-2">
+        <div class="flex my-2">
+            <h1>CLIENT ID : </h1>
+            <h1 class="clientID text-red-300 border mx-2 px-2"></h1>
+        </div>
+        <h1>GPT 문구추천</h1>
+        <div class="m-4 flex border py-2 px-2 flex-col">
+            <form id="gpt" method="post" action="">
+                <input class="text-x3l font-bold w-96 border-b-2" type="text" name="input" placeholder="프롬프트 텍스트를 입력 해주세요."/>
+                <input class=" cursor-pointer translate hover:bg-sky-500 bg-sky-300 text-white px-2 rounded-lg" type="submit" value="추천 문구 획득"/>
+            </form>
+            <div class="result">
+               <text>결과</text>
+            </div>
+        </div>
+        <h1>1. 프롬프트 영어로 변경하기</h1>
+        <div class="m-4 flex border py-2 px-2 flex-col">
+            <form id="myForm" method="post" action="">
+                <input class="text-x3l font-bold w-96 border-b-2" type="text" name="positive" placeholder="긍정 프롬프트 한글 입력 해주세요."/>
+                <input class="text-x3l font-bold w-96 border-b-2" type="text" name="negative" placeholder="부정 프롬프트 한글 입력 해주세요."/>
+                <input class=" cursor-pointer translate hover:bg-sky-500 bg-sky-300 text-white px-2 rounded-lg" type="submit" value="영어 번역 획득"/>
+            </form>
+            <div class="flex flex-col">
+                <div class="text-green-500">
+                    <text>긍정 : </text>
+                    <text class="border positive"></text>
+                </div>
+                <div class="text-red-500">
+                    <text>부정 : </text>
+                    <text class="border  negative"></text>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <h1>2. 선정된 프롬프트로 달리 이미지 받아오기</h1>
+        <div class="m-4 border py-2 px-2">
+            <text>프롬프트</text>
+            <div class="border-b-2 text-green-500">
+                <text class="positive px-1 py-1"></text>
+            </div>
+            <div class="mt-2 flex flex-row-reverse">
+                <button class="hover:bg-sky-500 cursor-pointer bg-sky-300 px-2 rounded-lg text-white dalle">이미지 생성</button>
+            </div>
+            <img class="dalleImg" src="" width="512" height="512"/>
+        </div>
+        <br/>
+        <h1>3. 달리이미지 + compfyUI 로 이미지 생성하기 옵션넣어서</h1>
+        <form id="comfyUiForm" method="post" action="" class="flex flex-col border px-2 py-2">
+            <div class="border py-2 my-2">
+                <label for="model">모델 : </label>
+                <select id="model" name="model">
+                    <option value="sd-v1-4.ckpt">스테이블 디퓨전 v1.4</option>
+                    <option value="chilloutmix_NiPrunedFp32Fix.safetensors">애니화</option>
+                    <option value="realisticVisionV60B1_v20Novae.safetensors">실사화</option>
+                </select>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="positive">긍정 프롬프트 : </label>
+                <input name="positive" id="positive" type="text" class="border-b-2 positive text-green-500" value=""/>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="negative">네거티브 프롬프트 : </label>
+                <input name="negative" id="negative" type="text" class="border-b-2 negative text-red-500"/>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="sampler">Sampler : </label>
+                <input name="sampler" id="sampler" type="text" class="border-b-2" value="dpmpp_2m" disabled/>
+            </div>
+            <div class="border py-2 my-2">
+                <label id="steps">Steps : </label>
+                <input name="steps" id="steps" type="text" class="border-b-2" value="20"/>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="cfg">CFG Scale : </label>
+                <input name="cfg" id="cfg" type="text" class="border-b-2" value="8"/>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="width">Width : </label>
+                <input name="width" id="width" type="text" class="border-b-2" value="512"/>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="height">height : </label>
+                <input name="height" id="height" type="text" class="border-b-2" value="512" />
+            </div>
+            <div class="border py-2 my-2">
+                <label for="seed">Seed : </label>
+                <input name="seed" id="seed" type="text" class="border-b-2" value="1021004397333543"/>
+            </div>
+            <div class="border py-2 my-2">
+                <label for="batchSize">Batch Size : </label>
+                <input name="batchSize" id="batchSize" type="text" class="border-b-2" value="1"/>
+            </div>
+            <div class="py-2 flex justify-center">
+                <input class="translate hover:bg-sky-500 bg-sky-300 cursor-pointer comfyUIbtn  p-4 rounded-lg text-white" type="submit" value="ComfyUI 이미지 생성">
+            </div>
+        </form>
+{{/*        <button class="comfyUIbtn bg-sky-500 px-2 rounded-lg text-white">comfyUI 이미지 생성</button>*/}}
+        <div>
+            <text class="progress"></text>
+            <img src="https://guiwoo-test.s3.amazonaws.com/bb104b31-fe49-442e-b5e6-0e52396794fb_00001_.png" class="comfyui" width="512" height="512"/>
+        </div>
+    </main>
+
+    <script>
+        let clientID = crypto.randomUUID()
+        clientID.replace("-","a")
+        document.querySelector(".clientID").innerText = clientID
+
+        const postData = async (url = "", data = {}) => {
+            // 옵션 기본 값은 *로 강조
+            const response = await fetch(url, {
+                method: "POST", // *GET, POST, PUT, DELETE 등
+                mode: "cors", // no-cors, *cors, same-origin
+                cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: "same-origin", // include, *same-origin, omit
+                headers: {
+                    "Content-Type": "application/json",
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                redirect: "follow", // manual, *follow, error
+                referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: JSON.stringify(data), // body의 데이터 유형은 반드시 "Content-Type" 헤더와 일치해야 함
+            });
+            return response.json(); // JSON 응답을 네이티브 JavaScript 객체로 파싱
+        };
+
+        const getData = async (url = "") => {
+            // GET 요청을 보냅니다.
+            const response = await fetch(url, {
+                method: "GET", // GET 요청
+                mode: "cors", // no-cors, *cors, same-origin
+                cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: "same-origin", // include, *same-origin, omit
+                headers: {
+                    "Content-Type": "application/json"
+                    // GET 요청에서는 주로 Content-Type 헤더를 설정하지 않습니다.
+                },
+                redirect: "follow", // manual, *follow, error
+                referrerPolicy: "no-referrer" // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            });
+            return response.json(); // JSON 응답을 네이티브 JavaScript 객체로 파싱
+        };
+
+        const translate =  (data) => {
+            const resp = postData("http://localhost:9000/translate",data)
+            resp.then((resp)=>{
+                positivie = resp["p_translate"]
+                negative = resp["n_translate"]
+
+                var pos = document.querySelectorAll(".positive");
+                pos.forEach(function(div) {
+                    div.innerText = positivie;
+                });
+
+                var nev = document.querySelectorAll(".negative");
+                nev.forEach(function (div){
+                    div.innerText = negative
+                })
+
+                var po = document.querySelector("#positive")
+                po.value = positivie
+
+                var ne = document.querySelector("#negative")
+                ne.value = negative
+            })
+       }
+
+       const generateDalle = (data) => {
+            const resp = postData("http://localhost:9000/dalle",data)
+           resp.then((resp)=>{
+               msg = resp["msg"]
+               console.log(msg)
+               if (msg === "ok") {
+                   img = document.querySelector(".dalleImg")
+                   console.log(img)
+                   img.src = resp["url"]
+                   console.log(img)
+               }
+           })
+       }
+
+       const gpt = (data) => {
+            const resp = postData("http://localhost:9000/gpt",data)
+           resp.then((resp)=>{
+               rs = document.querySelector(".result")
+               resp.forEach(function (data){
+                   n = document.createElement("div")
+                   n.innerText = data
+                   rs.appendChild(n)
+               })
+           })
+       }
+
+        document.getElementById("myForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // 기본 제출 동작을 막음
+            var formData = new FormData(this);
+
+
+            var jsonData = {};
+            formData.forEach(function(value, key){
+                jsonData[key] = value;
+            });
+
+            translate(jsonData)
+
+            return false;
+        });
+
+        document.getElementById("gpt").addEventListener("submit",function (event){
+            event.preventDefault()
+            var formData = new FormData(this)
+
+            var jsonData = {};
+            formData.forEach((value,key)=>{
+                jsonData[key] = value;
+            })
+
+            gpt(jsonData)
+
+            return false
+        })
+
+        document.querySelector(".dalle").addEventListener("click",function (event){
+            event.preventDefault(); // 기본 제출 동작을 막음
+
+            text = document.querySelector(".positive").innerText
+
+            jsonData = {
+                "positive" : text,
+                "client_id" : clientID
+            }
+
+            generateDalle(jsonData)
+
+            return false;
+        })
+
+        // document.querySelector(".comfyUIbtn").addEventListener("click", function(event) {
+        //     event.preventDefault(); // 기본 제출 동작을 막음
+        //
+        //     const text = document.querySelector(".translated").innerText;
+        //
+        //     const jsonData = {
+        //         "prompt": text
+        //     };
+        //
+        //     const socket = new WebSocket("ws://localhost:9000/generate");
+        //
+        //     socket.addEventListener("message", (event) => {
+        //         console.log("Message from server ", event.data);
+        //         if (event.data !== "progress") {
+        //             var img = document.querySelector(".comfyui")
+        //             img.src = "output/"+ event.data
+        //         }else {
+        //            var pr = document.querySelector(".progress")
+        //             pr.innerText = "progress"
+        //         }
+        //     });
+        //
+        //     return false;
+        // });
+
+        document.getElementById("comfyUiForm").addEventListener("submit",function (event){
+            event.preventDefault()
+
+            var formData = new FormData(this)
+
+            var jsonData = {}
+            formData.forEach(function (value,key){
+                jsonData[key] = value;
+            })
+            jsonData["client_id"] = clientID
+            console.log(clientID)
+
+            data = JSON.stringify(jsonData)
+
+
+            const socket = new WebSocket("ws://localhost:9000/generate");
+
+            socket.addEventListener("open",(event)=>{
+                socket.send(data)
+            })
+
+            socket.addEventListener("message", (event) => {
+                console.log("Message from server ", event.data);
+                img = document.querySelector(".comfyui")
+                pr = document.querySelector(".progress")
+                if (event.data !== "progress") {
+                    img.src = event.data
+                    pr.innerText = "done"
+                }else {
+                    pr.innerText = "progress"
+                }
+            });
+
+            return false;
+        })
+    </script>
+</body>
+</html>
