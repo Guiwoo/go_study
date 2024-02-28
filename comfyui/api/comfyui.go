@@ -98,7 +98,7 @@ func CreateImage(qReq types.QueueRequest) error {
 	host := "http://127.0.0.1:8188/prompt"
 
 	// todo client id로 변경하기 imageURL 확인해서 보내기 , s3 연동해보기
-	if err := UploadImage("/Users/guiwoopark/Desktop/personal/study/comfyui/assets/example2.png"); err != nil {
+	if err := UploadImage("/Users/guiwoopark/Desktop/personal/go_study/comfyui/assets/example.png"); err != nil {
 		panic(err)
 	}
 

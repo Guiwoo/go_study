@@ -12,7 +12,7 @@ import (
 )
 
 func CallPapagoAPI(kor string) (string, error) {
-	host := "https://openapi.naver.com/v1/papago/n2mt"
+	host := "https://naveropenapi.apigw.ntruss.com/nmt/v1/translation"
 	id := getEnv("PapagoID")
 	secret := getEnv("PapagoSecret")
 
@@ -28,8 +28,8 @@ func CallPapagoAPI(kor string) (string, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-	req.Header.Set("X-Naver-Client-Id", id)
-	req.Header.Set("X-Naver-Client-Secret", secret)
+	req.Header.Set("X-NCP-APIGW-API-KEY-ID", id)
+	req.Header.Set("X-NCP-APIGW-API-KEY", secret)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

@@ -6,6 +6,8 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/sashabaranov/go-openai"
+	"image/png"
+	"os"
 )
 
 func CallDalle(prompt, clientID string) (string, error) {
@@ -41,5 +43,13 @@ func CallDalle(prompt, clientID string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	imgData, err := png.Decode(reader)
+
+	file, err := os.Create(fileName)
+	if err := png.Encode(file, imgData); err != nil {
+		fmt.Printf("PNG encode error: %v\n", err)
+	}
+
 	return path, nil
 }

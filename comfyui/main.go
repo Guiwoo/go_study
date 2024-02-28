@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"comfyui/api"
 	"comfyui/types"
 	"encoding/json"
@@ -150,9 +151,26 @@ func Gpt(w http.ResponseWriter, r *http.Request) {
 	w.Write(rsp)
 }
 
+func HtmlConverter(w http.ResponseWriter, r *http.Request) {
+	htmlFile, _, _ := r.FormFile("html")
+	cssFile, _, _ := r.FormFile("css")
+	var (
+		htmlData = bytes.NewBuffer(make([]byte, 0))
+		cssData  = bytes.NewBuffer(make([]byte, 0))
+	)
+	if htmlFile != nil {
+		io.Copy(htmlData, htmlFile)
+	}
+	if cssFile != nil {
+		io.Copy(cssData, cssFile)
+	}
+
+	api.Converter(htmlData.Bytes(), cssData.Bytes())
+}
+
 func Render() {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		fp := path.Join("/Users/guiwoopark/Desktop/personal/study/comfyui/templates", "index.html")
+		fp := path.Join("/Users/guiwoopark/Desktop/personal/go_study/comfyui/templates", "index.html")
 		tmpl, err := template.ParseFiles(fp)
 		if err != nil {
 			log.Fatalf("fail to open file %+v", err)
@@ -168,8 +186,9 @@ func Render() {
 	mux.HandleFunc("/translate", Translate)
 	mux.HandleFunc("/dalle", CallDalle)
 	mux.HandleFunc("/generate", QueuePrompt)
-	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("/Users/guiwoopark/Desktop/personal/study/comfyui/assets"))))
-	mux.Handle("/output/", http.StripPrefix("/output/", http.FileServer(http.Dir("/Users/guiwoopark/Desktop/personal/study/comfyui/output"))))
+	mux.HandleFunc("/converter", HtmlConverter)
+	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("/Users/guiwoopark/Desktop/personal/go_study/comfyui/assets"))))
+	mux.Handle("/output/", http.StripPrefix("/output/", http.FileServer(http.Dir("/Users/guiwoopark/Desktop/personal/go_study/comfyui/output"))))
 	port := ":9000"
 	http.ListenAndServe(port, mux)
 }
