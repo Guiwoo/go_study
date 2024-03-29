@@ -2,7 +2,7 @@ FROM golang:1.22.1-alpine
 
 WORKDIR /src
 
-COPY . ./
+COPY ./docker_test ./
 
 RUN go build -o /bin/test
 
