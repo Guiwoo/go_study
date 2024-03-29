@@ -3,13 +3,16 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"os"
 	"sort"
-	"strings"
 )
 
 func main() {
+	var (
+		reader = bufio.NewReader(os.Stdin)
+		writer = bufio.NewWriter(os.Stdout)
+		N      int
+	)
 	fmt.Fscanln(reader, &N)
 
 	arr := make([]int, N)

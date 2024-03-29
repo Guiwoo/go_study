@@ -1,0 +1,21 @@
+name: Guiwoo - Test
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - ".github/**"
+
+jobs:
+  build:
+    name: Build Docker image and push on docker hub
+    runs-on: ubuntu-latest
+
+    steps:
+      #Docker build Docker hub push 진행
+      - name: Build image and push
+        id: build-image
+        run: |-
+          docker build --tag guiwootest ../../docker_test/Dockerfile .
+          docker push guiwoo/guiwootest:latest
+          

@@ -17,11 +17,13 @@ type SearchKeyword struct {
 
 func callEcho() {
 	e := echo.New()
+	var keyword SearchKeyword
+
 	e.GET("/test", func(c echo.Context) error {
-		var keyword SearchKeyword
 		if err := c.Bind(&keyword); err != nil {
 			fmt.Printf("got error ", err)
 		}
+		fmt.Printf("%p", &keyword)
 		fmt.Println(keyword)
 		fmt.Println("got request")
 		return c.JSON(200, struct {
