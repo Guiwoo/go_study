@@ -12,7 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      #Docker build Docker hub push 진행
+      # 소스 가져오기
+      - name : Checkout
+        uses : actions/checkout@v3
+      # Docker build Docker hub push 진행
       - name: Build image and push
         id: build-image
         run: |-
