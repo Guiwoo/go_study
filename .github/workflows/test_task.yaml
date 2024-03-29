@@ -19,6 +19,6 @@ jobs:
       - name: Build image and push
         id: build-image
         run: |-
-          docker build . -f Dockerfile.dev -t guiwootest
+          docker build . -f Dockerfile_dev -t guiwootest
           docker push guiwoo/guiwootest:latest
           
