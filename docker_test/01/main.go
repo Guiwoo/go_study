@@ -10,7 +10,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc(
-		"POST /hello",
+		"GET /hello",
 		func(writer http.ResponseWriter, request *http.Request) {
 			fmt.Fprintf(writer, "Here is Hello Hello")
 		},
