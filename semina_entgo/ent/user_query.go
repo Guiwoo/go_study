@@ -155,7 +155,7 @@ func (uq *UserQuery) QueryCard() *CardQuery {
 	return query
 }
 
-// First returns the first User entity from the query.
+// First returns the first User dto from the query.
 // Returns a *NotFoundError when no User was found.
 func (uq *UserQuery) First(ctx context.Context) (*User, error) {
 	nodes, err := uq.Limit(1).All(setContextOp(ctx, uq.ctx, "First"))
@@ -200,8 +200,8 @@ func (uq *UserQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single User entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one User entity is found.
+// Only returns a single User dto found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one User dto is found.
 // Returns a *NotFoundError when no User entities are found.
 func (uq *UserQuery) Only(ctx context.Context) (*User, error) {
 	nodes, err := uq.Limit(2).All(setContextOp(ctx, uq.ctx, "Only"))
@@ -425,7 +425,7 @@ func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
 }
 
 // Select allows the selection one or more fields/columns for the given query,
-// instead of selecting all fields in the entity.
+// instead of selecting all fields in the dto.
 //
 // Example:
 //

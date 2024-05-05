@@ -57,7 +57,7 @@ func (tq *TesterQuery) Order(o ...tester.OrderOption) *TesterQuery {
 	return tq
 }
 
-// First returns the first Tester entity from the query.
+// First returns the first Tester dto from the query.
 // Returns a *NotFoundError when no Tester was found.
 func (tq *TesterQuery) First(ctx context.Context) (*Tester, error) {
 	nodes, err := tq.Limit(1).All(setContextOp(ctx, tq.ctx, "First"))
@@ -102,8 +102,8 @@ func (tq *TesterQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single Tester entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one Tester entity is found.
+// Only returns a single Tester dto found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one Tester dto is found.
 // Returns a *NotFoundError when no Tester entities are found.
 func (tq *TesterQuery) Only(ctx context.Context) (*Tester, error) {
 	nodes, err := tq.Limit(2).All(setContextOp(ctx, tq.ctx, "Only"))
@@ -279,7 +279,7 @@ func (tq *TesterQuery) GroupBy(field string, fields ...string) *TesterGroupBy {
 }
 
 // Select allows the selection one or more fields/columns for the given query,
-// instead of selecting all fields in the entity.
+// instead of selecting all fields in the dto.
 //
 // Example:
 //

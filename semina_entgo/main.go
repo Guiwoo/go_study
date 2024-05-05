@@ -284,7 +284,7 @@ func main() {
 
 	//auto migrate
 	if err := client.Schema.Create(context.TODO()); err != nil {
-		log.Fatalf("failed to create entity %+v", err)
+		log.Fatalf("failed to create dto %+v", err)
 	}
 
 	if err := CreateCardAndUser(context.Background(), client); err != nil {

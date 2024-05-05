@@ -169,7 +169,7 @@ func (tx *Tx) init() {
 // Commit and Rollback are nop for the internal builders and the user must call one
 // of them in order to commit or rollback the transaction.
 //
-// If a closed transaction is embedded in one of the generated entities, and the entity
+// If a closed transaction is embedded in one of the generated entities, and the dto
 // applies a query, for example: Car.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //

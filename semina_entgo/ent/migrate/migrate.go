@@ -14,7 +14,7 @@ import (
 var (
 	// WithGlobalUniqueID sets the universal ids options to the migration.
 	// If this option is enabled, ent migration will allocate a 1<<32 range
-	// for the ids of each entity (table).
+	// for the ids of each dto (table).
 	// Note that this option cannot be applied on tables that already exist.
 	WithGlobalUniqueID = schema.WithGlobalUniqueID
 	// WithDropColumn sets the drop column option to the migration.

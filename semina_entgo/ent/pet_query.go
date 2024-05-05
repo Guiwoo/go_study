@@ -82,7 +82,7 @@ func (pq *PetQuery) QueryOwner() *UserQuery {
 	return query
 }
 
-// First returns the first Pet entity from the query.
+// First returns the first Pet dto from the query.
 // Returns a *NotFoundError when no Pet was found.
 func (pq *PetQuery) First(ctx context.Context) (*Pet, error) {
 	nodes, err := pq.Limit(1).All(setContextOp(ctx, pq.ctx, "First"))
@@ -127,8 +127,8 @@ func (pq *PetQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single Pet entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one Pet entity is found.
+// Only returns a single Pet dto found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one Pet dto is found.
 // Returns a *NotFoundError when no Pet entities are found.
 func (pq *PetQuery) Only(ctx context.Context) (*Pet, error) {
 	nodes, err := pq.Limit(2).All(setContextOp(ctx, pq.ctx, "Only"))
@@ -316,7 +316,7 @@ func (pq *PetQuery) GroupBy(field string, fields ...string) *PetGroupBy {
 }
 
 // Select allows the selection one or more fields/columns for the given query,
-// instead of selecting all fields in the entity.
+// instead of selecting all fields in the dto.
 //
 // Example:
 //

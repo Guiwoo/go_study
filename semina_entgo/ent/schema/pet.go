@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// Pet holds the schema definition for the Pet entity.
+// Pet holds the schema definition for the Pet dto.
 type Pet struct {
 	ent.Schema
 }

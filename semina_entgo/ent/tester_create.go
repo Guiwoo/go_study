@@ -13,7 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// TesterCreate is the builder for creating a Tester entity.
+// TesterCreate is the builder for creating a Tester dto.
 type TesterCreate struct {
 	config
 	mutation *TesterMutation

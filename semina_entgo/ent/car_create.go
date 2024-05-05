@@ -14,7 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// CarCreate is the builder for creating a Car entity.
+// CarCreate is the builder for creating a Car dto.
 type CarCreate struct {
 	config
 	mutation *CarMutation
@@ -33,13 +33,13 @@ func (cc *CarCreate) SetRegisteredAt(t time.Time) *CarCreate {
 	return cc
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
+// SetOwnerID sets the "owner" edge to the User dto by ID.
 func (cc *CarCreate) SetOwnerID(id int) *CarCreate {
 	cc.mutation.SetOwnerID(id)
 	return cc
 }
 
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+// SetNillableOwnerID sets the "owner" edge to the User dto by ID if the given value is not nil.
 func (cc *CarCreate) SetNillableOwnerID(id *int) *CarCreate {
 	if id != nil {
 		cc = cc.SetOwnerID(*id)
@@ -47,7 +47,7 @@ func (cc *CarCreate) SetNillableOwnerID(id *int) *CarCreate {
 	return cc
 }
 
-// SetOwner sets the "owner" edge to the User entity.
+// SetOwner sets the "owner" edge to the User dto.
 func (cc *CarCreate) SetOwner(u *User) *CarCreate {
 	return cc.SetOwnerID(u.ID)
 }

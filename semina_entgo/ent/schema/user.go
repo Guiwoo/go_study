@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// User holds the schema definition for the User entity.
+// User holds the schema definition for the User dto.
 type User struct {
 	ent.Schema
 }

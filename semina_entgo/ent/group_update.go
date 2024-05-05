@@ -42,13 +42,13 @@ func (gu *GroupUpdate) SetNillableName(s *string) *GroupUpdate {
 	return gu
 }
 
-// AddUserIDs adds the "users" edge to the User entity by IDs.
+// AddUserIDs adds the "users" edge to the User dto by IDs.
 func (gu *GroupUpdate) AddUserIDs(ids ...int) *GroupUpdate {
 	gu.mutation.AddUserIDs(ids...)
 	return gu
 }
 
-// AddUsers adds the "users" edges to the User entity.
+// AddUsers adds the "users" edges to the User dto.
 func (gu *GroupUpdate) AddUsers(u ...*User) *GroupUpdate {
 	ids := make([]int, len(u))
 	for i := range u {
@@ -62,7 +62,7 @@ func (gu *GroupUpdate) Mutation() *GroupMutation {
 	return gu.mutation
 }
 
-// ClearUsers clears all "users" edges to the User entity.
+// ClearUsers clears all "users" edges to the User dto.
 func (gu *GroupUpdate) ClearUsers() *GroupUpdate {
 	gu.mutation.ClearUsers()
 	return gu
@@ -192,7 +192,7 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	return n, nil
 }
 
-// GroupUpdateOne is the builder for updating a single Group entity.
+// GroupUpdateOne is the builder for updating a single Group dto.
 type GroupUpdateOne struct {
 	config
 	fields   []string
@@ -214,13 +214,13 @@ func (guo *GroupUpdateOne) SetNillableName(s *string) *GroupUpdateOne {
 	return guo
 }
 
-// AddUserIDs adds the "users" edge to the User entity by IDs.
+// AddUserIDs adds the "users" edge to the User dto by IDs.
 func (guo *GroupUpdateOne) AddUserIDs(ids ...int) *GroupUpdateOne {
 	guo.mutation.AddUserIDs(ids...)
 	return guo
 }
 
-// AddUsers adds the "users" edges to the User entity.
+// AddUsers adds the "users" edges to the User dto.
 func (guo *GroupUpdateOne) AddUsers(u ...*User) *GroupUpdateOne {
 	ids := make([]int, len(u))
 	for i := range u {
@@ -234,7 +234,7 @@ func (guo *GroupUpdateOne) Mutation() *GroupMutation {
 	return guo.mutation
 }
 
-// ClearUsers clears all "users" edges to the User entity.
+// ClearUsers clears all "users" edges to the User dto.
 func (guo *GroupUpdateOne) ClearUsers() *GroupUpdateOne {
 	guo.mutation.ClearUsers()
 	return guo
@@ -261,14 +261,14 @@ func (guo *GroupUpdateOne) Where(ps ...predicate.Group) *GroupUpdateOne {
 	return guo
 }
 
-// Select allows selecting one or more fields (columns) of the returned entity.
-// The default is selecting all fields defined in the entity schema.
+// Select allows selecting one or more fields (columns) of the returned dto.
+// The default is selecting all fields defined in the dto schema.
 func (guo *GroupUpdateOne) Select(field string, fields ...string) *GroupUpdateOne {
 	guo.fields = append([]string{field}, fields...)
 	return guo
 }
 
-// Save executes the query and returns the updated Group entity.
+// Save executes the query and returns the updated Group dto.
 func (guo *GroupUpdateOne) Save(ctx context.Context) (*Group, error) {
 	return withHooks(ctx, guo.sqlSave, guo.mutation, guo.hooks)
 }
@@ -282,7 +282,7 @@ func (guo *GroupUpdateOne) SaveX(ctx context.Context) *Group {
 	return node
 }
 
-// Exec executes the query on the entity.
+// Exec executes the query on the dto.
 func (guo *GroupUpdateOne) Exec(ctx context.Context) error {
 	_, err := guo.Save(ctx)
 	return err

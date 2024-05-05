@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Card holds the schema definition for the Card entity.
+// Card holds the schema definition for the Card dto.
 type Card struct {
 	ent.Schema
 }

@@ -16,7 +16,7 @@ We want to listen to events and notified when they occur
 Two participants : observable and observer
 
 An observer is an object that wishes to be informed about events happening in the system.
-Then entity generating the events is and observable.
+Then dto generating the events is and observable.
 */
 
 // Observable, Observer

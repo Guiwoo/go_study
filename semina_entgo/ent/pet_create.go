@@ -13,7 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// PetCreate is the builder for creating a Pet entity.
+// PetCreate is the builder for creating a Pet dto.
 type PetCreate struct {
 	config
 	mutation *PetMutation
@@ -38,13 +38,13 @@ func (pc *PetCreate) SetAge(i int) *PetCreate {
 	return pc
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
+// SetOwnerID sets the "owner" edge to the User dto by ID.
 func (pc *PetCreate) SetOwnerID(id int) *PetCreate {
 	pc.mutation.SetOwnerID(id)
 	return pc
 }
 
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+// SetNillableOwnerID sets the "owner" edge to the User dto by ID if the given value is not nil.
 func (pc *PetCreate) SetNillableOwnerID(id *int) *PetCreate {
 	if id != nil {
 		pc = pc.SetOwnerID(*id)
@@ -52,7 +52,7 @@ func (pc *PetCreate) SetNillableOwnerID(id *int) *PetCreate {
 	return pc
 }
 
-// SetOwner sets the "owner" edge to the User entity.
+// SetOwner sets the "owner" edge to the User dto.
 func (pc *PetCreate) SetOwner(u *User) *PetCreate {
 	return pc.SetOwnerID(u.ID)
 }

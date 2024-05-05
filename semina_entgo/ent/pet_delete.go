@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// PetDelete is the builder for deleting a Pet entity.
+// PetDelete is the builder for deleting a Pet dto.
 type PetDelete struct {
 	config
 	hooks    []Hook
@@ -56,7 +56,7 @@ func (pd *PetDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// PetDeleteOne is the builder for deleting a single Pet entity.
+// PetDeleteOne is the builder for deleting a single Pet dto.
 type PetDeleteOne struct {
 	pd *PetDelete
 }

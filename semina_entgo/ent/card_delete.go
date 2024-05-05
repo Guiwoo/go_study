@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// CardDelete is the builder for deleting a Card entity.
+// CardDelete is the builder for deleting a Card dto.
 type CardDelete struct {
 	config
 	hooks    []Hook
@@ -56,7 +56,7 @@ func (cd *CardDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// CardDeleteOne is the builder for deleting a single Card entity.
+// CardDeleteOne is the builder for deleting a single Card dto.
 type CardDeleteOne struct {
 	cd *CardDelete
 }

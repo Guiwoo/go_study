@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// TesterDelete is the builder for deleting a Tester entity.
+// TesterDelete is the builder for deleting a Tester dto.
 type TesterDelete struct {
 	config
 	hooks    []Hook
@@ -56,7 +56,7 @@ func (td *TesterDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// TesterDeleteOne is the builder for deleting a single Tester entity.
+// TesterDeleteOne is the builder for deleting a single Tester dto.
 type TesterDeleteOne struct {
 	td *TesterDelete
 }

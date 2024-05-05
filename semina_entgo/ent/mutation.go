@@ -59,7 +59,7 @@ var _ ent.Mutation = (*CarMutation)(nil)
 // carOption allows management of the mutation configuration using functional options.
 type carOption func(*CarMutation)
 
-// newCarMutation creates new mutation for the Car entity.
+// newCarMutation creates new mutation for the Car dto.
 func newCarMutation(c config, op Op, opts ...carOption) *CarMutation {
 	m := &CarMutation{
 		config:        c,
@@ -133,7 +133,7 @@ func (m *CarMutation) ID() (id int, exists bool) {
 	return *m.id, true
 }
 
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// IDs queries the database and returns the dto ids that match the mutation's predicate.
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
@@ -166,7 +166,7 @@ func (m *CarMutation) Model() (r string, exists bool) {
 	return *v, true
 }
 
-// OldModel returns the old "model" field's value of the Car entity.
+// OldModel returns the old "model" field's value of the Car dto.
 // If the Car object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *CarMutation) OldModel(ctx context.Context) (v string, err error) {
@@ -202,7 +202,7 @@ func (m *CarMutation) RegisteredAt() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldRegisteredAt returns the old "registered_at" field's value of the Car entity.
+// OldRegisteredAt returns the old "registered_at" field's value of the Car dto.
 // If the Car object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *CarMutation) OldRegisteredAt(ctx context.Context) (v time.Time, err error) {
@@ -224,17 +224,17 @@ func (m *CarMutation) ResetRegisteredAt() {
 	m.registered_at = nil
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by id.
+// SetOwnerID sets the "owner" edge to the User dto by id.
 func (m *CarMutation) SetOwnerID(id int) {
 	m.owner = &id
 }
 
-// ClearOwner clears the "owner" edge to the User entity.
+// ClearOwner clears the "owner" edge to the User dto.
 func (m *CarMutation) ClearOwner() {
 	m.clearedowner = true
 }
 
-// OwnerCleared reports if the "owner" edge to the User entity was cleared.
+// OwnerCleared reports if the "owner" edge to the User dto was cleared.
 func (m *CarMutation) OwnerCleared() bool {
 	return m.clearedowner
 }
@@ -506,7 +506,7 @@ var _ ent.Mutation = (*CardMutation)(nil)
 // cardOption allows management of the mutation configuration using functional options.
 type cardOption func(*CardMutation)
 
-// newCardMutation creates new mutation for the Card entity.
+// newCardMutation creates new mutation for the Card dto.
 func newCardMutation(c config, op Op, opts ...cardOption) *CardMutation {
 	m := &CardMutation{
 		config:        c,
@@ -580,7 +580,7 @@ func (m *CardMutation) ID() (id int, exists bool) {
 	return *m.id, true
 }
 
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// IDs queries the database and returns the dto ids that match the mutation's predicate.
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
@@ -613,7 +613,7 @@ func (m *CardMutation) Number() (r string, exists bool) {
 	return *v, true
 }
 
-// OldNumber returns the old "number" field's value of the Card entity.
+// OldNumber returns the old "number" field's value of the Card dto.
 // If the Card object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *CardMutation) OldNumber(ctx context.Context) (v string, err error) {
@@ -649,7 +649,7 @@ func (m *CardMutation) ExpiredAt() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldExpiredAt returns the old "expired_at" field's value of the Card entity.
+// OldExpiredAt returns the old "expired_at" field's value of the Card dto.
 // If the Card object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *CardMutation) OldExpiredAt(ctx context.Context) (v time.Time, err error) {
@@ -671,17 +671,17 @@ func (m *CardMutation) ResetExpiredAt() {
 	m.expired_at = nil
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by id.
+// SetOwnerID sets the "owner" edge to the User dto by id.
 func (m *CardMutation) SetOwnerID(id int) {
 	m.owner = &id
 }
 
-// ClearOwner clears the "owner" edge to the User entity.
+// ClearOwner clears the "owner" edge to the User dto.
 func (m *CardMutation) ClearOwner() {
 	m.clearedowner = true
 }
 
-// OwnerCleared reports if the "owner" edge to the User entity was cleared.
+// OwnerCleared reports if the "owner" edge to the User dto was cleared.
 func (m *CardMutation) OwnerCleared() bool {
 	return m.clearedowner
 }
@@ -953,7 +953,7 @@ var _ ent.Mutation = (*GroupMutation)(nil)
 // groupOption allows management of the mutation configuration using functional options.
 type groupOption func(*GroupMutation)
 
-// newGroupMutation creates new mutation for the Group entity.
+// newGroupMutation creates new mutation for the Group dto.
 func newGroupMutation(c config, op Op, opts ...groupOption) *GroupMutation {
 	m := &GroupMutation{
 		config:        c,
@@ -1027,7 +1027,7 @@ func (m *GroupMutation) ID() (id int, exists bool) {
 	return *m.id, true
 }
 
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// IDs queries the database and returns the dto ids that match the mutation's predicate.
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
@@ -1060,7 +1060,7 @@ func (m *GroupMutation) Name() (r string, exists bool) {
 	return *v, true
 }
 
-// OldName returns the old "name" field's value of the Group entity.
+// OldName returns the old "name" field's value of the Group dto.
 // If the Group object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *GroupMutation) OldName(ctx context.Context) (v string, err error) {
@@ -1082,7 +1082,7 @@ func (m *GroupMutation) ResetName() {
 	m.name = nil
 }
 
-// AddUserIDs adds the "users" edge to the User entity by ids.
+// AddUserIDs adds the "users" edge to the User dto by ids.
 func (m *GroupMutation) AddUserIDs(ids ...int) {
 	if m.users == nil {
 		m.users = make(map[int]struct{})
@@ -1092,17 +1092,17 @@ func (m *GroupMutation) AddUserIDs(ids ...int) {
 	}
 }
 
-// ClearUsers clears the "users" edge to the User entity.
+// ClearUsers clears the "users" edge to the User dto.
 func (m *GroupMutation) ClearUsers() {
 	m.clearedusers = true
 }
 
-// UsersCleared reports if the "users" edge to the User entity was cleared.
+// UsersCleared reports if the "users" edge to the User dto was cleared.
 func (m *GroupMutation) UsersCleared() bool {
 	return m.clearedusers
 }
 
-// RemoveUserIDs removes the "users" edge to the User entity by IDs.
+// RemoveUserIDs removes the "users" edge to the User dto by IDs.
 func (m *GroupMutation) RemoveUserIDs(ids ...int) {
 	if m.removedusers == nil {
 		m.removedusers = make(map[int]struct{})
@@ -1113,7 +1113,7 @@ func (m *GroupMutation) RemoveUserIDs(ids ...int) {
 	}
 }
 
-// RemovedUsers returns the removed IDs of the "users" edge to the User entity.
+// RemovedUsers returns the removed IDs of the "users" edge to the User dto.
 func (m *GroupMutation) RemovedUsersIDs() (ids []int) {
 	for id := range m.removedusers {
 		ids = append(ids, id)
@@ -1374,7 +1374,7 @@ var _ ent.Mutation = (*PetMutation)(nil)
 // petOption allows management of the mutation configuration using functional options.
 type petOption func(*PetMutation)
 
-// newPetMutation creates new mutation for the Pet entity.
+// newPetMutation creates new mutation for the Pet dto.
 func newPetMutation(c config, op Op, opts ...petOption) *PetMutation {
 	m := &PetMutation{
 		config:        c,
@@ -1448,7 +1448,7 @@ func (m *PetMutation) ID() (id int, exists bool) {
 	return *m.id, true
 }
 
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// IDs queries the database and returns the dto ids that match the mutation's predicate.
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
@@ -1481,7 +1481,7 @@ func (m *PetMutation) Breed() (r string, exists bool) {
 	return *v, true
 }
 
-// OldBreed returns the old "breed" field's value of the Pet entity.
+// OldBreed returns the old "breed" field's value of the Pet dto.
 // If the Pet object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *PetMutation) OldBreed(ctx context.Context) (v string, err error) {
@@ -1517,7 +1517,7 @@ func (m *PetMutation) Sex() (r string, exists bool) {
 	return *v, true
 }
 
-// OldSex returns the old "sex" field's value of the Pet entity.
+// OldSex returns the old "sex" field's value of the Pet dto.
 // If the Pet object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *PetMutation) OldSex(ctx context.Context) (v string, err error) {
@@ -1554,7 +1554,7 @@ func (m *PetMutation) Age() (r int, exists bool) {
 	return *v, true
 }
 
-// OldAge returns the old "age" field's value of the Pet entity.
+// OldAge returns the old "age" field's value of the Pet dto.
 // If the Pet object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *PetMutation) OldAge(ctx context.Context) (v int, err error) {
@@ -1595,17 +1595,17 @@ func (m *PetMutation) ResetAge() {
 	m.addage = nil
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by id.
+// SetOwnerID sets the "owner" edge to the User dto by id.
 func (m *PetMutation) SetOwnerID(id int) {
 	m.owner = &id
 }
 
-// ClearOwner clears the "owner" edge to the User entity.
+// ClearOwner clears the "owner" edge to the User dto.
 func (m *PetMutation) ClearOwner() {
 	m.clearedowner = true
 }
 
-// OwnerCleared reports if the "owner" edge to the User entity was cleared.
+// OwnerCleared reports if the "owner" edge to the User dto was cleared.
 func (m *PetMutation) OwnerCleared() bool {
 	return m.clearedowner
 }
@@ -1910,7 +1910,7 @@ var _ ent.Mutation = (*TesterMutation)(nil)
 // testerOption allows management of the mutation configuration using functional options.
 type testerOption func(*TesterMutation)
 
-// newTesterMutation creates new mutation for the Tester entity.
+// newTesterMutation creates new mutation for the Tester dto.
 func newTesterMutation(c config, op Op, opts ...testerOption) *TesterMutation {
 	m := &TesterMutation{
 		config:        c,
@@ -1984,7 +1984,7 @@ func (m *TesterMutation) ID() (id int, exists bool) {
 	return *m.id, true
 }
 
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// IDs queries the database and returns the dto ids that match the mutation's predicate.
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
@@ -2017,7 +2017,7 @@ func (m *TesterMutation) PascalCase() (r string, exists bool) {
 	return *v, true
 }
 
-// OldPascalCase returns the old "PascalCase" field's value of the Tester entity.
+// OldPascalCase returns the old "PascalCase" field's value of the Tester dto.
 // If the Tester object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *TesterMutation) OldPascalCase(ctx context.Context) (v string, err error) {
@@ -2053,7 +2053,7 @@ func (m *TesterMutation) LetMeCheck() (r string, exists bool) {
 	return *v, true
 }
 
-// OldLetMeCheck returns the old "let_me_check" field's value of the Tester entity.
+// OldLetMeCheck returns the old "let_me_check" field's value of the Tester dto.
 // If the Tester object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *TesterMutation) OldLetMeCheck(ctx context.Context) (v string, err error) {
@@ -2089,7 +2089,7 @@ func (m *TesterMutation) Size() (r tester.Size, exists bool) {
 	return *v, true
 }
 
-// OldSize returns the old "size" field's value of the Tester entity.
+// OldSize returns the old "size" field's value of the Tester dto.
 // If the Tester object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *TesterMutation) OldSize(ctx context.Context) (v tester.Size, err error) {
@@ -2125,7 +2125,7 @@ func (m *TesterMutation) Shape() (r custom.Shape, exists bool) {
 	return *v, true
 }
 
-// OldShape returns the old "shape" field's value of the Tester entity.
+// OldShape returns the old "shape" field's value of the Tester dto.
 // If the Tester object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *TesterMutation) OldShape(ctx context.Context) (v custom.Shape, err error) {
@@ -2161,7 +2161,7 @@ func (m *TesterMutation) Level() (r custom.Level, exists bool) {
 	return *v, true
 }
 
-// OldLevel returns the old "level" field's value of the Tester entity.
+// OldLevel returns the old "level" field's value of the Tester dto.
 // If the Tester object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *TesterMutation) OldLevel(ctx context.Context) (v custom.Level, err error) {
@@ -2461,7 +2461,7 @@ var _ ent.Mutation = (*UserMutation)(nil)
 // userOption allows management of the mutation configuration using functional options.
 type userOption func(*UserMutation)
 
-// newUserMutation creates new mutation for the User entity.
+// newUserMutation creates new mutation for the User dto.
 func newUserMutation(c config, op Op, opts ...userOption) *UserMutation {
 	m := &UserMutation{
 		config:        c,
@@ -2535,7 +2535,7 @@ func (m *UserMutation) ID() (id int, exists bool) {
 	return *m.id, true
 }
 
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// IDs queries the database and returns the dto ids that match the mutation's predicate.
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
@@ -2569,7 +2569,7 @@ func (m *UserMutation) Age() (r int, exists bool) {
 	return *v, true
 }
 
-// OldAge returns the old "age" field's value of the User entity.
+// OldAge returns the old "age" field's value of the User dto.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *UserMutation) OldAge(ctx context.Context) (v int, err error) {
@@ -2624,7 +2624,7 @@ func (m *UserMutation) Name() (r string, exists bool) {
 	return *v, true
 }
 
-// OldName returns the old "name" field's value of the User entity.
+// OldName returns the old "name" field's value of the User dto.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *UserMutation) OldName(ctx context.Context) (v string, err error) {
@@ -2646,7 +2646,7 @@ func (m *UserMutation) ResetName() {
 	m.name = nil
 }
 
-// AddCarIDs adds the "cars" edge to the Car entity by ids.
+// AddCarIDs adds the "cars" edge to the Car dto by ids.
 func (m *UserMutation) AddCarIDs(ids ...int) {
 	if m.cars == nil {
 		m.cars = make(map[int]struct{})
@@ -2656,17 +2656,17 @@ func (m *UserMutation) AddCarIDs(ids ...int) {
 	}
 }
 
-// ClearCars clears the "cars" edge to the Car entity.
+// ClearCars clears the "cars" edge to the Car dto.
 func (m *UserMutation) ClearCars() {
 	m.clearedcars = true
 }
 
-// CarsCleared reports if the "cars" edge to the Car entity was cleared.
+// CarsCleared reports if the "cars" edge to the Car dto was cleared.
 func (m *UserMutation) CarsCleared() bool {
 	return m.clearedcars
 }
 
-// RemoveCarIDs removes the "cars" edge to the Car entity by IDs.
+// RemoveCarIDs removes the "cars" edge to the Car dto by IDs.
 func (m *UserMutation) RemoveCarIDs(ids ...int) {
 	if m.removedcars == nil {
 		m.removedcars = make(map[int]struct{})
@@ -2677,7 +2677,7 @@ func (m *UserMutation) RemoveCarIDs(ids ...int) {
 	}
 }
 
-// RemovedCars returns the removed IDs of the "cars" edge to the Car entity.
+// RemovedCars returns the removed IDs of the "cars" edge to the Car dto.
 func (m *UserMutation) RemovedCarsIDs() (ids []int) {
 	for id := range m.removedcars {
 		ids = append(ids, id)
@@ -2700,7 +2700,7 @@ func (m *UserMutation) ResetCars() {
 	m.removedcars = nil
 }
 
-// AddPetIDs adds the "pets" edge to the Pet entity by ids.
+// AddPetIDs adds the "pets" edge to the Pet dto by ids.
 func (m *UserMutation) AddPetIDs(ids ...int) {
 	if m.pets == nil {
 		m.pets = make(map[int]struct{})
@@ -2710,17 +2710,17 @@ func (m *UserMutation) AddPetIDs(ids ...int) {
 	}
 }
 
-// ClearPets clears the "pets" edge to the Pet entity.
+// ClearPets clears the "pets" edge to the Pet dto.
 func (m *UserMutation) ClearPets() {
 	m.clearedpets = true
 }
 
-// PetsCleared reports if the "pets" edge to the Pet entity was cleared.
+// PetsCleared reports if the "pets" edge to the Pet dto was cleared.
 func (m *UserMutation) PetsCleared() bool {
 	return m.clearedpets
 }
 
-// RemovePetIDs removes the "pets" edge to the Pet entity by IDs.
+// RemovePetIDs removes the "pets" edge to the Pet dto by IDs.
 func (m *UserMutation) RemovePetIDs(ids ...int) {
 	if m.removedpets == nil {
 		m.removedpets = make(map[int]struct{})
@@ -2731,7 +2731,7 @@ func (m *UserMutation) RemovePetIDs(ids ...int) {
 	}
 }
 
-// RemovedPets returns the removed IDs of the "pets" edge to the Pet entity.
+// RemovedPets returns the removed IDs of the "pets" edge to the Pet dto.
 func (m *UserMutation) RemovedPetsIDs() (ids []int) {
 	for id := range m.removedpets {
 		ids = append(ids, id)
@@ -2754,7 +2754,7 @@ func (m *UserMutation) ResetPets() {
 	m.removedpets = nil
 }
 
-// AddGroupIDs adds the "groups" edge to the Group entity by ids.
+// AddGroupIDs adds the "groups" edge to the Group dto by ids.
 func (m *UserMutation) AddGroupIDs(ids ...int) {
 	if m.groups == nil {
 		m.groups = make(map[int]struct{})
@@ -2764,17 +2764,17 @@ func (m *UserMutation) AddGroupIDs(ids ...int) {
 	}
 }
 
-// ClearGroups clears the "groups" edge to the Group entity.
+// ClearGroups clears the "groups" edge to the Group dto.
 func (m *UserMutation) ClearGroups() {
 	m.clearedgroups = true
 }
 
-// GroupsCleared reports if the "groups" edge to the Group entity was cleared.
+// GroupsCleared reports if the "groups" edge to the Group dto was cleared.
 func (m *UserMutation) GroupsCleared() bool {
 	return m.clearedgroups
 }
 
-// RemoveGroupIDs removes the "groups" edge to the Group entity by IDs.
+// RemoveGroupIDs removes the "groups" edge to the Group dto by IDs.
 func (m *UserMutation) RemoveGroupIDs(ids ...int) {
 	if m.removedgroups == nil {
 		m.removedgroups = make(map[int]struct{})
@@ -2785,7 +2785,7 @@ func (m *UserMutation) RemoveGroupIDs(ids ...int) {
 	}
 }
 
-// RemovedGroups returns the removed IDs of the "groups" edge to the Group entity.
+// RemovedGroups returns the removed IDs of the "groups" edge to the Group dto.
 func (m *UserMutation) RemovedGroupsIDs() (ids []int) {
 	for id := range m.removedgroups {
 		ids = append(ids, id)
@@ -2808,17 +2808,17 @@ func (m *UserMutation) ResetGroups() {
 	m.removedgroups = nil
 }
 
-// SetCardID sets the "card" edge to the Card entity by id.
+// SetCardID sets the "card" edge to the Card dto by id.
 func (m *UserMutation) SetCardID(id int) {
 	m.card = &id
 }
 
-// ClearCard clears the "card" edge to the Card entity.
+// ClearCard clears the "card" edge to the Card dto.
 func (m *UserMutation) ClearCard() {
 	m.clearedcard = true
 }
 
-// CardCleared reports if the "card" edge to the Card entity was cleared.
+// CardCleared reports if the "card" edge to the Card dto was cleared.
 func (m *UserMutation) CardCleared() bool {
 	return m.clearedcard
 }

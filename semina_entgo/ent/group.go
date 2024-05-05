@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Group is the model entity for the Group schema.
+// Group is the model dto for the Group schema.
 type Group struct {
 	config `json:"-"`
 	// ID of the ent.
@@ -91,7 +91,7 @@ func (gr *Group) Value(name string) (ent.Value, error) {
 	return gr.selectValues.Get(name)
 }
 
-// QueryUsers queries the "users" edge of the Group entity.
+// QueryUsers queries the "users" edge of the Group dto.
 func (gr *Group) QueryUsers() *UserQuery {
 	return NewGroupClient(gr.config).QueryUsers(gr)
 }
@@ -103,12 +103,12 @@ func (gr *Group) Update() *GroupUpdateOne {
 	return NewGroupClient(gr.config).UpdateOne(gr)
 }
 
-// Unwrap unwraps the Group entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the Group dto that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
 func (gr *Group) Unwrap() *Group {
 	_tx, ok := gr.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: Group is not a transactional entity")
+		panic("ent: Group is not a transactional dto")
 	}
 	gr.config.driver = _tx.drv
 	return gr

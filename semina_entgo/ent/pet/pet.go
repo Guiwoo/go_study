@@ -24,7 +24,7 @@ const (
 	Table = "pets"
 	// OwnerTable is the table that holds the owner relation/edge.
 	OwnerTable = "pets"
-	// OwnerInverseTable is the table name for the User entity.
+	// OwnerInverseTable is the table name for the User dto.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	OwnerInverseTable = "users"
 	// OwnerColumn is the table column denoting the owner relation/edge.

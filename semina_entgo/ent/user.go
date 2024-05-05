@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// User is the model entity for the User schema.
+// User is the model dto for the User schema.
 type User struct {
 	config `json:"-"`
 	// ID of the ent.
@@ -147,22 +147,22 @@ func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
 }
 
-// QueryCars queries the "cars" edge of the User entity.
+// QueryCars queries the "cars" edge of the User dto.
 func (u *User) QueryCars() *CarQuery {
 	return NewUserClient(u.config).QueryCars(u)
 }
 
-// QueryPets queries the "pets" edge of the User entity.
+// QueryPets queries the "pets" edge of the User dto.
 func (u *User) QueryPets() *PetQuery {
 	return NewUserClient(u.config).QueryPets(u)
 }
 
-// QueryGroups queries the "groups" edge of the User entity.
+// QueryGroups queries the "groups" edge of the User dto.
 func (u *User) QueryGroups() *GroupQuery {
 	return NewUserClient(u.config).QueryGroups(u)
 }
 
-// QueryCard queries the "card" edge of the User entity.
+// QueryCard queries the "card" edge of the User dto.
 func (u *User) QueryCard() *CardQuery {
 	return NewUserClient(u.config).QueryCard(u)
 }
@@ -174,12 +174,12 @@ func (u *User) Update() *UserUpdateOne {
 	return NewUserClient(u.config).UpdateOne(u)
 }
 
-// Unwrap unwraps the User entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the User dto that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
 func (u *User) Unwrap() *User {
 	_tx, ok := u.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: User is not a transactional entity")
+		panic("ent: User is not a transactional dto")
 	}
 	u.config.driver = _tx.drv
 	return u

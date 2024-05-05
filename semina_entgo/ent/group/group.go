@@ -20,7 +20,7 @@ const (
 	Table = "groups"
 	// UsersTable is the table that holds the users relation/edge. The primary key declared below.
 	UsersTable = "group_users"
-	// UsersInverseTable is the table name for the User entity.
+	// UsersInverseTable is the table name for the User dto.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UsersInverseTable = "users"
 )

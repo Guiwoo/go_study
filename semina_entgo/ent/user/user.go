@@ -28,26 +28,26 @@ const (
 	Table = "users"
 	// CarsTable is the table that holds the cars relation/edge.
 	CarsTable = "cars"
-	// CarsInverseTable is the table name for the Car entity.
+	// CarsInverseTable is the table name for the Car dto.
 	// It exists in this package in order to avoid circular dependency with the "car" package.
 	CarsInverseTable = "cars"
 	// CarsColumn is the table column denoting the cars relation/edge.
 	CarsColumn = "user_cars"
 	// PetsTable is the table that holds the pets relation/edge.
 	PetsTable = "pets"
-	// PetsInverseTable is the table name for the Pet entity.
+	// PetsInverseTable is the table name for the Pet dto.
 	// It exists in this package in order to avoid circular dependency with the "pet" package.
 	PetsInverseTable = "pets"
 	// PetsColumn is the table column denoting the pets relation/edge.
 	PetsColumn = "user_pets"
 	// GroupsTable is the table that holds the groups relation/edge. The primary key declared below.
 	GroupsTable = "group_users"
-	// GroupsInverseTable is the table name for the Group entity.
+	// GroupsInverseTable is the table name for the Group dto.
 	// It exists in this package in order to avoid circular dependency with the "group" package.
 	GroupsInverseTable = "groups"
 	// CardTable is the table that holds the card relation/edge.
 	CardTable = "users"
-	// CardInverseTable is the table name for the Card entity.
+	// CardInverseTable is the table name for the Card dto.
 	// It exists in this package in order to avoid circular dependency with the "card" package.
 	CardInverseTable = "cards"
 	// CardColumn is the table column denoting the card relation/edge.

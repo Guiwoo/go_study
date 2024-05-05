@@ -16,7 +16,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// UserCreate is the builder for creating a User entity.
+// UserCreate is the builder for creating a User dto.
 type UserCreate struct {
 	config
 	mutation *UserMutation
@@ -43,13 +43,13 @@ func (uc *UserCreate) SetNillableName(s *string) *UserCreate {
 	return uc
 }
 
-// AddCarIDs adds the "cars" edge to the Car entity by IDs.
+// AddCarIDs adds the "cars" edge to the Car dto by IDs.
 func (uc *UserCreate) AddCarIDs(ids ...int) *UserCreate {
 	uc.mutation.AddCarIDs(ids...)
 	return uc
 }
 
-// AddCars adds the "cars" edges to the Car entity.
+// AddCars adds the "cars" edges to the Car dto.
 func (uc *UserCreate) AddCars(c ...*Car) *UserCreate {
 	ids := make([]int, len(c))
 	for i := range c {
@@ -58,13 +58,13 @@ func (uc *UserCreate) AddCars(c ...*Car) *UserCreate {
 	return uc.AddCarIDs(ids...)
 }
 
-// AddPetIDs adds the "pets" edge to the Pet entity by IDs.
+// AddPetIDs adds the "pets" edge to the Pet dto by IDs.
 func (uc *UserCreate) AddPetIDs(ids ...int) *UserCreate {
 	uc.mutation.AddPetIDs(ids...)
 	return uc
 }
 
-// AddPets adds the "pets" edges to the Pet entity.
+// AddPets adds the "pets" edges to the Pet dto.
 func (uc *UserCreate) AddPets(p ...*Pet) *UserCreate {
 	ids := make([]int, len(p))
 	for i := range p {
@@ -73,13 +73,13 @@ func (uc *UserCreate) AddPets(p ...*Pet) *UserCreate {
 	return uc.AddPetIDs(ids...)
 }
 
-// AddGroupIDs adds the "groups" edge to the Group entity by IDs.
+// AddGroupIDs adds the "groups" edge to the Group dto by IDs.
 func (uc *UserCreate) AddGroupIDs(ids ...int) *UserCreate {
 	uc.mutation.AddGroupIDs(ids...)
 	return uc
 }
 
-// AddGroups adds the "groups" edges to the Group entity.
+// AddGroups adds the "groups" edges to the Group dto.
 func (uc *UserCreate) AddGroups(g ...*Group) *UserCreate {
 	ids := make([]int, len(g))
 	for i := range g {
@@ -88,13 +88,13 @@ func (uc *UserCreate) AddGroups(g ...*Group) *UserCreate {
 	return uc.AddGroupIDs(ids...)
 }
 
-// SetCardID sets the "card" edge to the Card entity by ID.
+// SetCardID sets the "card" edge to the Card dto by ID.
 func (uc *UserCreate) SetCardID(id int) *UserCreate {
 	uc.mutation.SetCardID(id)
 	return uc
 }
 
-// SetNillableCardID sets the "card" edge to the Card entity by ID if the given value is not nil.
+// SetNillableCardID sets the "card" edge to the Card dto by ID if the given value is not nil.
 func (uc *UserCreate) SetNillableCardID(id *int) *UserCreate {
 	if id != nil {
 		uc = uc.SetCardID(*id)
@@ -102,7 +102,7 @@ func (uc *UserCreate) SetNillableCardID(id *int) *UserCreate {
 	return uc
 }
 
-// SetCard sets the "card" edge to the Card entity.
+// SetCard sets the "card" edge to the Card dto.
 func (uc *UserCreate) SetCard(c *Card) *UserCreate {
 	return uc.SetCardID(c.ID)
 }

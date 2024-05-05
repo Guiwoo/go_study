@@ -57,13 +57,13 @@ func (cu *CardUpdate) SetNillableExpiredAt(t *time.Time) *CardUpdate {
 	return cu
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
+// SetOwnerID sets the "owner" edge to the User dto by ID.
 func (cu *CardUpdate) SetOwnerID(id int) *CardUpdate {
 	cu.mutation.SetOwnerID(id)
 	return cu
 }
 
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+// SetNillableOwnerID sets the "owner" edge to the User dto by ID if the given value is not nil.
 func (cu *CardUpdate) SetNillableOwnerID(id *int) *CardUpdate {
 	if id != nil {
 		cu = cu.SetOwnerID(*id)
@@ -71,7 +71,7 @@ func (cu *CardUpdate) SetNillableOwnerID(id *int) *CardUpdate {
 	return cu
 }
 
-// SetOwner sets the "owner" edge to the User entity.
+// SetOwner sets the "owner" edge to the User dto.
 func (cu *CardUpdate) SetOwner(u *User) *CardUpdate {
 	return cu.SetOwnerID(u.ID)
 }
@@ -81,7 +81,7 @@ func (cu *CardUpdate) Mutation() *CardMutation {
 	return cu.mutation
 }
 
-// ClearOwner clears the "owner" edge to the User entity.
+// ClearOwner clears the "owner" edge to the User dto.
 func (cu *CardUpdate) ClearOwner() *CardUpdate {
 	cu.mutation.ClearOwner()
 	return cu
@@ -183,7 +183,7 @@ func (cu *CardUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	return n, nil
 }
 
-// CardUpdateOne is the builder for updating a single Card entity.
+// CardUpdateOne is the builder for updating a single Card dto.
 type CardUpdateOne struct {
 	config
 	fields   []string
@@ -219,13 +219,13 @@ func (cuo *CardUpdateOne) SetNillableExpiredAt(t *time.Time) *CardUpdateOne {
 	return cuo
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
+// SetOwnerID sets the "owner" edge to the User dto by ID.
 func (cuo *CardUpdateOne) SetOwnerID(id int) *CardUpdateOne {
 	cuo.mutation.SetOwnerID(id)
 	return cuo
 }
 
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+// SetNillableOwnerID sets the "owner" edge to the User dto by ID if the given value is not nil.
 func (cuo *CardUpdateOne) SetNillableOwnerID(id *int) *CardUpdateOne {
 	if id != nil {
 		cuo = cuo.SetOwnerID(*id)
@@ -233,7 +233,7 @@ func (cuo *CardUpdateOne) SetNillableOwnerID(id *int) *CardUpdateOne {
 	return cuo
 }
 
-// SetOwner sets the "owner" edge to the User entity.
+// SetOwner sets the "owner" edge to the User dto.
 func (cuo *CardUpdateOne) SetOwner(u *User) *CardUpdateOne {
 	return cuo.SetOwnerID(u.ID)
 }
@@ -243,7 +243,7 @@ func (cuo *CardUpdateOne) Mutation() *CardMutation {
 	return cuo.mutation
 }
 
-// ClearOwner clears the "owner" edge to the User entity.
+// ClearOwner clears the "owner" edge to the User dto.
 func (cuo *CardUpdateOne) ClearOwner() *CardUpdateOne {
 	cuo.mutation.ClearOwner()
 	return cuo
@@ -255,14 +255,14 @@ func (cuo *CardUpdateOne) Where(ps ...predicate.Card) *CardUpdateOne {
 	return cuo
 }
 
-// Select allows selecting one or more fields (columns) of the returned entity.
-// The default is selecting all fields defined in the entity schema.
+// Select allows selecting one or more fields (columns) of the returned dto.
+// The default is selecting all fields defined in the dto schema.
 func (cuo *CardUpdateOne) Select(field string, fields ...string) *CardUpdateOne {
 	cuo.fields = append([]string{field}, fields...)
 	return cuo
 }
 
-// Save executes the query and returns the updated Card entity.
+// Save executes the query and returns the updated Card dto.
 func (cuo *CardUpdateOne) Save(ctx context.Context) (*Card, error) {
 	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
 }
@@ -276,7 +276,7 @@ func (cuo *CardUpdateOne) SaveX(ctx context.Context) *Card {
 	return node
 }
 
-// Exec executes the query on the entity.
+// Exec executes the query on the dto.
 func (cuo *CardUpdateOne) Exec(ctx context.Context) error {
 	_, err := cuo.Save(ctx)
 	return err

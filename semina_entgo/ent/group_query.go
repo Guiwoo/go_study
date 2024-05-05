@@ -82,7 +82,7 @@ func (gq *GroupQuery) QueryUsers() *UserQuery {
 	return query
 }
 
-// First returns the first Group entity from the query.
+// First returns the first Group dto from the query.
 // Returns a *NotFoundError when no Group was found.
 func (gq *GroupQuery) First(ctx context.Context) (*Group, error) {
 	nodes, err := gq.Limit(1).All(setContextOp(ctx, gq.ctx, "First"))
@@ -127,8 +127,8 @@ func (gq *GroupQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single Group entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one Group entity is found.
+// Only returns a single Group dto found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one Group dto is found.
 // Returns a *NotFoundError when no Group entities are found.
 func (gq *GroupQuery) Only(ctx context.Context) (*Group, error) {
 	nodes, err := gq.Limit(2).All(setContextOp(ctx, gq.ctx, "Only"))
@@ -316,7 +316,7 @@ func (gq *GroupQuery) GroupBy(field string, fields ...string) *GroupGroupBy {
 }
 
 // Select allows the selection one or more fields/columns for the given query,
-// instead of selecting all fields in the entity.
+// instead of selecting all fields in the dto.
 //
 // Example:
 //

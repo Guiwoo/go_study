@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// Car holds the schema definition for the Car entity.
+// Car holds the schema definition for the Car dto.
 type Car struct {
 	ent.Schema
 }

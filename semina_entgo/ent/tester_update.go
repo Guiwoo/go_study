@@ -189,7 +189,7 @@ func (tu *TesterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	return n, nil
 }
 
-// TesterUpdateOne is the builder for updating a single Tester entity.
+// TesterUpdateOne is the builder for updating a single Tester dto.
 type TesterUpdateOne struct {
 	config
 	fields   []string
@@ -278,14 +278,14 @@ func (tuo *TesterUpdateOne) Where(ps ...predicate.Tester) *TesterUpdateOne {
 	return tuo
 }
 
-// Select allows selecting one or more fields (columns) of the returned entity.
-// The default is selecting all fields defined in the entity schema.
+// Select allows selecting one or more fields (columns) of the returned dto.
+// The default is selecting all fields defined in the dto schema.
 func (tuo *TesterUpdateOne) Select(field string, fields ...string) *TesterUpdateOne {
 	tuo.fields = append([]string{field}, fields...)
 	return tuo
 }
 
-// Save executes the query and returns the updated Tester entity.
+// Save executes the query and returns the updated Tester dto.
 func (tuo *TesterUpdateOne) Save(ctx context.Context) (*Tester, error) {
 	return withHooks(ctx, tuo.sqlSave, tuo.mutation, tuo.hooks)
 }
@@ -299,7 +299,7 @@ func (tuo *TesterUpdateOne) SaveX(ctx context.Context) *Tester {
 	return node
 }
 
-// Exec executes the query on the entity.
+// Exec executes the query on the dto.
 func (tuo *TesterUpdateOne) Exec(ctx context.Context) error {
 	_, err := tuo.Save(ctx)
 	return err

@@ -14,7 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// CardCreate is the builder for creating a Card entity.
+// CardCreate is the builder for creating a Card dto.
 type CardCreate struct {
 	config
 	mutation *CardMutation
@@ -41,13 +41,13 @@ func (cc *CardCreate) SetNillableExpiredAt(t *time.Time) *CardCreate {
 	return cc
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
+// SetOwnerID sets the "owner" edge to the User dto by ID.
 func (cc *CardCreate) SetOwnerID(id int) *CardCreate {
 	cc.mutation.SetOwnerID(id)
 	return cc
 }
 
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+// SetNillableOwnerID sets the "owner" edge to the User dto by ID if the given value is not nil.
 func (cc *CardCreate) SetNillableOwnerID(id *int) *CardCreate {
 	if id != nil {
 		cc = cc.SetOwnerID(*id)
@@ -55,7 +55,7 @@ func (cc *CardCreate) SetNillableOwnerID(id *int) *CardCreate {
 	return cc
 }
 
-// SetOwner sets the "owner" edge to the User entity.
+// SetOwner sets the "owner" edge to the User dto.
 func (cc *CardCreate) SetOwner(u *User) *CardCreate {
 	return cc.SetOwnerID(u.ID)
 }

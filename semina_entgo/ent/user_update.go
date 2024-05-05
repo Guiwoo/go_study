@@ -66,13 +66,13 @@ func (uu *UserUpdate) SetNillableName(s *string) *UserUpdate {
 	return uu
 }
 
-// AddCarIDs adds the "cars" edge to the Car entity by IDs.
+// AddCarIDs adds the "cars" edge to the Car dto by IDs.
 func (uu *UserUpdate) AddCarIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddCarIDs(ids...)
 	return uu
 }
 
-// AddCars adds the "cars" edges to the Car entity.
+// AddCars adds the "cars" edges to the Car dto.
 func (uu *UserUpdate) AddCars(c ...*Car) *UserUpdate {
 	ids := make([]int, len(c))
 	for i := range c {
@@ -81,13 +81,13 @@ func (uu *UserUpdate) AddCars(c ...*Car) *UserUpdate {
 	return uu.AddCarIDs(ids...)
 }
 
-// AddPetIDs adds the "pets" edge to the Pet entity by IDs.
+// AddPetIDs adds the "pets" edge to the Pet dto by IDs.
 func (uu *UserUpdate) AddPetIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddPetIDs(ids...)
 	return uu
 }
 
-// AddPets adds the "pets" edges to the Pet entity.
+// AddPets adds the "pets" edges to the Pet dto.
 func (uu *UserUpdate) AddPets(p ...*Pet) *UserUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
@@ -96,13 +96,13 @@ func (uu *UserUpdate) AddPets(p ...*Pet) *UserUpdate {
 	return uu.AddPetIDs(ids...)
 }
 
-// AddGroupIDs adds the "groups" edge to the Group entity by IDs.
+// AddGroupIDs adds the "groups" edge to the Group dto by IDs.
 func (uu *UserUpdate) AddGroupIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddGroupIDs(ids...)
 	return uu
 }
 
-// AddGroups adds the "groups" edges to the Group entity.
+// AddGroups adds the "groups" edges to the Group dto.
 func (uu *UserUpdate) AddGroups(g ...*Group) *UserUpdate {
 	ids := make([]int, len(g))
 	for i := range g {
@@ -111,13 +111,13 @@ func (uu *UserUpdate) AddGroups(g ...*Group) *UserUpdate {
 	return uu.AddGroupIDs(ids...)
 }
 
-// SetCardID sets the "card" edge to the Card entity by ID.
+// SetCardID sets the "card" edge to the Card dto by ID.
 func (uu *UserUpdate) SetCardID(id int) *UserUpdate {
 	uu.mutation.SetCardID(id)
 	return uu
 }
 
-// SetNillableCardID sets the "card" edge to the Card entity by ID if the given value is not nil.
+// SetNillableCardID sets the "card" edge to the Card dto by ID if the given value is not nil.
 func (uu *UserUpdate) SetNillableCardID(id *int) *UserUpdate {
 	if id != nil {
 		uu = uu.SetCardID(*id)
@@ -125,7 +125,7 @@ func (uu *UserUpdate) SetNillableCardID(id *int) *UserUpdate {
 	return uu
 }
 
-// SetCard sets the "card" edge to the Card entity.
+// SetCard sets the "card" edge to the Card dto.
 func (uu *UserUpdate) SetCard(c *Card) *UserUpdate {
 	return uu.SetCardID(c.ID)
 }
@@ -135,7 +135,7 @@ func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
 }
 
-// ClearCars clears all "cars" edges to the Car entity.
+// ClearCars clears all "cars" edges to the Car dto.
 func (uu *UserUpdate) ClearCars() *UserUpdate {
 	uu.mutation.ClearCars()
 	return uu
@@ -156,7 +156,7 @@ func (uu *UserUpdate) RemoveCars(c ...*Car) *UserUpdate {
 	return uu.RemoveCarIDs(ids...)
 }
 
-// ClearPets clears all "pets" edges to the Pet entity.
+// ClearPets clears all "pets" edges to the Pet dto.
 func (uu *UserUpdate) ClearPets() *UserUpdate {
 	uu.mutation.ClearPets()
 	return uu
@@ -177,7 +177,7 @@ func (uu *UserUpdate) RemovePets(p ...*Pet) *UserUpdate {
 	return uu.RemovePetIDs(ids...)
 }
 
-// ClearGroups clears all "groups" edges to the Group entity.
+// ClearGroups clears all "groups" edges to the Group dto.
 func (uu *UserUpdate) ClearGroups() *UserUpdate {
 	uu.mutation.ClearGroups()
 	return uu
@@ -198,7 +198,7 @@ func (uu *UserUpdate) RemoveGroups(g ...*Group) *UserUpdate {
 	return uu.RemoveGroupIDs(ids...)
 }
 
-// ClearCard clears the "card" edge to the Card entity.
+// ClearCard clears the "card" edge to the Card dto.
 func (uu *UserUpdate) ClearCard() *UserUpdate {
 	uu.mutation.ClearCard()
 	return uu
@@ -438,7 +438,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	return n, nil
 }
 
-// UserUpdateOne is the builder for updating a single User entity.
+// UserUpdateOne is the builder for updating a single User dto.
 type UserUpdateOne struct {
 	config
 	fields   []string
@@ -481,13 +481,13 @@ func (uuo *UserUpdateOne) SetNillableName(s *string) *UserUpdateOne {
 	return uuo
 }
 
-// AddCarIDs adds the "cars" edge to the Car entity by IDs.
+// AddCarIDs adds the "cars" edge to the Car dto by IDs.
 func (uuo *UserUpdateOne) AddCarIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddCarIDs(ids...)
 	return uuo
 }
 
-// AddCars adds the "cars" edges to the Car entity.
+// AddCars adds the "cars" edges to the Car dto.
 func (uuo *UserUpdateOne) AddCars(c ...*Car) *UserUpdateOne {
 	ids := make([]int, len(c))
 	for i := range c {
@@ -496,13 +496,13 @@ func (uuo *UserUpdateOne) AddCars(c ...*Car) *UserUpdateOne {
 	return uuo.AddCarIDs(ids...)
 }
 
-// AddPetIDs adds the "pets" edge to the Pet entity by IDs.
+// AddPetIDs adds the "pets" edge to the Pet dto by IDs.
 func (uuo *UserUpdateOne) AddPetIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddPetIDs(ids...)
 	return uuo
 }
 
-// AddPets adds the "pets" edges to the Pet entity.
+// AddPets adds the "pets" edges to the Pet dto.
 func (uuo *UserUpdateOne) AddPets(p ...*Pet) *UserUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
@@ -511,13 +511,13 @@ func (uuo *UserUpdateOne) AddPets(p ...*Pet) *UserUpdateOne {
 	return uuo.AddPetIDs(ids...)
 }
 
-// AddGroupIDs adds the "groups" edge to the Group entity by IDs.
+// AddGroupIDs adds the "groups" edge to the Group dto by IDs.
 func (uuo *UserUpdateOne) AddGroupIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddGroupIDs(ids...)
 	return uuo
 }
 
-// AddGroups adds the "groups" edges to the Group entity.
+// AddGroups adds the "groups" edges to the Group dto.
 func (uuo *UserUpdateOne) AddGroups(g ...*Group) *UserUpdateOne {
 	ids := make([]int, len(g))
 	for i := range g {
@@ -526,13 +526,13 @@ func (uuo *UserUpdateOne) AddGroups(g ...*Group) *UserUpdateOne {
 	return uuo.AddGroupIDs(ids...)
 }
 
-// SetCardID sets the "card" edge to the Card entity by ID.
+// SetCardID sets the "card" edge to the Card dto by ID.
 func (uuo *UserUpdateOne) SetCardID(id int) *UserUpdateOne {
 	uuo.mutation.SetCardID(id)
 	return uuo
 }
 
-// SetNillableCardID sets the "card" edge to the Card entity by ID if the given value is not nil.
+// SetNillableCardID sets the "card" edge to the Card dto by ID if the given value is not nil.
 func (uuo *UserUpdateOne) SetNillableCardID(id *int) *UserUpdateOne {
 	if id != nil {
 		uuo = uuo.SetCardID(*id)
@@ -540,7 +540,7 @@ func (uuo *UserUpdateOne) SetNillableCardID(id *int) *UserUpdateOne {
 	return uuo
 }
 
-// SetCard sets the "card" edge to the Card entity.
+// SetCard sets the "card" edge to the Card dto.
 func (uuo *UserUpdateOne) SetCard(c *Card) *UserUpdateOne {
 	return uuo.SetCardID(c.ID)
 }
@@ -550,7 +550,7 @@ func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
 }
 
-// ClearCars clears all "cars" edges to the Car entity.
+// ClearCars clears all "cars" edges to the Car dto.
 func (uuo *UserUpdateOne) ClearCars() *UserUpdateOne {
 	uuo.mutation.ClearCars()
 	return uuo
@@ -571,7 +571,7 @@ func (uuo *UserUpdateOne) RemoveCars(c ...*Car) *UserUpdateOne {
 	return uuo.RemoveCarIDs(ids...)
 }
 
-// ClearPets clears all "pets" edges to the Pet entity.
+// ClearPets clears all "pets" edges to the Pet dto.
 func (uuo *UserUpdateOne) ClearPets() *UserUpdateOne {
 	uuo.mutation.ClearPets()
 	return uuo
@@ -592,7 +592,7 @@ func (uuo *UserUpdateOne) RemovePets(p ...*Pet) *UserUpdateOne {
 	return uuo.RemovePetIDs(ids...)
 }
 
-// ClearGroups clears all "groups" edges to the Group entity.
+// ClearGroups clears all "groups" edges to the Group dto.
 func (uuo *UserUpdateOne) ClearGroups() *UserUpdateOne {
 	uuo.mutation.ClearGroups()
 	return uuo
@@ -613,7 +613,7 @@ func (uuo *UserUpdateOne) RemoveGroups(g ...*Group) *UserUpdateOne {
 	return uuo.RemoveGroupIDs(ids...)
 }
 
-// ClearCard clears the "card" edge to the Card entity.
+// ClearCard clears the "card" edge to the Card dto.
 func (uuo *UserUpdateOne) ClearCard() *UserUpdateOne {
 	uuo.mutation.ClearCard()
 	return uuo
@@ -625,14 +625,14 @@ func (uuo *UserUpdateOne) Where(ps ...predicate.User) *UserUpdateOne {
 	return uuo
 }
 
-// Select allows selecting one or more fields (columns) of the returned entity.
-// The default is selecting all fields defined in the entity schema.
+// Select allows selecting one or more fields (columns) of the returned dto.
+// The default is selecting all fields defined in the dto schema.
 func (uuo *UserUpdateOne) Select(field string, fields ...string) *UserUpdateOne {
 	uuo.fields = append([]string{field}, fields...)
 	return uuo
 }
 
-// Save executes the query and returns the updated User entity.
+// Save executes the query and returns the updated User dto.
 func (uuo *UserUpdateOne) Save(ctx context.Context) (*User, error) {
 	return withHooks(ctx, uuo.sqlSave, uuo.mutation, uuo.hooks)
 }
@@ -646,7 +646,7 @@ func (uuo *UserUpdateOne) SaveX(ctx context.Context) *User {
 	return node
 }
 
-// Exec executes the query on the entity.
+// Exec executes the query on the dto.
 func (uuo *UserUpdateOne) Exec(ctx context.Context) error {
 	_, err := uuo.Save(ctx)
 	return err

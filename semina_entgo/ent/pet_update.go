@@ -77,13 +77,13 @@ func (pu *PetUpdate) AddAge(i int) *PetUpdate {
 	return pu
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
+// SetOwnerID sets the "owner" edge to the User dto by ID.
 func (pu *PetUpdate) SetOwnerID(id int) *PetUpdate {
 	pu.mutation.SetOwnerID(id)
 	return pu
 }
 
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+// SetNillableOwnerID sets the "owner" edge to the User dto by ID if the given value is not nil.
 func (pu *PetUpdate) SetNillableOwnerID(id *int) *PetUpdate {
 	if id != nil {
 		pu = pu.SetOwnerID(*id)
@@ -91,7 +91,7 @@ func (pu *PetUpdate) SetNillableOwnerID(id *int) *PetUpdate {
 	return pu
 }
 
-// SetOwner sets the "owner" edge to the User entity.
+// SetOwner sets the "owner" edge to the User dto.
 func (pu *PetUpdate) SetOwner(u *User) *PetUpdate {
 	return pu.SetOwnerID(u.ID)
 }
@@ -101,7 +101,7 @@ func (pu *PetUpdate) Mutation() *PetMutation {
 	return pu.mutation
 }
 
-// ClearOwner clears the "owner" edge to the User entity.
+// ClearOwner clears the "owner" edge to the User dto.
 func (pu *PetUpdate) ClearOwner() *PetUpdate {
 	pu.mutation.ClearOwner()
 	return pu
@@ -196,7 +196,7 @@ func (pu *PetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	return n, nil
 }
 
-// PetUpdateOne is the builder for updating a single Pet entity.
+// PetUpdateOne is the builder for updating a single Pet dto.
 type PetUpdateOne struct {
 	config
 	fields   []string
@@ -253,13 +253,13 @@ func (puo *PetUpdateOne) AddAge(i int) *PetUpdateOne {
 	return puo
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
+// SetOwnerID sets the "owner" edge to the User dto by ID.
 func (puo *PetUpdateOne) SetOwnerID(id int) *PetUpdateOne {
 	puo.mutation.SetOwnerID(id)
 	return puo
 }
 
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+// SetNillableOwnerID sets the "owner" edge to the User dto by ID if the given value is not nil.
 func (puo *PetUpdateOne) SetNillableOwnerID(id *int) *PetUpdateOne {
 	if id != nil {
 		puo = puo.SetOwnerID(*id)
@@ -267,7 +267,7 @@ func (puo *PetUpdateOne) SetNillableOwnerID(id *int) *PetUpdateOne {
 	return puo
 }
 
-// SetOwner sets the "owner" edge to the User entity.
+// SetOwner sets the "owner" edge to the User dto.
 func (puo *PetUpdateOne) SetOwner(u *User) *PetUpdateOne {
 	return puo.SetOwnerID(u.ID)
 }
@@ -277,7 +277,7 @@ func (puo *PetUpdateOne) Mutation() *PetMutation {
 	return puo.mutation
 }
 
-// ClearOwner clears the "owner" edge to the User entity.
+// ClearOwner clears the "owner" edge to the User dto.
 func (puo *PetUpdateOne) ClearOwner() *PetUpdateOne {
 	puo.mutation.ClearOwner()
 	return puo
@@ -289,14 +289,14 @@ func (puo *PetUpdateOne) Where(ps ...predicate.Pet) *PetUpdateOne {
 	return puo
 }
 
-// Select allows selecting one or more fields (columns) of the returned entity.
-// The default is selecting all fields defined in the entity schema.
+// Select allows selecting one or more fields (columns) of the returned dto.
+// The default is selecting all fields defined in the dto schema.
 func (puo *PetUpdateOne) Select(field string, fields ...string) *PetUpdateOne {
 	puo.fields = append([]string{field}, fields...)
 	return puo
 }
 
-// Save executes the query and returns the updated Pet entity.
+// Save executes the query and returns the updated Pet dto.
 func (puo *PetUpdateOne) Save(ctx context.Context) (*Pet, error) {
 	return withHooks(ctx, puo.sqlSave, puo.mutation, puo.hooks)
 }
@@ -310,7 +310,7 @@ func (puo *PetUpdateOne) SaveX(ctx context.Context) *Pet {
 	return node
 }
 
-// Exec executes the query on the entity.
+// Exec executes the query on the dto.
 func (puo *PetUpdateOne) Exec(ctx context.Context) error {
 	_, err := puo.Save(ctx)
 	return err

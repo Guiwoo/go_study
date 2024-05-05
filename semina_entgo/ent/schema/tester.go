@@ -6,7 +6,7 @@ import (
 	"semina_entgo/custom"
 )
 
-// Tester holds the schema definition for the Tester entity.
+// Tester holds the schema definition for the Tester dto.
 type Tester struct {
 	ent.Schema
 }

@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Pet is the model entity for the Pet schema.
+// Pet is the model dto for the Pet schema.
 type Pet struct {
 	config `json:"-"`
 	// ID of the ent.
@@ -122,7 +122,7 @@ func (pe *Pet) Value(name string) (ent.Value, error) {
 	return pe.selectValues.Get(name)
 }
 
-// QueryOwner queries the "owner" edge of the Pet entity.
+// QueryOwner queries the "owner" edge of the Pet dto.
 func (pe *Pet) QueryOwner() *UserQuery {
 	return NewPetClient(pe.config).QueryOwner(pe)
 }
@@ -134,12 +134,12 @@ func (pe *Pet) Update() *PetUpdateOne {
 	return NewPetClient(pe.config).UpdateOne(pe)
 }
 
-// Unwrap unwraps the Pet entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the Pet dto that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
 func (pe *Pet) Unwrap() *Pet {
 	_tx, ok := pe.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: Pet is not a transactional entity")
+		panic("ent: Pet is not a transactional dto")
 	}
 	pe.config.driver = _tx.drv
 	return pe

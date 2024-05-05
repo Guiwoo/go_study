@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// CarDelete is the builder for deleting a Car entity.
+// CarDelete is the builder for deleting a Car dto.
 type CarDelete struct {
 	config
 	hooks    []Hook
@@ -56,7 +56,7 @@ func (cd *CarDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// CarDeleteOne is the builder for deleting a single Car entity.
+// CarDeleteOne is the builder for deleting a single Car dto.
 type CarDeleteOne struct {
 	cd *CarDelete
 }

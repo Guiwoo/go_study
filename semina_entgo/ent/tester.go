@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Tester is the model entity for the Tester schema.
+// Tester is the model dto for the Tester schema.
 type Tester struct {
 	config `json:"-"`
 	// ID of the ent.
@@ -112,12 +112,12 @@ func (t *Tester) Update() *TesterUpdateOne {
 	return NewTesterClient(t.config).UpdateOne(t)
 }
 
-// Unwrap unwraps the Tester entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the Tester dto that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
 func (t *Tester) Unwrap() *Tester {
 	_tx, ok := t.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: Tester is not a transactional entity")
+		panic("ent: Tester is not a transactional dto")
 	}
 	t.config.driver = _tx.drv
 	return t

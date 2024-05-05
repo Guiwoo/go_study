@@ -13,7 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// GroupCreate is the builder for creating a Group entity.
+// GroupCreate is the builder for creating a Group dto.
 type GroupCreate struct {
 	config
 	mutation *GroupMutation
@@ -26,13 +26,13 @@ func (gc *GroupCreate) SetName(s string) *GroupCreate {
 	return gc
 }
 
-// AddUserIDs adds the "users" edge to the User entity by IDs.
+// AddUserIDs adds the "users" edge to the User dto by IDs.
 func (gc *GroupCreate) AddUserIDs(ids ...int) *GroupCreate {
 	gc.mutation.AddUserIDs(ids...)
 	return gc
 }
 
-// AddUsers adds the "users" edges to the User entity.
+// AddUsers adds the "users" edges to the User dto.
 func (gc *GroupCreate) AddUsers(u ...*User) *GroupCreate {
 	ids := make([]int, len(u))
 	for i := range u {

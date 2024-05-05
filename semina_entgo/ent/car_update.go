@@ -57,13 +57,13 @@ func (cu *CarUpdate) SetNillableRegisteredAt(t *time.Time) *CarUpdate {
 	return cu
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
+// SetOwnerID sets the "owner" edge to the User dto by ID.
 func (cu *CarUpdate) SetOwnerID(id int) *CarUpdate {
 	cu.mutation.SetOwnerID(id)
 	return cu
 }
 
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+// SetNillableOwnerID sets the "owner" edge to the User dto by ID if the given value is not nil.
 func (cu *CarUpdate) SetNillableOwnerID(id *int) *CarUpdate {
 	if id != nil {
 		cu = cu.SetOwnerID(*id)
@@ -71,7 +71,7 @@ func (cu *CarUpdate) SetNillableOwnerID(id *int) *CarUpdate {
 	return cu
 }
 
-// SetOwner sets the "owner" edge to the User entity.
+// SetOwner sets the "owner" edge to the User dto.
 func (cu *CarUpdate) SetOwner(u *User) *CarUpdate {
 	return cu.SetOwnerID(u.ID)
 }
@@ -81,7 +81,7 @@ func (cu *CarUpdate) Mutation() *CarMutation {
 	return cu.mutation
 }
 
-// ClearOwner clears the "owner" edge to the User entity.
+// ClearOwner clears the "owner" edge to the User dto.
 func (cu *CarUpdate) ClearOwner() *CarUpdate {
 	cu.mutation.ClearOwner()
 	return cu
@@ -170,7 +170,7 @@ func (cu *CarUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	return n, nil
 }
 
-// CarUpdateOne is the builder for updating a single Car entity.
+// CarUpdateOne is the builder for updating a single Car dto.
 type CarUpdateOne struct {
 	config
 	fields   []string
@@ -206,13 +206,13 @@ func (cuo *CarUpdateOne) SetNillableRegisteredAt(t *time.Time) *CarUpdateOne {
 	return cuo
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
+// SetOwnerID sets the "owner" edge to the User dto by ID.
 func (cuo *CarUpdateOne) SetOwnerID(id int) *CarUpdateOne {
 	cuo.mutation.SetOwnerID(id)
 	return cuo
 }
 
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
+// SetNillableOwnerID sets the "owner" edge to the User dto by ID if the given value is not nil.
 func (cuo *CarUpdateOne) SetNillableOwnerID(id *int) *CarUpdateOne {
 	if id != nil {
 		cuo = cuo.SetOwnerID(*id)
@@ -220,7 +220,7 @@ func (cuo *CarUpdateOne) SetNillableOwnerID(id *int) *CarUpdateOne {
 	return cuo
 }
 
-// SetOwner sets the "owner" edge to the User entity.
+// SetOwner sets the "owner" edge to the User dto.
 func (cuo *CarUpdateOne) SetOwner(u *User) *CarUpdateOne {
 	return cuo.SetOwnerID(u.ID)
 }
@@ -230,7 +230,7 @@ func (cuo *CarUpdateOne) Mutation() *CarMutation {
 	return cuo.mutation
 }
 
-// ClearOwner clears the "owner" edge to the User entity.
+// ClearOwner clears the "owner" edge to the User dto.
 func (cuo *CarUpdateOne) ClearOwner() *CarUpdateOne {
 	cuo.mutation.ClearOwner()
 	return cuo
@@ -242,14 +242,14 @@ func (cuo *CarUpdateOne) Where(ps ...predicate.Car) *CarUpdateOne {
 	return cuo
 }
 
-// Select allows selecting one or more fields (columns) of the returned entity.
-// The default is selecting all fields defined in the entity schema.
+// Select allows selecting one or more fields (columns) of the returned dto.
+// The default is selecting all fields defined in the dto schema.
 func (cuo *CarUpdateOne) Select(field string, fields ...string) *CarUpdateOne {
 	cuo.fields = append([]string{field}, fields...)
 	return cuo
 }
 
-// Save executes the query and returns the updated Car entity.
+// Save executes the query and returns the updated Car dto.
 func (cuo *CarUpdateOne) Save(ctx context.Context) (*Car, error) {
 	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
 }
@@ -263,7 +263,7 @@ func (cuo *CarUpdateOne) SaveX(ctx context.Context) *Car {
 	return node
 }
 
-// Exec executes the query on the entity.
+// Exec executes the query on the dto.
 func (cuo *CarUpdateOne) Exec(ctx context.Context) error {
 	_, err := cuo.Save(ctx)
 	return err

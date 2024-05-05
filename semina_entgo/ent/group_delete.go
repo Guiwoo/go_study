@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// GroupDelete is the builder for deleting a Group entity.
+// GroupDelete is the builder for deleting a Group dto.
 type GroupDelete struct {
 	config
 	hooks    []Hook
@@ -56,7 +56,7 @@ func (gd *GroupDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// GroupDeleteOne is the builder for deleting a single Group entity.
+// GroupDeleteOne is the builder for deleting a single Group dto.
 type GroupDeleteOne struct {
 	gd *GroupDelete
 }

@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// UserDelete is the builder for deleting a User entity.
+// UserDelete is the builder for deleting a User dto.
 type UserDelete struct {
 	config
 	hooks    []Hook
@@ -56,7 +56,7 @@ func (ud *UserDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// UserDeleteOne is the builder for deleting a single User entity.
+// UserDeleteOne is the builder for deleting a single User dto.
 type UserDeleteOne struct {
 	ud *UserDelete
 }

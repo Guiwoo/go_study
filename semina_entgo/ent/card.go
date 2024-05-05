@@ -13,7 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Card is the model entity for the Card schema.
+// Card is the model dto for the Card schema.
 type Card struct {
 	config `json:"-"`
 	// ID of the ent.
@@ -107,7 +107,7 @@ func (c *Card) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
 }
 
-// QueryOwner queries the "owner" edge of the Card entity.
+// QueryOwner queries the "owner" edge of the Card dto.
 func (c *Card) QueryOwner() *UserQuery {
 	return NewCardClient(c.config).QueryOwner(c)
 }
@@ -119,12 +119,12 @@ func (c *Card) Update() *CardUpdateOne {
 	return NewCardClient(c.config).UpdateOne(c)
 }
 
-// Unwrap unwraps the Card entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the Card dto that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
 func (c *Card) Unwrap() *Card {
 	_tx, ok := c.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: Card is not a transactional entity")
+		panic("ent: Card is not a transactional dto")
 	}
 	c.config.driver = _tx.drv
 	return c

@@ -7,7 +7,7 @@ import (
 	"regexp"
 )
 
-// Group holds the schema definition for the Group entity.
+// Group holds the schema definition for the Group dto.
 type Group struct {
 	ent.Schema
 }

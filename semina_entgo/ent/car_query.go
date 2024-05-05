@@ -82,7 +82,7 @@ func (cq *CarQuery) QueryOwner() *UserQuery {
 	return query
 }
 
-// First returns the first Car entity from the query.
+// First returns the first Car dto from the query.
 // Returns a *NotFoundError when no Car was found.
 func (cq *CarQuery) First(ctx context.Context) (*Car, error) {
 	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, "First"))
@@ -127,8 +127,8 @@ func (cq *CarQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single Car entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one Car entity is found.
+// Only returns a single Car dto found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one Car dto is found.
 // Returns a *NotFoundError when no Car entities are found.
 func (cq *CarQuery) Only(ctx context.Context) (*Car, error) {
 	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, "Only"))
@@ -316,7 +316,7 @@ func (cq *CarQuery) GroupBy(field string, fields ...string) *CarGroupBy {
 }
 
 // Select allows the selection one or more fields/columns for the given query,
-// instead of selecting all fields in the entity.
+// instead of selecting all fields in the dto.
 //
 // Example:
 //

@@ -82,7 +82,7 @@ func (cq *CardQuery) QueryOwner() *UserQuery {
 	return query
 }
 
-// First returns the first Card entity from the query.
+// First returns the first Card dto from the query.
 // Returns a *NotFoundError when no Card was found.
 func (cq *CardQuery) First(ctx context.Context) (*Card, error) {
 	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, "First"))
@@ -127,8 +127,8 @@ func (cq *CardQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single Card entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one Card entity is found.
+// Only returns a single Card dto found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one Card dto is found.
 // Returns a *NotFoundError when no Card entities are found.
 func (cq *CardQuery) Only(ctx context.Context) (*Card, error) {
 	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, "Only"))
@@ -316,7 +316,7 @@ func (cq *CardQuery) GroupBy(field string, fields ...string) *CardGroupBy {
 }
 
 // Select allows the selection one or more fields/columns for the given query,
-// instead of selecting all fields in the entity.
+// instead of selecting all fields in the dto.
 //
 // Example:
 //

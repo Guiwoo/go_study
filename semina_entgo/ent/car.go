@@ -13,7 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Car is the model entity for the Car schema.
+// Car is the model dto for the Car schema.
 type Car struct {
 	config `json:"-"`
 	// ID of the ent.
@@ -117,7 +117,7 @@ func (c *Car) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
 }
 
-// QueryOwner queries the "owner" edge of the Car entity.
+// QueryOwner queries the "owner" edge of the Car dto.
 func (c *Car) QueryOwner() *UserQuery {
 	return NewCarClient(c.config).QueryOwner(c)
 }
@@ -129,12 +129,12 @@ func (c *Car) Update() *CarUpdateOne {
 	return NewCarClient(c.config).UpdateOne(c)
 }
 
-// Unwrap unwraps the Car entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the Car dto that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
 func (c *Car) Unwrap() *Car {
 	_tx, ok := c.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: Car is not a transactional entity")
+		panic("ent: Car is not a transactional dto")
 	}
 	c.config.driver = _tx.drv
 	return c
