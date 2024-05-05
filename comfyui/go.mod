@@ -11,7 +11,7 @@ require (
 	github.com/chromedp/chromedp v0.9.5
 	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd
 	github.com/sashabaranov/go-openai v1.19.3
-	golang.org/x/net v0.21.0
+	golang.org/x/net v0.23.0
 )
 
 require (
@@ -22,7 +22,7 @@ require (
 	github.com/gobwas/ws v1.3.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	golang.org/x/sys v0.17.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 )
 
 require (
