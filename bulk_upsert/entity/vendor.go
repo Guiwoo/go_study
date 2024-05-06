@@ -1,21 +1,21 @@
 package entity
 
 type Vendor struct {
-	ID            string `json:"id"`
-	Active        bool   `json:"active"`
-	Name          string `json:"name"`
-	Description   string `json:"description"`
-	CompanyName   string `json:"company_name"`
-	AccountNumber string `json:"account_number"`
-	Website       string `json:"website"`
-	InternalNotes string `json:"internal_notes"`
-	CustomFields  string `json:"custom_fields"`
-	Currency      string `json:"currency"`
+	Id            string
+	Active        bool
+	Name          string
+	Description   string
+	CompanyName   string
+	AccountNumber string
+	Website       string
+	InternalNotes string
+	CustomFields  string
+	Currency      string
 
-	TaxCodeID     string `json:"tax_code"`
-	PaymentTermID string `json:"payment_term"`
-	AddressID     string `json:"address"`
-	ContractID    string `json:"contract"`
+	TaxCodeId     string
+	PaymentTermId string
+	AddressId     string
+	ContactId     string
 }
 
 func (_ Vendor) TableName() string {

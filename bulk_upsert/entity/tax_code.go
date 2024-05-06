@@ -1,7 +1,7 @@
 package entity
 
 type TaxCode struct {
-	ID   string
+	Id   string
 	Name string
 }
 

@@ -9,7 +9,7 @@ type PaymentTerm struct {
 
 func (paymentTerm PaymentTerm) ToEntity() entity.PaymentTerm {
 	return entity.PaymentTerm{
-		ID:   paymentTerm.ID,
+		Id:   paymentTerm.ID,
 		Name: paymentTerm.Name,
 	}
 }

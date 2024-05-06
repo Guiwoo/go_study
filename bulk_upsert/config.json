@@ -1,0 +1,4 @@
+{
+  "source" : "/Users/guiwoopark/Desktop/personal/go_study/bulk_upsert/bulk_upsert.json",
+  "dns" : "root:rain45bow@tcp(127.0.0.1:3306)/test"
+}

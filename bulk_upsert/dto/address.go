@@ -19,7 +19,7 @@ type Address struct {
 
 func (address Address) ToEntity() entity.Address {
 	return entity.Address{
-		ID:         address.ID,
+		Id:         address.ID,
 		Person:     address.Person,
 		Company:    address.Company,
 		Line1:      address.Line1,

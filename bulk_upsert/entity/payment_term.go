@@ -1,7 +1,7 @@
 package entity
 
 type PaymentTerm struct {
-	ID   string
+	Id   string
 	Name string
 }
 

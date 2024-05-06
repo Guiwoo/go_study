@@ -1,7 +1,7 @@
 package entity
 
-type Contract struct {
-	ID         string
+type Contact struct {
+	Id         string
 	Title      string
 	FirstName  string
 	MiddleName string
@@ -15,6 +15,6 @@ type Contract struct {
 	Fax        string
 }
 
-func (_ Contract) TableName() string {
-	return "contract"
+func (_ Contact) TableName() string {
+	return "contact"
 }

@@ -1,7 +1,7 @@
 package entity
 
 type Address struct {
-	ID         string
+	Id         string
 	Person     string
 	Company    string
 	Line1      string
