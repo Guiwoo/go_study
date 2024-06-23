@@ -6,7 +6,7 @@ import (
 	"db_design/table"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/labstack/gommon/log"
+	log "github.com/labstack/gommon/log"
 	"gorm.io/gorm"
 	"testing"
 )
@@ -24,13 +24,29 @@ func insertFakeUser(needs int) error {
 }
 
 func Test_FakeUser(t *testing.T) {
-	db := table.GetDB()
 
-	total, err := db.Count(&table.User{})
+	db, err := table.GetDBForTest("")
 	if err != nil {
-		t.Errorf("count user error %v", err)
-	} else if total < 10000 {
-		t.Errorf("total user less than 10000 need to run insertFakeUser %d needs %d", total, 10000-total)
+		t.Error(err)
+	}
+
+	type Comment struct {
+		UserId  string `gorm:"user_id"`
+		Message string `gorm:"column:comment"`
+	}
+	for i := 0; i < 100000; i++ {
+		length := 10000
+		a := make([]Comment, 0, length)
+		for j := 0; j < length; j++ {
+			a = append(a, Comment{
+				UserId:  uuid.NewString(),
+				Message: "Message" + uuid.NewString() + "Holy",
+			})
+		}
+
+		if err := db.Table("comment").Create(&a).Error; err != nil {
+			t.Error(err)
+		}
 	}
 }
 

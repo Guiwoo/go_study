@@ -36,6 +36,24 @@ func (c *CustomDB) Update(field string, model any, id string) error {
 
 var dbInstance *CustomDB
 
+func GetDBForTest(dsn string) (*gorm.DB, error) {
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Silent,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  true,
+		},
+	)
+
+	dsn = "root:rain45bow@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+	return gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger:                 newLogger.LogMode(logger.Info),
+		SkipDefaultTransaction: true,
+	})
+}
+
 func connect() error {
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
@@ -58,11 +76,11 @@ func connect() error {
 	return err
 }
 
-func init() {
-	if err := connect(); err != nil {
-		panic(err)
-	}
-}
+//func init() {
+//	if err := connect(); err != nil {
+//		panic(err)
+//	}
+//}
 
 func GetDB() *CustomDB {
 	if dbInstance == nil {

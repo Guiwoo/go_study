@@ -1,6 +1,7 @@
 package test
 
 import (
+	"container/heap"
 	"fmt"
 	"reflect"
 	"strings"
@@ -121,5 +122,190 @@ func TestEqual(t *testing.T) {
 		fmt.Println("true")
 	} else {
 		fmt.Println("false")
+	}
+}
+
+func solution(ball, order []int) []int {
+	left, right := 0, len(ball)-1
+	arr := make(map[int]bool)
+	answer := make([]int, 0, len(ball))
+
+	process := func() {
+		for {
+			if left <= right && arr[ball[left]] {
+				delete(arr, ball[left])
+				answer = append(answer, ball[left])
+				left++
+			} else if left <= right && arr[ball[right]] {
+				delete(arr, ball[right])
+				answer = append(answer, ball[right])
+				right--
+			} else {
+				break
+			}
+		}
+	}
+
+	for _, o := range order {
+		process()
+		if o == ball[left] {
+			answer = append(answer, ball[left])
+			left++
+		} else if o == ball[right] {
+			answer = append(answer, ball[right])
+			right--
+		} else {
+			arr[o] = true
+		}
+	}
+	process() // 마지막으로 남은 요소 처리
+
+	return answer
+}
+
+type Room struct {
+	Number      int
+	max, people int
+}
+
+type PriorityQueue []*Room
+
+func (pq PriorityQueue) Len() int { return len(pq) }
+func (pq PriorityQueue) Less(i, j int) bool {
+	// 방이 max 이상 찬 경우 가장 후순위로 설정
+	if pq[i].people >= pq[i].max && pq[j].people >= pq[j].max {
+		return pq[i].Number < pq[j].Number
+	}
+	if pq[i].people >= pq[i].max {
+		return false
+	}
+	if pq[j].people >= pq[j].max {
+		return true
+	}
+	// people이 같으면 Number 순서대로 정렬
+	if pq[i].people == pq[j].people {
+		return pq[i].Number < pq[j].Number
+	}
+	return pq[i].people > pq[j].people
+}
+func (pq PriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+}
+func (pq *PriorityQueue) Push(x interface{}) {
+	item := x.(*Room)
+	*pq = append(*pq, item)
+}
+func (pq *PriorityQueue) Pop() interface{} {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	*pq = old[0 : n-1]
+	return item
+}
+
+func (pq *PriorityQueue) update(roomNum, change int) {
+	idx := -1
+	for i := range *pq {
+		if (*pq)[i].Number == roomNum {
+			idx = i
+			break
+		}
+	}
+
+	if idx == -1 {
+		return
+	}
+
+	(*pq)[idx].people += change
+
+	heap.Fix(pq, idx)
+}
+
+func Test03(t *testing.T) {
+	pq := make(PriorityQueue, 0)
+	heap.Init(&pq)
+
+	heap.Push(&pq, &Room{Number: 1, max: 2, people: 1})
+	heap.Push(&pq, &Room{Number: 2, max: 2, people: 2})
+	heap.Push(&pq, &Room{Number: 3, max: 2, people: 1})
+	heap.Push(&pq, &Room{Number: 4, max: 2, people: 1})
+	pq.update(4, -1)
+
+	for pq.Len() > 0 {
+		item := heap.Pop(&pq).(*Room)
+		fmt.Printf("%+v\n", item)
+	}
+}
+
+func solution2(n int, entry []int) []int {
+	//cur := 1
+	pq := make(PriorityQueue, 0)
+	heap.Init(&pq)
+
+	heap.Push(&pq, &Room{1, n, 0})
+
+	for i := 0; i < len(entry); i++ {
+		// heap 의 첫값이 max 랑 people 랑 같으면 ? 방생성해서 넣어주기
+		//c := heap.Pop(&pq).(*Room)
+		//if entry[i] == 0 {
+		//	c.people++
+		//} else {
+		//	c.people--
+		//}
+		//heap.Push(&pq, c)
+	}
+	return nil
+}
+
+func Test01(t *testing.T) {
+	type input struct {
+		name   string
+		ball   []int
+		order  []int
+		answer []int
+	}
+	inputs := []input{
+		{
+			"예제 1",
+			[]int{1, 2, 3, 4, 5, 6},
+			[]int{6, 2, 5, 1, 4, 3},
+			[]int{6, 5, 1, 2, 4, 3},
+		},
+		{
+			"예제 2",
+			[]int{1, 2, 3, 4, 5, 6},
+			[]int{6, 2, 5, 1, 4, 3},
+			[]int{6, 5, 1, 2, 4, 3},
+		},
+		{
+			"예제 3",
+			[]int{11, 2, 9, 13, 24},
+			[]int{9, 2, 13, 24, 11},
+			[]int{24, 13, 9, 2, 11},
+		},
+		{
+			"1자리 수",
+			[]int{1},
+			[]int{1},
+			[]int{1},
+		},
+		{
+			"순차적입력",
+			[]int{1, 2, 3, 4, 5},
+			[]int{1, 2, 3, 4, 5},
+			[]int{1, 2, 3, 4, 5},
+		},
+	}
+
+	for _, i := range inputs {
+		t.Run(i.name, func(t *testing.T) {
+			answer := solution(i.ball, i.order)
+			for idx := range answer {
+				if answer[idx] != i.answer[idx] {
+					t.Errorf("fail testing got %+v expected %+v", answer, i.answer)
+					break
+				}
+			}
+		})
 	}
 }
