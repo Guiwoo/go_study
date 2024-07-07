@@ -8,14 +8,14 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
-	"sync"
+	"sse/client/third"
 	"time"
 )
 
 func main() {
 	e := echo.New()
 	log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
-	hub := NewHubClient(&log)
+	hub := third.NewHubClient(&log)
 
 	go hub.Run()
 
@@ -24,26 +24,23 @@ func main() {
 		middleware.LoggerWithConfig(middleware.LoggerConfig{}),
 	)
 
+	done := make(chan bool)
 	sse := e.Group("/sse")
-
 	sse.GET("/call/:id", func(c echo.Context) error {
-		time.Sleep(500 * time.Millisecond)
 		id := c.Param("id")
 		log.Info().Msgf("Get Request Id :%+v", id)
-		hub.Register(id)
+		hub.Connect(id)
 		log.Info().Msgf("after register")
-		var wg sync.WaitGroup
-		wg.Add(1)
-		go func(id string, ctx echo.Context, wg *sync.WaitGroup) {
-			defer log.Info().Msg("go routine is done")
-			defer wg.Done()
+		go func(done chan bool, id string) {
+			ticker := time.NewTicker(500 * time.Millisecond)
+			defer log.Info().Msgf("go routine done")
 			for {
 				select {
-				case data := <-hub.GetData(id):
+				case <-ticker.C:
 					c.Response().Header().Set("Content-Type", "text/event-stream")
 					c.Response().Header().Set("Cache-Control", "no-cache")
 					c.Response().Header().Set("Connection", "keep-alive")
-					str := fmt.Sprintf(`{"alarm":%v}`, data)
+					str := fmt.Sprintf(`{"alarm":%v}`, hub.GetAlarm(id))
 					if _, err := fmt.Fprintf(c.Response().Writer, "data: %s\n\n", str); err != nil {
 						log.Err(err).Msg("failed to send data")
 					}
@@ -51,13 +48,16 @@ func main() {
 					c.Response().Flush()
 				case <-c.Request().Context().Done():
 					log.Info().Msg("get done signal from request")
-					hub.Unregister(id)
+					hub.Disconnect(id)
+					done <- true
 					return
 				}
 			}
-		}(id, c, &wg)
+		}(done, id)
+		<-done
+
 		log.Info().Msgf("pass the groutine")
-		wg.Wait()
+		log.Debug().Msgf("sse conection has been closed")
 
 		log.Debug().Msgf("sse conection has been closed")
 		return nil
