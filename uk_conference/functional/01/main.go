@@ -19,6 +19,7 @@ func (c Cache[T]) Dump() {
 }
 
 type Function func(any) any
+type Transformer func(Function) Function
 
 func recurF(f any) Function {
 	return f.(func(any) any)(f).(func(any) any)
@@ -31,6 +32,17 @@ func YRecurF(g Function) Function {
 			})
 		},
 	)
+}
+func TransFormRecur(f Function) Function {
+	return f(f).(Function)
+}
+func YTransFormer(g Transformer) Function {
+	return TransFormRecur(
+		func(f any) any {
+			return g(func(x any) any {
+				return TransFormRecur(f.(Function))(x)
+			})
+		})
 }
 
 func main() {
